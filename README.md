@@ -4,6 +4,7 @@ Confronto di strategie di trading con backtest dal 01/01/2021, a partire dall'an
 [`andreagalanti91/radar`](https://github.com/andreagalanti91/radar).
 
 - **[`STRATEGIE.md`](STRATEGIE.md)** — confronto di 16 strategie e 4 portafogli dal 2021, robustezza, proposta e domande aperte.
+- **[`SWING.md`](SWING.md)** — TAO sul supporto e SOL con MACD/RSI: le operazioni reali confrontate con le regole, 165 altcoin, quando vendere, leva.
 - **[`INTRADAY.md`](INTRADAY.md)** — ricerca di una strategia intraday su BTC per OKX dal 2018: 5 famiglie, 1.224 configurazioni, verifiche.
 
 ```bash
