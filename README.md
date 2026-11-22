@@ -3,7 +3,8 @@
 Confronto di strategie di trading con backtest dal 01/01/2021, a partire dall'analisi del repo
 [`andreagalanti91/radar`](https://github.com/andreagalanti91/radar).
 
-**Report: [`STRATEGIE.md`](STRATEGIE.md)** — sintesi, confronto, robustezza, proposta e domande aperte.
+- **[`STRATEGIE.md`](STRATEGIE.md)** — confronto di 16 strategie e 4 portafogli dal 2021, robustezza, proposta e domande aperte.
+- **[`INTRADAY.md`](INTRADAY.md)** — ricerca di una strategia intraday su BTC per OKX dal 2018: 5 famiglie, 1.224 configurazioni, verifiche.
 
 ```bash
 pip install pandas numpy matplotlib
