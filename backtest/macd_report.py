@@ -40,10 +40,6 @@ T.append(f"\nComposto senza costi: regola x{rcomp:.1f} su {len(tr)} trade; i tuo
 
 # ---------------------------------------------------------------- regole su SOL, TAO, BTC, ETH
 def load_any(sym):
-    if sym == "BTC":
-        d = pd.read_csv(S.ROOT / "data" / "crypto" / "BTC_spot.csv", parse_dates=[0], index_col=0)
-        d.index.name = "ts"
-        return d
     return S.load(sym)
 
 

@@ -5,7 +5,8 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parent.parent
 JOBS = ((["results/tables.md"], "backtest/report_template.md", "STRATEGIE.md"),
         (["results/intraday/tables.md"], "backtest/intraday_template.md", "INTRADAY.md"),
-        (["results/tao/tables.md", "results/tao/tables_macd.md"], "backtest/swing_template.md", "SWING.md"))
+        (["results/tao/tables.md", "results/tao/tables_macd.md"], "backtest/swing_template.md", "SWING.md"),
+        (["results/algo/tables.md"], "backtest/algo_template.md", "ALGORITMO.md"))
 for tables, template, out in JOBS:
     src = "\n".join((ROOT / t).read_text() for t in tables)
     parts = re.split(r"^## ([A-Z]\d) .*$", src, flags=re.M)

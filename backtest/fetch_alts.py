@@ -71,6 +71,10 @@ def one(sym: str) -> tuple[str, int]:
         raw = _get(f"https://data.binance.vision/data/spot/monthly/klines/{sym}USDT/1d/{sym}USDT-1d-{m}.zip")
         if raw is not None:
             parts.append(_binance_zip(raw))
+    for day in pd.date_range("2026-11-01", pd.Timestamp.now("UTC").tz_localize(None).normalize() - pd.Timedelta(days=1), freq="D"):
+        raw = _get(f"https://data.binance.vision/data/spot/daily/klines/{sym}USDT/1d/{sym}USDT-1d-{day.date()}.zip") if parts else None
+        if raw is not None:                                  # mese in corso: file giornalieri
+            parts.append(_binance_zip(raw))
     if not parts:
         return sym, 0
     d = pd.concat(parts).drop_duplicates("ts").sort_values("ts")
@@ -80,7 +84,7 @@ def one(sym: str) -> tuple[str, int]:
 
 def alts() -> None:
     with ThreadPoolExecutor(16) as ex:
-        res = list(ex.map(one, ALTS))
+        res = list(ex.map(one, ALTS + ["BTC"]))
     print("alt scaricate:", sum(1 for _, n in res if n), "di", len(res), "| senza dati:", [s for s, n in res if not n])
 
 
