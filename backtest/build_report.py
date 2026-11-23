@@ -9,7 +9,8 @@ JOBS = ((["results/tables.md"], "backtest/report_template.md", "STRATEGIE.md"),
         (["results/algo/tables.md"], "backtest/algo_template.md", "ALGORITMO.md"),
         (["results/btc/tables.md"], "backtest/btc_template.md", "ANALISI_BTC.md"),
         (["results/regole/tables.md"], "backtest/regole_template.md", "REGOLE_AT.md"),
-        (["results/w32/tables.md"], "backtest/w32_template.md", "CONFRONTO_W32.md"))
+        (["results/w32/tables.md"], "backtest/w32_template.md", "CONFRONTO_W32.md"),
+        (["results/w32_inout/tables.md"], "backtest/w32_inout_template.md", "W32_INGRESSI_USCITE.md"))
 for tables, template, out in JOBS:
     src = "\n".join((ROOT / t).read_text() for t in tables)
     parts = re.split(r"^## ([A-Z]\d) .*$", src, flags=re.M)

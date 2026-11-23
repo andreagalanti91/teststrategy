@@ -110,7 +110,16 @@ media a 40 settimane in calo. Gli algoritmi tecnici non hanno ancora il consenso
 - **Dimensione diversa**: W3.2 riduce l'esposizione quando lo stop è lontano (0,4–1x), v1 e v2 stanno sempre a 1x. Parte del
   drawdown più basso di W3.2 viene da qui.
 - **Poche operazioni** per tutte (23, 30 e 9): le percentuali di vincenti sono stime grossolane.
-- W3.2 è stata sviluppata guardando il periodo dal 2021; v1 e v2 hanno i parametri scelti sul 2018–21.
+- **Il confronto dal 2021 non è alla pari**: W3.2 è stata sviluppata e tarata guardando tutto il 2021–26 (rischio 25% e filtro
+  MACD decisi a novembre 2026), mentre v1 e v2 hanno i parametri scelti sul 2018–21 e il 2022–26 come verifica. Il vantaggio di
+  W3.2 dal 2021 va letto con questo sconto.
+- **Funding 2018–19**: nel frame lungo del radar manca e per W3.2 vale zero; v1 accredita agli short lo 0,03% al giorno
+  ipotizzato (circa +3,9% in tutto). Favorisce v1 in quel periodo.
+- **v1 è sensibile al ritardo di esecuzione**: con un giorno in più il rendimento annuo scende da +38,8% a +33,0%.
+- **Percentuale di vincenti di W3.2**: il 78% include lo short ancora aperto e il long chiuso d'ufficio al 31/12/2020; sulle 21
+  operazioni chiuse per regola è il 76%. Senza la cucitura al 31/12/2020 W3.2 farebbe meglio (2021 a +118% invece di +92%).
+- **Verifica indipendente**: un secondo agente ha ricalcolato rendimenti, drawdown e tabelle delle operazioni e ha cercato usi
+  di dati futuri in v1 e v2 (troncando i dati a 150 date casuali): numeri confermati, nessun uso di dati futuri.
 
 ## 11. Riproducibilità
 
