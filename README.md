@@ -4,6 +4,7 @@ Confronto di strategie di trading con backtest dal 01/01/2021, a partire dall'an
 [`andreagalanti91/radar`](https://github.com/andreagalanti91/radar).
 
 - **[`STRATEGIE.md`](STRATEGIE.md)** — confronto di 16 strategie e 4 portafogli dal 2021, robustezza, proposta e domande aperte.
+- **[`REGOLE_AT.md`](REGOLE_AT.md)** — come funziona l'analisi tecnica, 15 regole classiche verificate su BTC, regole operative, nuovo algoritmo a tre schermi, confronto e motivo di ogni operazione.
 - **[`ANALISI_BTC.md`](ANALISI_BTC.md)** — fondamenti dell'analisi tecnica, lettura tecnica e di sentiment di BTC, algoritmo long/short a voto di 17 indicatori con backtest dal 2018.
 - **[`ALGORITMO.md`](ALGORITMO.md)** — l'algoritmo "MACD a regime" costruito sui dati: regole, verifiche, rischio e leva, stato attuale.
 - **[`SWING.md`](SWING.md)** — TAO sul supporto e SOL con MACD/RSI: le operazioni reali confrontate con le regole, 165 altcoin, quando vendere, leva.
