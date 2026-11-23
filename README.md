@@ -29,3 +29,6 @@ python backtest/build_report.py
 (commit `da61c5a`); `vendor/radar_weekly.py` è una copia non modificata di `radar/weekly.py`.
 
 Ricerca su dati storici, non una raccomandazione d'investimento.
+
+
+Strumento di confronto: `tool/index.html` con `tool/data.json` (rigenerabile con `python backtest/build_tool.py`).
