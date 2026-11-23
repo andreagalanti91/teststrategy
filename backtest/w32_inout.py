@@ -1,6 +1,6 @@
 """W3.2: quando entra, quando esce, e controlli con ingressi e uscite a scaglioni (DCA).
 Motore: vendor/radar_iu_engine.py (copia del motore a scaglioni del radar, rischio 25%), che a configurazione predefinita
-riproduce W3.2 (78.474 $ dal 2021 con dati al 15/11/2026; 25.142 $ nel 2018-20). Scrive results/w32_inout/."""
+riproduce W3.2 (dal 2021: 78.474 $ con dati al 15/11/2026, 83.129 $ con dati al 22/11/2026; 25.142 $ nel 2018-20). Scrive results/w32_inout/."""
 from __future__ import annotations
 
 import sys
@@ -63,7 +63,8 @@ for per, x in (("2018–20", "L"), ("2021+", "ALL")):
         mae14 = adv(d0, min(d0 + pd.Timedelta(days=13), d1))
         mfe = fav(d0, d1)
         mae_all = adv(d0, d1)
-        best_close = float(((C.loc[d0:d1] / px - 1) * sg).max())
+        held = C.loc[d0:d1 - pd.Timedelta(days=1)] if t.get("exit") else C.loc[d0:d1]      # il giorno d'uscita non e' tenuto fino alla chiusura
+        best_close = float(((held / px - 1) * sg).max()) if len(held) else 0.0
         # giorni fino al miglior prezzo d'ingresso disponibile nei primi 14 giorni
         seg = (L if sg > 0 else H).loc[d0:min(d0 + pd.Timedelta(days=13), d1)]
         day_best = int((seg.idxmin() if sg > 0 else seg.idxmax() - d0).days) if sg < 0 else int((seg.idxmin() - d0).days)
@@ -71,8 +72,8 @@ for per, x in (("2018–20", "L"), ("2021+", "ALL")):
         if t.get("exit"):
             ex = t["exit_px"]
             for hd in (14, 28):
-                seg2 = C.loc[d1:d1 + pd.Timedelta(days=hd)]
-                post[hd] = float((seg2.iloc[-1] / ex - 1) * sg) if len(seg2) > 1 else np.nan
+                tgt = d1 + pd.Timedelta(days=hd)
+                post[hd] = float((C.loc[tgt] / ex - 1) * sg) if tgt in C.index else np.nan     # n/d se i dati non arrivano a quella data
         age = int(ws.get("trend_age", np.nan)) if sg > 0 and np.isfinite(ws.get("trend_age", np.nan)) else np.nan
         rows.append({"periodo": per, "verso": t["side"], "segnale": t["signal"], "entra": t["entry"], "esce": t.get("exit"), "prezzo_in": px, "prezzo_out": t.get("exit_px", C.iloc[-1]),
                      "espo": t["expo"], "dist_ema21": float(ws["close"] / ws["ema21"] - 1), "dist_sma40": float(ws["close"] / ws["sma"] - 1), "flusso": float(ws["flow"]),
@@ -113,6 +114,13 @@ for lab, x in [(k, v) for k, v in cl.groupby("uscita")] + [("Tutte le chiuse", c
              f"{pct(x.dopo28.mean())} | {(x.dopo28 > 0.05).sum()} su {x.dopo28.notna().sum()} |")
 T.append(f"\nDurata mediana: {cl.giorni.median():.0f} giorni (in guadagno {cl[cl.pnl > 0].giorni.median():.0f}, in perdita {cl[cl.pnl <= 0].giorni.median():.0f}). "
          f"Somma dei massimi guadagni toccati: {pct(cl.mfe.sum(), 0)}; somma delle mosse incassate: {pct(cl.mossa.sum(), 0)}.")
+a21, a18 = cl[cl.periodo == "2021+"], cl[cl.periodo == "2018–20"]
+x28 = cl.dopo28.dropna()
+T.append(f"\nPer periodo, prezzo 28 giorni dopo l'uscita: 2018–20 {pct(a18.dopo28.mean())} su {a18.dopo28.notna().sum()} uscite, dal 2021 {pct(a21.dopo28.mean())} su "
+         f"{a21.dopo28.notna().sum()}. Statistica t della media complessiva: {num(x28.mean() / x28.std() * np.sqrt(len(x28)))} (sotto 2 in valore assoluto = non distinguibile da zero).")
+d5 = A[A.mae14 <= -0.05]
+T.append(f"\nOperazioni andate contro di almeno il 5% nei primi 14 giorni: 2018–20 {len(d5[d5.periodo == '2018–20'])}, di cui {(d5[d5.periodo == '2018–20'].pnl <= 0).sum()} in perdita; "
+         f"dal 2021 {len(d5[d5.periodo == '2021+'])}, di cui {(d5[d5.periodo == '2021+'].pnl <= 0).sum()} in perdita.")
 
 # ------------------------------------------------------------------ varianti DCA
 VAR = {
@@ -170,7 +178,7 @@ print("\n".join(T))
 
 # ------------------------------------------------------------------ controllo sull'unica variante promettente: trailing in due meta'
 T2 = ["\n## I7 vicini\n"]
-T2.append("| Variante | 10.000 $ → (dal 2021) | Max DD | CAGR/DD | Esposizione media in posizione | 2021–23: finale | 2024–26: finale | 2018–20: finale / DD | Peggiore |")
+T2.append("| Variante | 10.000 $ → (dal 2021) | Max DD | CAGR/DD | Esposizione media all'ingresso | 2021–23: finale | 2024–26: finale | 2018–20: finale / DD | Peggiore |")
 T2.append("|---|---|---|---|---|---|---|---|---|")
 NB = {"W3.2: trailing unico a 2,5 ATR": {}, "Due metà 1,5 e 2,5 ATR": dict(exit=("U2", 1.5, 2.5)), "Due metà 1,25 e 2,5": dict(exit=("U2", 1.25, 2.5)),
       "Due metà 1,75 e 2,5": dict(exit=("U2", 1.75, 2.5)), "Due metà 2,0 e 2,5": dict(exit=("U2", 2.0, 2.5)), "Due metà 1,5 e 3,0": dict(exit=("U2", 1.5, 3.0)),
@@ -187,6 +195,17 @@ for nm, cfg in NB.items():
     T2.append(f"| {nm} | {usd(m['ALL']['final'])} | {pct(m['ALL']['dd'])} | {num(m['ALL']['cdd'])} | {num(ex)}x | {usd(m['IS']['final'])} | {usd(m['OOS']['final'])} | "
               f"{usd(m['L']['final'])} / {pct(m['L']['dd'], 0)} | {pct(m['ALL']['worst'])} |")
 pd.DataFrame(nb).to_csv(OUT / "vicini_trailing.csv", index=False)
+rb, rv = run({}, "ALL"), run(dict(exit=("U2", 1.5, 2.5)), "ALL")
+tb, tv = {t["signal"]: t for t in tl(rb)}, {t["signal"]: t for t in tl(rv)}
+dec = pd.DataFrame([{"segnale": k, "base": tb[k]["pnl"], "variante": tv[k]["pnl"], "diff": tv[k]["pnl"] - tb[k]["pnl"], "expo_base": tb[k]["expo"], "expo_var": tv[k]["expo"]}
+                    for k in tb if k in tv]).sort_values("diff", ascending=False)
+dec.to_csv(OUT / "scomposizione_trailing.csv", index=False)
+ratio = float(np.prod((1 + dec.variante) / (1 + dec.base)))
+ratio2 = float(np.prod(((1 + dec.variante) / (1 + dec.base)).iloc[2:]))
+same = float(np.prod(1 + dec.variante * dec.expo_base / dec.expo_var)) / float(np.prod(1 + dec.base))
+T2.append(f"\nScomposizione di \"due metà 1,5 e 2,5 ATR\" dal 2021: rapporto fra capitale finale della variante e di W3.2 {num(ratio)}; senza le 2 operazioni più favorevoli "
+          f"({dec.segnale.iloc[0]} {pct(dec['diff'].iloc[0])}, {dec.segnale.iloc[1]} {pct(dec['diff'].iloc[1])}) {num(ratio2)}. Esposizione media all'ingresso {num(dec.expo_var.mean())}x contro "
+          f"{num(dec.expo_base.mean())}x. Riportando ogni operazione alla dimensione di W3.2 (stima lineare) il rapporto diventa {num(same)}.")
 with open(OUT / "tables.md", "a") as fh:
     fh.write("\n".join(T2) + "\n")
 print("\n".join(T2))

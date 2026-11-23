@@ -41,17 +41,17 @@
 | 9 | long | 2020-12-14 | aperta | 17 | aperta | +52,7% | +50,7% | +50,7% | +0,0% | n/d | n/d |
 | 10 | long | 2021-02-01 | 2021-02-22 | 21 | distribuzione | +76,2% | +73,3% | +73,1% | +0,2% | -8,7% | -5,7% |
 | 11 | long | 2021-08-02 | 2021-09-27 | 56 | EMA 21 | +32,7% | +32,0% | +8,1% | +23,9% | +33,3% | +46,3% |
-| 12 | long | 2021-10-04 | 2021-11-08 | 35 | distribuzione | +40,5% | +40,0% | +31,0% | +8,9% | -11,0% | -20,2% |
+| 12 | long | 2021-10-04 | 2021-11-08 | 35 | distribuzione | +40,5% | +36,8% | +31,0% | +5,8% | -11,0% | -20,2% |
 | 13 | short | 2022-01-03 | 2022-03-28 | 84 | EMA 21 | +30,3% | +25,8% | +0,8% | +25,0% | +15,7% | +13,8% |
 | 14 | short | 2022-08-15 | 2023-01-16 | 154 | EMA 21 | +36,3% | +35,0% | +13,9% | +21,1% | -9,2% | -4,2% |
 | 15 | long | 2023-01-23 | 2023-08-17 | 206 | trailing | +39,9% | +38,4% | +14,2% | +24,1% | -0,1% | +2,1% |
-| 16 | long | 2023-10-23 | 2024-01-01 | 70 | distribuzione | +48,9% | +47,2% | +40,7% | +6,5% | +0,6% | +2,5% |
-| 17 | long | 2024-02-12 | 2024-03-11 | 28 | distribuzione | +50,6% | +49,1% | +42,5% | +6,6% | +1,4% | +4,0% |
+| 16 | long | 2023-10-23 | 2024-01-01 | 70 | distribuzione | +48,9% | +47,1% | +40,7% | +6,4% | +0,6% | +2,5% |
+| 17 | long | 2024-02-12 | 2024-03-11 | 28 | distribuzione | +50,6% | +42,6% | +42,5% | +0,1% | +1,4% | +4,0% |
 | 18 | long | 2024-09-23 | 2025-02-26 | 156 | trailing | +72,2% | +66,8% | +34,0% | +32,8% | -1,8% | +1,9% |
 | 19 | long | 2025-04-28 | 2025-10-10 | 165 | trailing | +34,5% | +32,8% | +11,6% | +21,3% | +6,0% | -1,3% |
 | 20 | short | 2025-12-01 | 2026-04-27 | 147 | EMA 21 | +33,5% | +30,3% | +12,8% | +17,5% | -3,8% | +1,8% |
 | 21 | short | 2026-05-25 | 2026-08-20 | 87 | trailing | +24,9% | +23,9% | +4,8% | +19,0% | -10,9% | -4,3% |
-| 22 | long | 2026-08-24 | 2026-11-09 | 77 | EMA 21 | +12,3% | +11,3% | -3,9% | +15,2% | -18,1% | -18,1% |
+| 22 | long | 2026-08-24 | 2026-11-09 | 77 | EMA 21 | +12,3% | +11,3% | -3,9% | +15,2% | n/d | n/d |
 | 23 | short | 2026-11-16 | aperta | 6 | aperta | +15,6% | +9,7% | +6,1% | +3,6% | n/d | n/d |
 
 ## I3 coerenza ingressi
@@ -70,12 +70,16 @@
 
 | Motivo di uscita | Operazioni | In guadagno | Mossa media incassata | Miglior chiusura media | Restituito in media | Prezzo 14 giorni dopo (media, nel verso del trade) | 28 giorni dopo | Uscite seguite da un movimento a favore oltre +5% a 28 giorni |
 |---|---|---|---|---|---|---|---|---|
-| EMA 21 | 7 | 57% | -2,9% | +20,7% | +23,6% | -1,6% | +0,5% | 2 su 7 |
-| distribuzione | 7 | 86% | +35,7% | +41,0% | +5,3% | -1,8% | -5,7% | 2 su 7 |
+| EMA 21 | 7 | 57% | -2,9% | +20,7% | +23,6% | +1,1% | +3,6% | 2 su 6 |
+| distribuzione | 7 | 86% | +35,7% | +39,7% | +3,9% | -1,8% | -5,7% | 2 su 7 |
 | trailing | 7 | 86% | +14,8% | +41,5% | +26,7% | -1,0% | -5,2% | 0 su 7 |
-| Tutte le chiuse | 21 | 76% | +15,9% | +34,4% | +18,6% | -1,5% | -3,5% | 4 su 21 |
+| Tutte le chiuse | 21 | 76% | +15,9% | +34,0% | +18,1% | -0,6% | -2,7% | 4 su 20 |
 
 Durata mediana: 70 giorni (in guadagno 86, in perdita 14). Somma dei massimi guadagni toccati: +792%; somma delle mosse incassate: +333%.
+
+Per periodo, prezzo 28 giorni dopo l'uscita: 2018–20 -11,4% su 8 uscite, dal 2021 +3,1% su 12. Statistica t della media complessiva: -0,65 (sotto 2 in valore assoluto = non distinguibile da zero).
+
+Operazioni andate contro di almeno il 5% nei primi 14 giorni: 2018–20 6, di cui 4 in perdita; dal 2021 2, di cui 0 in perdita.
 
 ## I5 dca
 
@@ -130,7 +134,7 @@ Durata mediana: 70 giorni (in guadagno 86, in perdita 14). Somma dei massimi gua
 
 ## I7 vicini
 
-| Variante | 10.000 $ → (dal 2021) | Max DD | CAGR/DD | Esposizione media in posizione | 2021–23: finale | 2024–26: finale | 2018–20: finale / DD | Peggiore |
+| Variante | 10.000 $ → (dal 2021) | Max DD | CAGR/DD | Esposizione media all'ingresso | 2021–23: finale | 2024–26: finale | 2018–20: finale / DD | Peggiore |
 |---|---|---|---|---|---|---|---|---|
 | W3.2: trailing unico a 2,5 ATR | 83.129 | -21,1% | 2,05 | 0,85x | 33.477 | 24.881 | 25.142 / -37% | -4,1% |
 | Due metà 1,5 e 2,5 ATR | 96.158 | -17,7% | 2,65 | 0,92x | 36.023 | 26.721 | 22.503 / -34% | -2,4% |
@@ -144,3 +148,5 @@ Durata mediana: 70 giorni (in guadagno 86, in perdita 14). Somma dei massimi gua
 | Trailing unico a 2,25 ATR | 81.867 | -29,7% | 1,44 | 0,90x | 29.918 | 27.419 | 26.054 / -38% | -13,7% |
 | Trailing unico a 1,5 ATR | 75.765 | -27,2% | 1,51 | 0,99x | 29.907 | 25.385 | 14.684 / -50% | -10,3% |
 | Trailing unico a 3,0 ATR | 64.427 | -19,9% | 1,87 | 0,74x | 29.599 | 21.811 | 22.506 / -36% | -4,0% |
+
+Scomposizione di "due metà 1,5 e 2,5 ATR" dal 2021: rapporto fra capitale finale della variante e di W3.2 1,16; senza le 2 operazioni più favorevoli (2021-01-31 +13,0%, 2024-09-22 +9,5%) 0,99. Esposizione media all'ingresso 0,92x contro 0,85x. Riportando ogni operazione alla dimensione di W3.2 (stima lineare) il rapporto diventa 0,94.

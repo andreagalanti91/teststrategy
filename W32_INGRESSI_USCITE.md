@@ -8,8 +8,8 @@ con cui entra ed esce, e prove di ingresso e uscita a scaglioni. Dati fino al 22
 ## 1. Sintesi
 
 **W3.2 entra tardi e tutta insieme, ed è giusto così: ogni forma di ingresso a scaglioni peggiora il risultato in tutti i
-periodi. In uscita la regola migliore è già dentro la strategia (la "distribuzione"); una sola variante è promettente, ma
-non passa il 2018–20.**
+periodi. In uscita la regola migliore è già dentro la strategia (la "distribuzione"), e nessuna variante a scaglioni la
+migliora davvero.**
 
 | Domanda | Risposta dai dati |
 |---|---|
@@ -17,9 +17,9 @@ non passa il 2018–20.**
 | Conviene entrare a scaglioni? | No. Le 7 varianti di DCA in ingresso fanno peggio in tutti e tre i periodi: dal 2021, da 83.129 $ a 33.579–62.371 $. |
 | Perché? | Nelle operazioni vincenti il prezzo migliore è quello del primo giorno: aspettare costa. Il DCA aiuta solo sulle perdenti, che sono poche e piccole. |
 | Quando esce? | In tre modi, sette volte ciascuno: distribuzione, trailing, chiusura oltre la EMA 21. |
-| Quale uscita è la migliore? | La distribuzione: incassa in media +35,7% e restituisce solo 5 punti dal massimo. Trailing ed EMA 21 ne restituiscono 24–27. |
-| Esce troppo presto? | No. Dopo l'uscita il prezzo in media non prosegue a favore (−3,5% a 28 giorni); solo 4 uscite su 21 sono seguite da oltre +5%. |
-| Conviene uscire a scaglioni? | Uscire metà al primo segnale peggiora. Un target parziale non cambia quasi nulla. Dividere il trailing in due metà (1,5 e 2,5 ATR) migliora dal 2021 ma peggiora nel 2018–20. |
+| Quale uscita è la migliore? | La distribuzione: incassa in media +35,7% e restituisce solo 4 punti dal massimo. Trailing ed EMA 21 ne restituiscono 24–27. |
+| Esce troppo presto? | Non risulta. A 28 giorni dall'uscita il prezzo è in media a −2,7%, un valore non distinguibile da zero; solo 4 uscite su 20 sono seguite da oltre +5% a favore. |
+| Conviene uscire a scaglioni? | No. Uscire metà al primo segnale peggiora; un target parziale non cambia quasi nulla; il trailing diviso in due metà sembra migliorare dal 2021, ma il vantaggio viene da una posizione più grande e da due operazioni. |
 
 ## 2. Quando entra
 
@@ -72,8 +72,8 @@ giorno era il migliore.
    ingresso su ritracciamento.
 2. **Nelle operazioni in guadagno il prezzo non torna indietro**: il prezzo migliore è quello del giorno d'ingresso, e il
    peggior momento dei primi 14 giorni è in mediana solo −2%.
-3. **Le operazioni in perdita si riconoscono presto**: quattro su cinque sono andate contro di almeno il 5% nei primi 14
-   giorni. Fra le 8 operazioni con un calo simile, 4 hanno perso; fra le altre 15, una sola.
+3. **Quattro perdenti su cinque sono andate contro di almeno il 5% nei primi 14 giorni**, ma sono tutte del 2018–20. Dal
+   2021 i casi con un calo simile sono solo due, entrambi chiusi in guadagno: non è un segnale su cui contare.
 4. **Le perdenti avevano lo stop più lontano** (mediana −41% contro −27%), quindi W3.2 le aveva già ridotte: esposizione
    0,40–0,62x nelle due perdite maggiori.
 5. **Dal 2021 gli ingressi sono più puliti**: distanza dalla EMA 21 dell'11% contro il 23% del 2018–20, e solo il 14% delle
@@ -97,17 +97,17 @@ Quello che non separa vincenti e perdenti: la distanza dalle medie e la forza de
 | 9 | long | 2020-12-14 | aperta | 17 | aperta | +52,7% | +50,7% | +50,7% | +0,0% | n/d | n/d |
 | 10 | long | 2021-02-01 | 2021-02-22 | 21 | distribuzione | +76,2% | +73,3% | +73,1% | +0,2% | -8,7% | -5,7% |
 | 11 | long | 2021-08-02 | 2021-09-27 | 56 | EMA 21 | +32,7% | +32,0% | +8,1% | +23,9% | +33,3% | +46,3% |
-| 12 | long | 2021-10-04 | 2021-11-08 | 35 | distribuzione | +40,5% | +40,0% | +31,0% | +8,9% | -11,0% | -20,2% |
+| 12 | long | 2021-10-04 | 2021-11-08 | 35 | distribuzione | +40,5% | +36,8% | +31,0% | +5,8% | -11,0% | -20,2% |
 | 13 | short | 2022-01-03 | 2022-03-28 | 84 | EMA 21 | +30,3% | +25,8% | +0,8% | +25,0% | +15,7% | +13,8% |
 | 14 | short | 2022-08-15 | 2023-01-16 | 154 | EMA 21 | +36,3% | +35,0% | +13,9% | +21,1% | -9,2% | -4,2% |
 | 15 | long | 2023-01-23 | 2023-08-17 | 206 | trailing | +39,9% | +38,4% | +14,2% | +24,1% | -0,1% | +2,1% |
-| 16 | long | 2023-10-23 | 2024-01-01 | 70 | distribuzione | +48,9% | +47,2% | +40,7% | +6,5% | +0,6% | +2,5% |
-| 17 | long | 2024-02-12 | 2024-03-11 | 28 | distribuzione | +50,6% | +49,1% | +42,5% | +6,6% | +1,4% | +4,0% |
+| 16 | long | 2023-10-23 | 2024-01-01 | 70 | distribuzione | +48,9% | +47,1% | +40,7% | +6,4% | +0,6% | +2,5% |
+| 17 | long | 2024-02-12 | 2024-03-11 | 28 | distribuzione | +50,6% | +42,6% | +42,5% | +0,1% | +1,4% | +4,0% |
 | 18 | long | 2024-09-23 | 2025-02-26 | 156 | trailing | +72,2% | +66,8% | +34,0% | +32,8% | -1,8% | +1,9% |
 | 19 | long | 2025-04-28 | 2025-10-10 | 165 | trailing | +34,5% | +32,8% | +11,6% | +21,3% | +6,0% | -1,3% |
 | 20 | short | 2025-12-01 | 2026-04-27 | 147 | EMA 21 | +33,5% | +30,3% | +12,8% | +17,5% | -3,8% | +1,8% |
 | 21 | short | 2026-05-25 | 2026-08-20 | 87 | trailing | +24,9% | +23,9% | +4,8% | +19,0% | -10,9% | -4,3% |
-| 22 | long | 2026-08-24 | 2026-11-09 | 77 | EMA 21 | +12,3% | +11,3% | -3,9% | +15,2% | -18,1% | -18,1% |
+| 22 | long | 2026-08-24 | 2026-11-09 | 77 | EMA 21 | +12,3% | +11,3% | -3,9% | +15,2% | n/d | n/d |
 | 23 | short | 2026-11-16 | aperta | 6 | aperta | +15,6% | +9,7% | +6,1% | +3,6% | n/d | n/d |
 
 "Restituito" è la differenza fra la miglior chiusura raggiunta e la mossa incassata. Le ultime due colonne dicono dove
@@ -117,18 +117,23 @@ sarebbe andato il prezzo dopo l'uscita, nel verso dell'operazione: positivo sign
 
 | Motivo di uscita | Operazioni | In guadagno | Mossa media incassata | Miglior chiusura media | Restituito in media | Prezzo 14 giorni dopo (media, nel verso del trade) | 28 giorni dopo | Uscite seguite da un movimento a favore oltre +5% a 28 giorni |
 |---|---|---|---|---|---|---|---|---|
-| EMA 21 | 7 | 57% | -2,9% | +20,7% | +23,6% | -1,6% | +0,5% | 2 su 7 |
-| distribuzione | 7 | 86% | +35,7% | +41,0% | +5,3% | -1,8% | -5,7% | 2 su 7 |
+| EMA 21 | 7 | 57% | -2,9% | +20,7% | +23,6% | +1,1% | +3,6% | 2 su 6 |
+| distribuzione | 7 | 86% | +35,7% | +39,7% | +3,9% | -1,8% | -5,7% | 2 su 7 |
 | trailing | 7 | 86% | +14,8% | +41,5% | +26,7% | -1,0% | -5,2% | 0 su 7 |
-| Tutte le chiuse | 21 | 76% | +15,9% | +34,4% | +18,6% | -1,5% | -3,5% | 4 su 21 |
+| Tutte le chiuse | 21 | 76% | +15,9% | +34,0% | +18,1% | -0,6% | -2,7% | 4 su 20 |
 
 Durata mediana: 70 giorni (in guadagno 86, in perdita 14). Somma dei massimi guadagni toccati: +792%; somma delle mosse incassate: +333%.
 
-1. **La distribuzione è l'uscita migliore.** Chiude vicino al massimo (5 punti restituiti) e dopo il prezzo scende in media
+Per periodo, prezzo 28 giorni dopo l'uscita: 2018–20 -11,4% su 8 uscite, dal 2021 +3,1% su 12. Statistica t della media complessiva: -0,65 (sotto 2 in valore assoluto = non distinguibile da zero).
+
+Operazioni andate contro di almeno il 5% nei primi 14 giorni: 2018–20 6, di cui 4 in perdita; dal 2021 2, di cui 0 in perdita.
+
+1. **La distribuzione è l'uscita migliore.** Chiude vicino al massimo (4 punti restituiti) e dopo il prezzo scende in media
    del 5,7% a 28 giorni. È la regola che distingue W3.2 dagli algoritmi fatti solo di prezzo.
 2. **Trailing ed EMA 21 sono uscite di difesa**: scattano dopo che il prezzo ha già restituito 24–27 punti. L'uscita per EMA
    21 chiude in media in perdita (−2,9%) perché è quella che ferma le operazioni che non sono mai partite.
-3. **Dopo l'uscita il prezzo di solito non prosegue.** Le eccezioni sono quattro uscite: novembre 2020 (+23% nei 28 giorni
+3. **Dopo l'uscita il prezzo in media non prosegue**, ma il dato è debole: la media a 28 giorni non è distinguibile da zero
+   e cambia segno fra i periodi (−11,4% nel 2018–20, +3,1% dal 2021). Le uscite seguite da oltre +5% a favore sono quattro: novembre 2020 (+23% nei 28 giorni
    dopo), settembre 2021 (+46%), marzo 2022 (+14%, uno short) e agosto 2020 (+5%).
 4. **W3.2 restituisce più di metà del movimento**: la somma dei massimi toccati è +792%, quella delle mosse incassate +333%.
    È il costo di restare dentro i trend lunghi, già misurato nel radar (lezione 109).
@@ -200,9 +205,9 @@ Lettura:
 - **Uscita in due metà al primo segnale**: fa perdere il rientro successivo (ottobre 2021) e costa 13 punti su gennaio 2021.
 - **Target parziale a +2R**: quasi neutro (−2,7 punti in tutto). Scatta poche volte.
 
-### L'unica variante promettente: trailing diviso in due metà
+### Il trailing diviso in due metà: sembra meglio, non lo è
 
-| Variante | 10.000 $ → (dal 2021) | Max DD | CAGR/DD | Esposizione media in posizione | 2021–23: finale | 2024–26: finale | 2018–20: finale / DD | Peggiore |
+| Variante | 10.000 $ → (dal 2021) | Max DD | CAGR/DD | Esposizione media all'ingresso | 2021–23: finale | 2024–26: finale | 2018–20: finale / DD | Peggiore |
 |---|---|---|---|---|---|---|---|---|
 | W3.2: trailing unico a 2,5 ATR | 83.129 | -21,1% | 2,05 | 0,85x | 33.477 | 24.881 | 25.142 / -37% | -4,1% |
 | Due metà 1,5 e 2,5 ATR | 96.158 | -17,7% | 2,65 | 0,92x | 36.023 | 26.721 | 22.503 / -34% | -2,4% |
@@ -217,13 +222,18 @@ Lettura:
 | Trailing unico a 1,5 ATR | 75.765 | -27,2% | 1,51 | 0,99x | 29.907 | 25.385 | 14.684 / -50% | -10,3% |
 | Trailing unico a 3,0 ATR | 64.427 | -19,9% | 1,87 | 0,74x | 29.599 | 21.811 | 22.506 / -36% | -4,0% |
 
-- **Metà posizione con trailing a 1,5 ATR e metà a 2,5 ATR**: dal 2021 porta 10.000 $ a 96.158 $ invece di 83.129 $, con
-  drawdown −17,7% invece di −21,1%, e migliora sia nel 2021–23 sia nel 2024–26.
-- **Non è solo un effetto della dimensione**: un trailing unico a 2,0 ATR, che usa la stessa esposizione, fa molto peggio
-  (61.423 $, drawdown −37%).
-- **Ma nel 2018–20 peggiora** (22.503 $ contro 25.142 $), e la versione ancora più stretta (1,25 ATR) lì crolla a 14.859 $.
-  Le varianti vicine dal 2021 vanno da 66.414 a 100.219 $: il risultato dipende dal parametro.
-- È stata trovata fra 28 varianti provate sugli stessi dati: va trattata come ipotesi da seguire su carta, non come modifica.
+Scomposizione di "due metà 1,5 e 2,5 ATR" dal 2021: rapporto fra capitale finale della variante e di W3.2 1,16; senza le 2 operazioni più favorevoli (2021-01-31 +13,0%, 2024-09-22 +9,5%) 0,99. Esposizione media all'ingresso 0,92x contro 0,85x. Riportando ogni operazione alla dimensione di W3.2 (stima lineare) il rapporto diventa 0,94.
+
+- **In apparenza migliora**: metà posizione con trailing a 1,5 ATR e metà a 2,5 ATR porta 10.000 $ a 96.158 $ invece di
+  83.129 $ dal 2021, con drawdown −17,7% invece di −21,1%.
+- **Il vantaggio viene dalla dimensione, non dall'uscita.** Il motore calcola la posizione sulla distanza media dei due stop
+  (2,0 ATR invece di 2,5), quindi entra fino al 25% più grande. L'operazione di gennaio 2021 esce nello stesso giorno in
+  entrambe le versioni e guadagna di più solo perché è più grande. Riportando ogni operazione alla dimensione di W3.2, la
+  variante finisce sotto il riferimento.
+- **Dipende da due operazioni**: senza gennaio 2021 e settembre 2024 il vantaggio sparisce.
+- **Nel 2018–20 peggiora** (22.503 $ contro 25.142 $), e le versioni vicine più strette lì crollano (14.859 e 13.724 $).
+
+Conclusione: nessuna delle 28 varianti a scaglioni provate migliora W3.2.
 
 ## 5. La coerenza di W3.2, in regole
 
@@ -232,15 +242,15 @@ Lettura:
 1. Entra quando il trend è già confermato, non prima: chiusura settimanale oltre la EMA 21 con il flusso a favore.
 2. Tutto subito, il lunedì all'apertura. Nessuno scaglione, nessun ordine limite sul ritracciamento.
 3. La dimensione la decide la distanza dello stop: più è lontano, meno si entra.
-4. Se nei primi 14 giorni il prezzo va contro di oltre il 5%, l'operazione ha una probabilità su due di chiudere in
-   perdita. Non è una regola di uscita (lo stop resta dov'è), ma è il momento in cui non aggiungere.
+4. Non aggiungere a una posizione che va contro. Nel 2018–20 quattro operazioni su sei andate contro di oltre il 5% nei
+   primi 14 giorni hanno chiuso in perdita; dal 2021 il campione è troppo piccolo per dirlo.
 
 **Uscita**
 
 5. La prima uscita utile è la distribuzione: funding alto con il flusso che gira. È quella che chiude vicino ai massimi.
 6. Trailing ed EMA 21 sono la rete di sicurezza: accettano di restituire circa 25 punti per restare nei trend lunghi.
 7. Tutto insieme: uscire a metà fa perdere i rientri.
-8. Dopo l'uscita non si rientra a mano: il prezzo in media non prosegue. Si aspetta il segnale successivo.
+8. Dopo l'uscita non si rientra a mano: non c'è evidenza che il prezzo prosegua. Si aspetta il segnale successivo.
 
 **Cosa non fare**
 
@@ -253,7 +263,9 @@ Lettura:
 - **Il 2018–20 usa un flusso stimato** e non ha funding per due anni: è un controllo, non una misura.
 - **Le varianti DCA sono quelle previste dal motore del radar**; altre forme (per esempio aggiungere solo in guadagno) non
   sono testate qui. Nel radar la piramidazione è già stata respinta (lezione 100).
-- **Il campanello dei 14 giorni** è un'osservazione fatta dopo, su 8 casi: non è una regola validata.
+- **Verifica indipendente**: un secondo agente ha rieseguito le varianti (numeri confermati) e ha corretto tre punti della
+  prima stesura: il vantaggio del trailing in due metà è un effetto di dimensione, la finestra dei 28 giorni dopo l'uscita
+  era troncata per l'ultima operazione chiusa, e le osservazioni sui primi 14 giorni e sul dopo-uscita poggiano sul 2018–20.
 - W3.2 è stata tarata sul periodo dal 2021: le sue stesse regole di uscita sono "in campione".
 
 ## 7. Riproducibilità

@@ -8,8 +8,8 @@ con cui entra ed esce, e prove di ingresso e uscita a scaglioni. Dati fino al 22
 ## 1. Sintesi
 
 **W3.2 entra tardi e tutta insieme, ed è giusto così: ogni forma di ingresso a scaglioni peggiora il risultato in tutti i
-periodi. In uscita la regola migliore è già dentro la strategia (la "distribuzione"); una sola variante è promettente, ma
-non passa il 2018–20.**
+periodi. In uscita la regola migliore è già dentro la strategia (la "distribuzione"), e nessuna variante a scaglioni la
+migliora davvero.**
 
 | Domanda | Risposta dai dati |
 |---|---|
@@ -17,9 +17,9 @@ non passa il 2018–20.**
 | Conviene entrare a scaglioni? | No. Le 7 varianti di DCA in ingresso fanno peggio in tutti e tre i periodi: dal 2021, da 83.129 $ a 33.579–62.371 $. |
 | Perché? | Nelle operazioni vincenti il prezzo migliore è quello del primo giorno: aspettare costa. Il DCA aiuta solo sulle perdenti, che sono poche e piccole. |
 | Quando esce? | In tre modi, sette volte ciascuno: distribuzione, trailing, chiusura oltre la EMA 21. |
-| Quale uscita è la migliore? | La distribuzione: incassa in media +35,7% e restituisce solo 5 punti dal massimo. Trailing ed EMA 21 ne restituiscono 24–27. |
-| Esce troppo presto? | No. Dopo l'uscita il prezzo in media non prosegue a favore (−3,5% a 28 giorni); solo 4 uscite su 21 sono seguite da oltre +5%. |
-| Conviene uscire a scaglioni? | Uscire metà al primo segnale peggiora. Un target parziale non cambia quasi nulla. Dividere il trailing in due metà (1,5 e 2,5 ATR) migliora dal 2021 ma peggiora nel 2018–20. |
+| Quale uscita è la migliore? | La distribuzione: incassa in media +35,7% e restituisce solo 4 punti dal massimo. Trailing ed EMA 21 ne restituiscono 24–27. |
+| Esce troppo presto? | Non risulta. A 28 giorni dall'uscita il prezzo è in media a −2,7%, un valore non distinguibile da zero; solo 4 uscite su 20 sono seguite da oltre +5% a favore. |
+| Conviene uscire a scaglioni? | No. Uscire metà al primo segnale peggiora; un target parziale non cambia quasi nulla; il trailing diviso in due metà sembra migliorare dal 2021, ma il vantaggio viene da una posizione più grande e da due operazioni. |
 
 ## 2. Quando entra
 
@@ -40,8 +40,8 @@ giorno era il migliore.
    ingresso su ritracciamento.
 2. **Nelle operazioni in guadagno il prezzo non torna indietro**: il prezzo migliore è quello del giorno d'ingresso, e il
    peggior momento dei primi 14 giorni è in mediana solo −2%.
-3. **Le operazioni in perdita si riconoscono presto**: quattro su cinque sono andate contro di almeno il 5% nei primi 14
-   giorni. Fra le 8 operazioni con un calo simile, 4 hanno perso; fra le altre 15, una sola.
+3. **Quattro perdenti su cinque sono andate contro di almeno il 5% nei primi 14 giorni**, ma sono tutte del 2018–20. Dal
+   2021 i casi con un calo simile sono solo due, entrambi chiusi in guadagno: non è un segnale su cui contare.
 4. **Le perdenti avevano lo stop più lontano** (mediana −41% contro −27%), quindi W3.2 le aveva già ridotte: esposizione
    0,40–0,62x nelle due perdite maggiori.
 5. **Dal 2021 gli ingressi sono più puliti**: distanza dalla EMA 21 dell'11% contro il 23% del 2018–20, e solo il 14% delle
@@ -61,11 +61,12 @@ sarebbe andato il prezzo dopo l'uscita, nel verso dell'operazione: positivo sign
 
 {{I4}}
 
-1. **La distribuzione è l'uscita migliore.** Chiude vicino al massimo (5 punti restituiti) e dopo il prezzo scende in media
+1. **La distribuzione è l'uscita migliore.** Chiude vicino al massimo (4 punti restituiti) e dopo il prezzo scende in media
    del 5,7% a 28 giorni. È la regola che distingue W3.2 dagli algoritmi fatti solo di prezzo.
 2. **Trailing ed EMA 21 sono uscite di difesa**: scattano dopo che il prezzo ha già restituito 24–27 punti. L'uscita per EMA
    21 chiude in media in perdita (−2,9%) perché è quella che ferma le operazioni che non sono mai partite.
-3. **Dopo l'uscita il prezzo di solito non prosegue.** Le eccezioni sono quattro uscite: novembre 2020 (+23% nei 28 giorni
+3. **Dopo l'uscita il prezzo in media non prosegue**, ma il dato è debole: la media a 28 giorni non è distinguibile da zero
+   e cambia segno fra i periodi (−11,4% nel 2018–20, +3,1% dal 2021). Le uscite seguite da oltre +5% a favore sono quattro: novembre 2020 (+23% nei 28 giorni
    dopo), settembre 2021 (+46%), marzo 2022 (+14%, uno short) e agosto 2020 (+5%).
 4. **W3.2 restituisce più di metà del movimento**: la somma dei massimi toccati è +792%, quella delle mosse incassate +333%.
    È il costo di restare dentro i trend lunghi, già misurato nel radar (lezione 109).
@@ -94,17 +95,20 @@ Lettura:
 - **Uscita in due metà al primo segnale**: fa perdere il rientro successivo (ottobre 2021) e costa 13 punti su gennaio 2021.
 - **Target parziale a +2R**: quasi neutro (−2,7 punti in tutto). Scatta poche volte.
 
-### L'unica variante promettente: trailing diviso in due metà
+### Il trailing diviso in due metà: sembra meglio, non lo è
 
 {{I7}}
 
-- **Metà posizione con trailing a 1,5 ATR e metà a 2,5 ATR**: dal 2021 porta 10.000 $ a 96.158 $ invece di 83.129 $, con
-  drawdown −17,7% invece di −21,1%, e migliora sia nel 2021–23 sia nel 2024–26.
-- **Non è solo un effetto della dimensione**: un trailing unico a 2,0 ATR, che usa la stessa esposizione, fa molto peggio
-  (61.423 $, drawdown −37%).
-- **Ma nel 2018–20 peggiora** (22.503 $ contro 25.142 $), e la versione ancora più stretta (1,25 ATR) lì crolla a 14.859 $.
-  Le varianti vicine dal 2021 vanno da 66.414 a 100.219 $: il risultato dipende dal parametro.
-- È stata trovata fra 28 varianti provate sugli stessi dati: va trattata come ipotesi da seguire su carta, non come modifica.
+- **In apparenza migliora**: metà posizione con trailing a 1,5 ATR e metà a 2,5 ATR porta 10.000 $ a 96.158 $ invece di
+  83.129 $ dal 2021, con drawdown −17,7% invece di −21,1%.
+- **Il vantaggio viene dalla dimensione, non dall'uscita.** Il motore calcola la posizione sulla distanza media dei due stop
+  (2,0 ATR invece di 2,5), quindi entra fino al 25% più grande. L'operazione di gennaio 2021 esce nello stesso giorno in
+  entrambe le versioni e guadagna di più solo perché è più grande. Riportando ogni operazione alla dimensione di W3.2, la
+  variante finisce sotto il riferimento.
+- **Dipende da due operazioni**: senza gennaio 2021 e settembre 2024 il vantaggio sparisce.
+- **Nel 2018–20 peggiora** (22.503 $ contro 25.142 $), e le versioni vicine più strette lì crollano (14.859 e 13.724 $).
+
+Conclusione: nessuna delle 28 varianti a scaglioni provate migliora W3.2.
 
 ## 5. La coerenza di W3.2, in regole
 
@@ -113,15 +117,15 @@ Lettura:
 1. Entra quando il trend è già confermato, non prima: chiusura settimanale oltre la EMA 21 con il flusso a favore.
 2. Tutto subito, il lunedì all'apertura. Nessuno scaglione, nessun ordine limite sul ritracciamento.
 3. La dimensione la decide la distanza dello stop: più è lontano, meno si entra.
-4. Se nei primi 14 giorni il prezzo va contro di oltre il 5%, l'operazione ha una probabilità su due di chiudere in
-   perdita. Non è una regola di uscita (lo stop resta dov'è), ma è il momento in cui non aggiungere.
+4. Non aggiungere a una posizione che va contro. Nel 2018–20 quattro operazioni su sei andate contro di oltre il 5% nei
+   primi 14 giorni hanno chiuso in perdita; dal 2021 il campione è troppo piccolo per dirlo.
 
 **Uscita**
 
 5. La prima uscita utile è la distribuzione: funding alto con il flusso che gira. È quella che chiude vicino ai massimi.
 6. Trailing ed EMA 21 sono la rete di sicurezza: accettano di restituire circa 25 punti per restare nei trend lunghi.
 7. Tutto insieme: uscire a metà fa perdere i rientri.
-8. Dopo l'uscita non si rientra a mano: il prezzo in media non prosegue. Si aspetta il segnale successivo.
+8. Dopo l'uscita non si rientra a mano: non c'è evidenza che il prezzo prosegua. Si aspetta il segnale successivo.
 
 **Cosa non fare**
 
@@ -134,7 +138,9 @@ Lettura:
 - **Il 2018–20 usa un flusso stimato** e non ha funding per due anni: è un controllo, non una misura.
 - **Le varianti DCA sono quelle previste dal motore del radar**; altre forme (per esempio aggiungere solo in guadagno) non
   sono testate qui. Nel radar la piramidazione è già stata respinta (lezione 100).
-- **Il campanello dei 14 giorni** è un'osservazione fatta dopo, su 8 casi: non è una regola validata.
+- **Verifica indipendente**: un secondo agente ha rieseguito le varianti (numeri confermati) e ha corretto tre punti della
+  prima stesura: il vantaggio del trailing in due metà è un effetto di dimensione, la finestra dei 28 giorni dopo l'uscita
+  era troncata per l'ultima operazione chiusa, e le osservazioni sui primi 14 giorni e sul dopo-uscita poggiano sul 2018–20.
 - W3.2 è stata tarata sul periodo dal 2021: le sue stesse regole di uscita sono "in campione".
 
 ## 7. Riproducibilità
