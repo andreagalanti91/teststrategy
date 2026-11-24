@@ -43,6 +43,9 @@ T["v1 · voto di 17 indicatori"] = [{"verso": r.verso, "entra": r.entra, "esce":
 v2 = pd.read_csv(ROOT / "results" / "w32" / "movimenti_v2.csv")
 T["v2 · tre schermi"] = [{"verso": r.verso, "entra": str(r.entra)[:10], "esce": str(r.esce)[:10] if isinstance(r.esce, str) else None, "in": round(r.prezzo_in), "out": round(r.prezzo_out),
                           "espo": 1.0, "ris": round(r.mossa * 100, 1), "motivo": r.perche_esce.split(":")[0]} for r in v2.itertuples()]
-out = {"date": [str(d.date()) for d in idx], "serie": S, "meta": META, "operazioni": T, "aggiornato": str(idx[-1].date())}
+oggi = json.loads((ROOT / "results" / "livelli" / "oggi.json").read_text())      # livelli di BTC: python backtest/levels_study.py
+for x in oggi["livelli"]:
+    x["prezzo"], x["dist"] = round(x["prezzo"]), round(x["dist"], 4)
+out = {"date": [str(d.date()) for d in idx], "serie": S, "meta": META, "operazioni": T, "aggiornato": str(idx[-1].date()), "oggi": oggi}
 (ROOT / "tool" / "data.json").write_text(json.dumps(out, ensure_ascii=False, separators=(",", ":")))
 print(len(S), "serie,", round((ROOT / "tool" / "data.json").stat().st_size / 1024), "KB")

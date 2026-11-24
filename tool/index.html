@@ -41,6 +41,17 @@ th:first-child, td:first-child { text-align: left; }
 th { color: var(--muted); font-weight: 500; font-size: 12px; }
 td.name { display: flex; align-items: center; gap: 8px; white-space: normal; min-width: 180px; }
 .pos { color: var(--good); } .neg { color: var(--bad); }
+.kpis { display: flex; flex-wrap: wrap; gap: 8px 28px; margin: 0 0 12px; }
+.kpi b { display: block; font-family: var(--display); font-size: 22px; font-weight: 600; font-variant-numeric: tabular-nums; }
+.kpi span { color: var(--muted); font-size: 12px; }
+.tag { display: inline-flex; align-items: center; gap: 6px; }
+.sw { width: 14px; height: 3px; border-radius: 2px; flex: none; }
+tr.now td { font-weight: 600; background: var(--chip); }
+.grid2 { display: grid; grid-template-columns: minmax(0, 1.25fr) minmax(0, 1fr); gap: 16px; }
+@media (max-width: 900px) { .grid2 { grid-template-columns: minmax(0, 1fr); } }
+.chart.tall { height: 460px; }
+.legend { display: flex; flex-wrap: wrap; gap: 6px 16px; margin: 8px 0 0; color: var(--muted); font-size: 12px; }
+h2.big { font-size: 18px; }
 .note { color: var(--muted); font-size: 12px; margin: 8px 0 0; }
 select { font: inherit; padding: 5px 8px; border-radius: 6px; border: 1px solid var(--line); background: var(--surface); color: var(--fg); }
 td.l, th.l { text-align: left; }
@@ -51,6 +62,23 @@ td.l, th.l { text-align: left; }
     <h1>Confronto strategie</h1>
     <p class="sub" id="sub">Caricamento dei dati…</p>
   </header>
+
+  <section class="panel" id="oggi">
+    <h2 class="big">Oggi · livelli di BTC</h2>
+    <div class="kpis" id="okpi"></div>
+    <div class="grid2">
+      <div>
+        <div class="chart tall"><canvas id="lv" aria-label="Prezzo di BTC con supporti, resistenze e liquidazioni"></canvas></div>
+        <div class="legend" id="olegend"></div>
+      </div>
+      <div class="scroll"><table id="ladder"></table></div>
+    </div>
+    <h2 style="margin-top:16px">Zone dove più livelli coincidono</h2>
+    <div class="scroll"><table id="zones"></table></div>
+    <p class="note" id="onote"></p>
+  </section>
+
+  <h2 class="big" style="margin:6px 0 -6px">Confronto delle strategie</h2>
 
   <section class="panel controls" aria-label="Controlli">
     <div class="row" id="chips"><span class="label">Strategie</span></div>
@@ -201,6 +229,51 @@ function render() {
   document.getElementById("eqTitle").textContent = `10.000 $ investiti il ${st.start.split("-").reverse().join("/")}`;
 }
 
+const LV = { supporto: ["Supporto", "#1baf7a", []], resistenza: ["Resistenza", "#e34948", []], liq_long: ["Liquidazioni di long", "#eda100", []], liq_short: ["Liquidazioni di short", "#6250d6", []],
+  media: ["Media mobile", "#8a93a0", [5, 4]], fibonacci: ["Fibonacci", "#2a78d6", [2, 3]] };
+function oggi() {
+  const o = D.oggi, px = o.prezzo, it = d => d.split("-").reverse().join("/");
+  const lv = o.livelli.filter(x => x.prezzo > px * 0.72 && x.prezzo < px * 1.6);
+  const near = (side) => lv.filter(x => x.ruolo === side && ["supporto", "resistenza"].includes(x.tipo)).sort((a, b) => Math.abs(a.dist) - Math.abs(b.dist))[0];
+  const liq = (t) => lv.filter(x => x.tipo === t).sort((a, b) => Math.abs(a.dist) - Math.abs(b.dist))[0];
+  const k = (v, l) => `<div class="kpi"><b>${v}</b><span>${l}</span></div>`;
+  const s = near("sotto"), r = near("sopra"), ll = liq("liq_long"), ls = liq("liq_short");
+  document.getElementById("okpi").innerHTML = k(fmtUsd(px), `prezzo, chiusura del ${it(o.data)}`) +
+    (s ? k(fmtUsd(s.prezzo), `primo supporto (${fmtPct(s.dist, 0)})`) : "") + (r ? k(fmtUsd(r.prezzo), `prima resistenza (${fmtPct(r.dist, 0)})`) : "") +
+    (ll ? k(fmtUsd(ll.prezzo), `prime liquidazioni di long (${fmtPct(ll.dist, 0)})`) : "") + (ls ? k(fmtUsd(ls.prezzo), `prime liquidazioni di short (${fmtPct(ls.dist, 0)})`) : "") +
+    k(fmtUsd(o.atr), "movimento medio di un giorno (ATR)");
+  const tag = t => `<span class="tag"><span class="sw" style="background:${LV[t][1]}"></span>${LV[t][0]}</span>`;
+  document.getElementById("olegend").innerHTML = Object.keys(LV).map(tag).join("");
+  let rows = "", done = false;
+  o.livelli.forEach(x => {
+    if (!done && x.prezzo < px) { rows += `<tr class="now"><td>${fmtUsd(px)}</td><td>–</td><td class="l">Prezzo</td><td class="l">chiusura del ${it(o.data)}</td></tr>`; done = true; }
+    rows += `<tr><td>${fmtUsd(x.prezzo)}</td><td class="${cls(x.dist)}">${fmtPct(x.dist, 0)}</td><td class="l">${tag(x.tipo)}</td><td class="l" style="white-space:normal;min-width:170px">${x.cosa}</td></tr>`;
+  });
+  document.getElementById("ladder").innerHTML = "<thead><tr><th>Livello</th><th>Distanza</th><th class='l'>Tipo</th><th class='l'>Che cos'è</th></tr></thead><tbody>" + rows + "</tbody>";
+  document.getElementById("zones").innerHTML = "<thead><tr><th>Zona</th><th>Distanza dal prezzo</th><th>Livelli</th><th class='l'>Di che tipo</th><th>Liquidazioni stimate</th></tr></thead><tbody>" +
+    o.zone.slice().sort((a, b) => b.a - a.a).map(z => `<tr><td>${fmtInt(z.da)}–${fmtUsd(z.a)}</td><td>${fmtPct(z.da / px - 1, 0)} / ${fmtPct(z.a / px - 1, 0)}</td><td>${z.n}</td>` +
+      `<td class="l" style="white-space:normal">${z.tipi.map(t => LV[t][0].toLowerCase()).join(", ")}</td><td>${z.liq ? z.liq.toFixed(2).replace(".", ",") + " mld $" : "–"}</td></tr>`).join("") + "</tbody>";
+  document.getElementById("onote").textContent = `Supporti e resistenze: massimi e minimi di swing settimanali non ancora rotti. Liquidazioni: stime di Coinglass del ${o.coinglass}, non dati reali. ` +
+    "Nei test i livelli descrivono il mercato ma non danno un segnale: dopo la rottura di un supporto il prezzo è sceso ancora, nel punto peggiore dei 14 giorni successivi, dell'11% in mediana, ma nel 40% dei casi è rientrato sopra il livello entro 5 giorni.";
+  const c = o.candele, lo = Math.floor(px * 0.72 / 5000) * 5000, hi = Math.ceil(px * 1.6 / 5000) * 5000;
+  const lines = { id: "lines", afterDatasetsDraw(ch) {
+    const { ctx, chartArea: a, scales: { y } } = ch; ctx.save(); ctx.font = "11px Inter, system-ui, sans-serif"; ctx.textBaseline = "middle";
+    let lastY = -99;
+    lv.slice().sort((p, q) => q.prezzo - p.prezzo).forEach(x => {
+      const yy = y.getPixelForValue(x.prezzo); if (yy < a.top || yy > a.bottom) return;
+      ctx.strokeStyle = LV[x.tipo][1]; ctx.lineWidth = x.tipo.startsWith("liq") ? 2.5 : 1.5; ctx.setLineDash(LV[x.tipo][2]);
+      ctx.beginPath(); ctx.moveTo(a.left, yy); ctx.lineTo(a.right, yy); ctx.stroke();
+      if (yy - lastY >= 12) { ctx.setLineDash([]); ctx.fillStyle = css("--fg"); ctx.fillText(fmtInt(x.prezzo), a.right + 6, yy); lastY = yy; }
+    });
+    ctx.restore(); } };
+  new Chart(document.getElementById("lv"), { type: "line", plugins: [lines],
+    data: { labels: c.map(x => x.d), datasets: [{ label: "BTC", data: c.map(x => x.c), borderColor: css("--fg"), borderWidth: 1.6, pointRadius: 0, tension: 0 }] },
+    options: { responsive: true, maintainAspectRatio: false, animation: false, layout: { padding: { right: 52 } }, interaction: { mode: "index", intersect: false },
+      plugins: { legend: { display: false }, tooltip: { callbacks: { label: t => "BTC: " + fmtUsd(t.parsed.y) } } },
+      scales: { x: { ticks: { color: css("--muted"), maxTicksLimit: 7, maxRotation: 0, callback(v) { return this.getLabelForValue(v).slice(0, 7); } }, grid: { display: false } },
+                y: { min: lo, max: hi, ticks: { color: css("--muted"), callback: v => fmtInt(v), maxTicksLimit: 8 }, grid: { color: css("--line") } } } } });
+}
+
 function trades() {
   const n = document.getElementById("tsel").value, t = D.operazioni[n];
   const win = t.filter(x => x.ris > 0).length;
@@ -213,13 +286,13 @@ function trades() {
 
 fetch("data.json").then(r => r.json()).then(d => {
   D = d; names = Object.keys(D.serie);
-  document.getElementById("sub").textContent = `${names.length} strategie su BTC, altcoin ed ETF. Backtest con costi inclusi, dati fino al ${D.aggiornato.split("-").reverse().join("/")}. Ricerca su dati storici, non una raccomandazione.`;
+  document.getElementById("sub").textContent = `${names.length} strategie su BTC, altcoin ed ETF e i livelli di BTC di oggi. Backtest con costi inclusi, dati fino al ${D.aggiornato.split("-").reverse().join("/")}. Ricerca su dati storici, non una raccomandazione.`;
   chips();
   eqChart = mkChart("eq", v => fmtUsd(v), true);
   ddChart = mkChart("dd", v => Math.round(v) + "%", false);
   const sel = document.getElementById("tsel");
   Object.keys(D.operazioni).forEach(n => { const o = document.createElement("option"); o.value = o.textContent = n; sel.appendChild(o); });
   sel.onchange = trades;
-  render(); trades();
+  render(); trades(); oggi();
 }).catch(() => { document.getElementById("sub").textContent = "Non riesco a caricare data.json: va pubblicato accanto alla pagina."; });
 </script>
