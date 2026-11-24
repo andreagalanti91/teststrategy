@@ -7,24 +7,26 @@ Dati fino al 23/11/2026; quotazioni OKX del 24/11/2026.
 
 ## 1. Sintesi
 
-**La strategia è semplice: a ogni segnale di W3.2 si compra una sola opzione a 30 giorni (call se long, put se short) spendendo
-il 5% del capitale. Nel backtest equivale a W3.2 a metà dimensione: stesso rendimento, drawdown simile. Non rende di più.
-Quello che cambia è che la perdita per operazione è fissata al 5% in partenza, senza stop e senza leva. Si opera da OKX,
-che usi già.**
+**La strategia è semplice: a ogni segnale di W3.2 si compra una sola opzione a circa 30 giorni (call se long, put se short)
+spendendo il 5% del capitale. Rifatta con i prezzi veri delle opzioni dal 2018, rende quanto W3.2 a metà dimensione: non di
+più. Quello che cambia è che la perdita per operazione è fissata al 5% in partenza, senza stop e senza leva. Si opera da
+OKX, che usi già.**
 
 | Domanda | Risposta |
 |---|---|
 | Cos'è | Un contratto che dà il diritto di comprare (call) o vendere (put) BTC a un prezzo fissato, entro una data. Si paga un premio. Se va male si perde il premio e basta |
-| La strategia | Segnale di W3.2 → una call o una put a 30 giorni, al prezzo corrente, con il 5% del capitale. Si vende quando W3.2 esce, o si incassa a scadenza |
-| Risultato dal 2019 | 10.000 $ → 55.000 $ (+24% annuo), drawdown −14%, peggiore operazione −5%. W3.2 a metà dimensione: 54.000 $ (+24%), drawdown −20%, peggiore −9% |
-| Risultato dal 2018 (volatilità stimata) | +19% annuo, drawdown −20%. W3.2 a metà dimensione: +20%, −20%. Nessuna differenza |
-| Si può backtestare? | Sì, ma con prezzi delle opzioni calcolati da una formula: lo storico vero dei contratti scaduti non è gratuito. Dove esistono prezzi veri (OKX, ottobre–novembre 2026) il modello sbaglia dell'1% in mediana |
-| Quanto è solido | 20 operazioni, e le tre migliori fanno metà del risultato. Ogni 10% in più sul prezzo delle opzioni toglie circa 3 punti annui. Se i segnali di W3.2 peggiorano (metà delle operazioni in guadagno invece dell'80%) il risultato a tre anni scende a +32% e una volta su sei si perde |
+| La strategia | Segnale di W3.2 → una call o una put a circa 30 giorni, al prezzo corrente, con il 5% del capitale. Si vende quando W3.2 esce, o si incassa a scadenza |
+| Si può backtestare? | Sì, e con prezzi veri: l'archivio pubblico di Deribit ha gli scambi di tutte le opzioni scadute. Ho rifatto le 23 operazioni di W3.2 dal 2018 con i contratti realmente scambiati quel giorno |
+| Risultato con prezzi veri, dal 2018 | 10.000 $ → 55.000 $. W3.2 a metà dimensione: 53.000 $. W3.2 intera: 209.000 $ |
+| Cosa cambia rispetto a W3.2 a metà | Perdita peggiore per operazione −5% invece di −12,5%; serie peggiore di perdite −8% invece di −14%. Ma operazioni in guadagno 65% invece di 78% |
+| E con il 10%? | 228.000 $ contro 209.000 $ di W3.2 intera, perdita peggiore −10% invece di −25%, serie peggiore −16% invece di −27% |
+| Quanto è solido | 23 operazioni, e le tre migliori fanno metà del risultato. La singola operazione dipende molto dalla scadenza disponibile quel giorno. Se i segnali di W3.2 peggiorano (metà delle operazioni in guadagno) il risultato a tre anni scende a +32% e una volta su sei si perde |
+| Il modello era giusto? | Sì: la volatilità vera all'ingresso è stata in mediana 1,02 volte quella del modello. La differenza di risultato viene dalle scadenze: nella realtà esistono solo i venerdì, fra 25 e 46 giorni |
 | Da dove si opera | OKX Europe offre opzioni su BTC ai clienti al dettaglio: contratto minimo 0,01 BTC (circa 35 $ di premio), premio e incasso in dollari. Bitget non ha opzioni |
 | Come partire | Prima sulla carta: annotare il prezzo vero a ogni segnale. Poi con un contratto. Il 5% solo dopo aver visto almeno 3–4 operazioni |
 
-Una verifica indipendente ha riprodotto i calcoli e ha ridimensionato le conclusioni: il vantaggio sul drawdown che si vede
-dal 2019 sparisce se si include il 2018, e il risultato delle singole operazioni dipende dal giorno esatto di scadenza.
+Una verifica indipendente ha riprodotto i calcoli del backtest a modello e ne ha ridimensionato le conclusioni; il backtest
+con i prezzi veri, fatto dopo, conferma il quadro: equivale a W3.2 a metà dimensione, con un profilo di perdita diverso.
 
 ## 2. Le opzioni in una pagina
 
@@ -96,7 +98,7 @@ invece il movimento arriva dopo il primo mese, l'opzione è già scaduta.
 
 1. **Segnale**: quello di W3.2 del radar, senza modifiche. Si entra il lunedì.
 2. **Cosa comprare**: una call se il segnale è long, una put se è short.
-3. **Scadenza**: quella più vicina a 30 giorni (fra 25 e 40). Su OKX le scadenze sono il venerdì.
+3. **Scadenza**: il venerdì più vicino a 30 giorni fra quelli disponibili (nella pratica fra 25 e 46 giorni).
 4. **Prezzo d'esercizio**: il più vicino al prezzo di BTC in quel momento.
 5. **Quanto**: il 5% del capitale in premio, commissioni incluse. Il resto del capitale resta fermo, in dollari.
 6. **Uscita**: quando W3.2 esce, si vende l'opzione. Se l'opzione scade prima, l'incasso è automatico e si resta fuori fino al
@@ -106,9 +108,9 @@ invece il movimento arriva dopo il primo mese, l'opzione è già scaduta.
 
 Le scelte sono poche e fissate prima: una opzione per segnale, perdita massima nota all'ingresso.
 
-## 5. Il backtest
+## 5. Il backtest a modello
 
-Prezzi delle opzioni calcolati con la formula di Black e la volatilità implicita stimata delle opzioni alla pari. Il valore
+Serve a provare molte varianti in fretta; § 7 lo rifà con i prezzi veri. Prezzi delle opzioni calcolati con la formula di Black e la volatilità implicita stimata delle opzioni alla pari. Il valore
 è ricalcolato ogni giorno. "Una sola" = regola 6; "con rinnovo" = alla scadenza se ne compra un'altra finché W3.2 resta in
 posizione.
 
@@ -146,14 +148,14 @@ guadagna più di W3.2, che chiude in pari o in perdita, perché il movimento giu
   alto della griglia. Su OKX le scadenze sono solo il venerdì, quindi il giorno esatto non si sceglie.
 - **Poche operazioni contano molto.** Senza le tre migliori il rendimento scende a +12% annuo, senza le cinque migliori a +7%.
 
-### Il 2018, che nel backtest principale manca
+### Il 2018, con la volatilità stimata e la scadenza a 30 giorni esatti
 
 {{P7}}
 
-Con il 2018 dentro, l'opzione al 5% e W3.2 a metà dimensione sono uguali: +19–20% annuo, drawdown −20%. Le tre operazioni
-del 2018 perdono tutte con l'opzione, compresa quella che W3.2 chiude a +16,7%: lo short di ottobre scade il giorno prima
-del crollo di novembre. Con due giorni in più di scadenza sarebbe stata in guadagno. È un esempio di quanto pesa il caso
-sulla singola operazione.
+Con il 2018 dentro, l'opzione al 5% e W3.2 a metà dimensione sono uguali: +19–20% annuo, drawdown −20%. In questa prova le
+tre operazioni del 2018 perdono tutte con l'opzione, compresa quella che W3.2 chiude a +16,7%: lo short di ottobre scade il
+giorno prima del crollo di novembre. Con i contratti veri (§ 7) quel giorno la scadenza disponibile era a 74 giorni, e la
+stessa operazione chiude a +14%. È la misura di quanto pesa il caso sulla singola operazione.
 
 ### Se i segnali peggiorano
 
@@ -166,20 +168,44 @@ sulla singola operazione.
   guadagna più. La perdita resta lenta: 5% per volta.
 - Gli altri punti deboli sono quelli visti sopra: prezzi da modello, poche operazioni decisive, il caso sulla scadenza.
 
-## 7. Il modello contro i prezzi veri
+## 7. Il backtest con i prezzi veri
+
+Deribit è il mercato dove si scambia la maggior parte delle opzioni su BTC, e pubblica tutti gli scambi dei contratti
+scaduti. Per ogni operazione di W3.2:
+
+- all'ingresso si prende, fra le opzioni davvero scambiate nelle 12 ore intorno, la scadenza più vicina a 30 giorni e il
+  prezzo d'esercizio più vicino al prezzo di BTC;
+- il prezzo pagato è calcolato con la volatilità implicita di quegli scambi;
+- all'uscita si usa la volatilità degli scambi dello stesso contratto in quel momento; se l'opzione scade prima, il valore
+  alla scadenza.
+
+{{Q1}}
+
+{{Q2}}
+
+- **Dal 2018, con prezzi veri, l'opzione al 5% e W3.2 a metà dimensione finiscono pari**: 55.000 $ e 53.000 $.
+- **Il profilo è diverso.** L'opzione perde più spesso (35% delle operazioni contro 22%) ma poco per volta: mai più del 5%, e
+  la serie peggiore di perdite è −8% contro −14%. Nel 2018 W3.2 apre con −25% alla prima operazione; l'opzione con −4,9%.
+- **Al 10%** il risultato supera W3.2 intera (228.000 $ contro 209.000 $) con perdite più contenute. Sono però gli stessi
+  segnali con più leva: vale tutto quello che dice § 6 sulla dipendenza da poche operazioni.
+- **Il modello era centrato.** Volatilità vera in media 65%, modello 64%. Il risultato a modello (55.000 $ dal 2019) e quello
+  vero (53.000 $) sono vicini.
+- **La scadenza non si sceglie.** I contratti veri avevano fra 18 e 74 giorni di vita: fino al 2019 esistevano poche scadenze.
+  Dal 2020 in poi si resta fra 25 e 46 giorni.
+- **Usando direttamente il primo scambio dopo l'ingresso** invece della volatilità mediana, il risultato dal 2019 è 46.000 $:
+  il momento esatto dell'ordine conta.
+
+Limiti di questo backtest: i prezzi sono ricostruiti dalla volatilità scambiata, non sono il book del momento; la
+differenza denaro-lettera è una stima (3% per lato; oggi è circa 0,5%); nel 2018–2019 gli scambi erano pochi.
+
+### Controllo sui prezzi di OKX
 
 {{P5}}
 
-- **Sulla scadenza della strategia il modello è centrato**: 318 prezzi veri fra il 13/10 e il 17/11/2026, mediana 1,01, metà
-  dei casi fra 0,96 e 1,07. Le opzioni vere costavano l'1% in più del modello.
-- **Al livello del DVOL il modello sarebbe troppo caro del 5%**: conferma che la volatilità giusta è quella delle opzioni alla
-  pari, più bassa dell'indice.
-- **Sulle scadenze lunghe le opzioni vere costano di più** (fino al 9% oltre i 180 giorni): il modello usa la volatilità a 30
-  giorni anche per quelle. È un altro motivo per restare sulle scadenze brevi.
-- **Il limite**: OKX conserva lo storico solo dei contratti ancora vivi. Per i 30 giorni il confronto copre cinque settimane
-  del 2026, non il 2019–2025. Per coprire tutto servono i prezzi storici di Deribit, che non sono raggiungibili da questo
-  ambiente, oppure il tempo: lo script di § 10 costruisce lo storico da oggi in avanti.
-- La differenza denaro-lettera vera oggi è l'1% del premio in totale; il backtest usa il 3% per lato, cioè sei volte tanto.
+Sulla scadenza della strategia (20–45 giorni) i prezzi veri di OKX fra ottobre e novembre 2026 costavano l'1% in più del
+modello. Al livello del DVOL il modello sarebbe stato troppo caro del 5%: la volatilità giusta è quella delle opzioni alla
+pari. OKX conserva lo storico solo dei contratti ancora vivi, per questo il confronto copre poche settimane. La differenza
+denaro-lettera vera oggi è l'1% del premio in totale; il backtest usa il 3% per lato.
 
 ## 8. Da dove si opera
 
@@ -210,11 +236,9 @@ carico tuo (quadri RT e RW).
 ## 9. Cosa può andare storto
 
 - **Segnali peggiori che in passato.** È il rischio principale (§ 6).
-- **Campione piccolo e favorevole.** 20 operazioni dal 2019. Con il 2018 (volatilità stimata) il vantaggio sul drawdown
-  sparisce (§ 6).
+- **Campione piccolo.** 23 operazioni in nove anni.
 - **Il caso sulla scadenza.** La singola operazione può passare da perdita piena a guadagno per uno o due giorni di differenza.
-- **Prezzi da modello.** § 7 misura lo scarto solo su cinque settimane del 2026. Fino a marzo 2021 la volatilità usata è un
-  dato settimanale tenuto fermo: riguarda 7 operazioni su 20, fra cui due delle tre migliori.
+- **Prezzi ricostruiti.** § 7 usa la volatilità degli scambi veri, non il prezzo esatto a cui avresti comprato tu.
 - **Un'operazione tagliata.** La n. 6 è chiusa il 31/12/2020 per un cambio di dati nel backtest di W3.2, non per un segnale.
 - **Liquidità delle opzioni lineari.** Su OKX le quotazioni ci sono, con una differenza denaro-lettera dell'1%, ma gli scambi
   sono pochi: per importi sopra qualche BTC il prezzo può peggiorare. Per 0,5–1 BTC non è un problema.
@@ -240,7 +264,8 @@ carico tuo (quadri RT e RW).
 - Kraken, opzioni nel SEE — [annuncio](https://blog.kraken.com/product/kraken-derivatives/options-now-available-in-the-eea)
 - Interactive Brokers, opzioni su ETF USA per clienti UE — [nota](https://www.interactivebrokers.com/support/faq/content/40360001)
 - Fisco 2026 — [Agenda Digitale](https://www.agendadigitale.eu/documenti/tassazione-cripto-attivita-2026-cosa-cambia-su-plusvalenze-permute-e-isee/)
+- Scambi storici delle opzioni: archivio pubblico Deribit, `history.deribit.com` (`data/opzioni/deribit/`).
 - Quotazioni: API pubblica OKX (`data/opzioni/okx/`). Volatilità storica: indice DVOL e scambi Deribit (`data/opzioni/`).
 
-Codice: `backtest/opzioni_w32.py`, `backtest/fetch_okx_options.py`. Tabelle: `results/opzioni_w32/tables.md`.
+Codice: `backtest/opzioni_w32.py`, `backtest/opzioni_w32_reale.py`, `backtest/fetch_okx_options.py`. Tabelle: `results/opzioni_w32/tables.md`.
 Studio precedente sulle opzioni vendute e sulla leva: [`RICERCA_NUOVA.md`](RICERCA_NUOVA.md).
