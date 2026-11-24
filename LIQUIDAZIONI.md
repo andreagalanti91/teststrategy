@@ -6,8 +6,8 @@ Come verificarlo sui dati, cosa risulta, e come leggere la mappa di Coinglass de
 
 ## 1. Sintesi
 
-**No: nei dati dal 2022 il prezzo non va verso le liquidazioni più di quanto andrebbe verso un qualsiasi livello alla stessa
-distanza. La mappa racconta dove è già passato il prezzo, non dove andrà.**
+**No: nei dati dal 2022 non c'è un effetto misurabile delle liquidazioni oltre la semplice distanza dal prezzo. La mappa
+racconta dove è già passato il prezzo, non dove andrà.**
 
 | Domanda | Come si verifica | Risultato |
 |---|---|---|
@@ -103,6 +103,16 @@ Le differenze fra "raggiunto" e "atteso" stanno tutte entro due punti e cambiano
 
 È il test più diretto. Se le liquidazioni attirassero il prezzo, la fascia più grande dovrebbe vincere anche quando è più
 lontana. Succede una volta su tre a 7 giorni e una su cinque a 1 giorno.
+
+Controlli aggiuntivi fatti dalla verifica indipendente, a 7 giorni:
+
+- **Fascia più grande almeno doppia dell'altra** (104 giorni): viene toccata nel 66% dei casi, la più vicina nel 75%; quando
+  la più grande non è la più vicina, nel 36%. Con rapporto almeno triplo: 26%.
+- **Ordine esatto sul percorso orario** (quale fascia viene toccata per prima): stessi numeri, 59% la più grande, 72% la più
+  vicina, 33% la più grande quando è più lontana.
+- **A parità di distanza** il lato più grande è toccato per primo un po' più spesso (da 1 a 5 punti in quattro gruppi su
+  cinque), ma la relazione è debole (correlazione 0,05) e non distinguibile da zero. Quindi: nessun effetto misurabile della
+  dimensione, non un effetto nullo dimostrato.
 
 ### 4.5 Situazioni simili a oggi
 
@@ -208,6 +218,12 @@ il radar raccoglie da poche settimane. Servono alcuni mesi di storia.
 - **La mappa testata è una stima** fatta con il metodo del radar su una sola borsa (Binance USDT-M), entro ±15% dal prezzo.
   Non è la mappa di Coinglass, di cui non esiste uno storico pubblico da testare.
 - **Dati dal 12/2021 al 07/11/2026**: un solo ciclo e mezzo.
+- **Nessuna misura di incertezza formale**: le finestre a 7 giorni si sovrappongono e le mappe cambiano lentamente, quindi i
+  giorni davvero indipendenti sono molti meno di 1.782. Le righe con pochi giorni (squilibri oltre il 60%, situazioni simili a
+  oggi) non sostengono alcuna conclusione.
+- **"Atteso a pari distanza" è calcolato su tutto il campione**, senza tenere conto della volatilità del momento.
+- **Verifica indipendente**: un secondo agente ha ricostruito le mappe a mano su sei date (coincidono), escluso l'uso di dati
+  futuri e ricalcolato i test della mappa a 21 giorni (confermati). La mappa a 90 giorni non è stata riverificata.
 - **Scala giornaliera**: effetti di poche ore (il radar ne ha trovato uno a 12–24 ore, spiegato in gran parte dal momentum)
   non sono misurati qui.
 - **Situazioni come quella di oggi sono rarissime nello storico** (2–3 episodi).
