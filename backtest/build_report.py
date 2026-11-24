@@ -10,10 +10,11 @@ JOBS = ((["results/tables.md"], "backtest/report_template.md", "STRATEGIE.md"),
         (["results/btc/tables.md"], "backtest/btc_template.md", "ANALISI_BTC.md"),
         (["results/regole/tables.md"], "backtest/regole_template.md", "REGOLE_AT.md"),
         (["results/w32/tables.md"], "backtest/w32_template.md", "CONFRONTO_W32.md"),
-        (["results/w32_inout/tables.md"], "backtest/w32_inout_template.md", "W32_INGRESSI_USCITE.md"))
+        (["results/w32_inout/tables.md"], "backtest/w32_inout_template.md", "W32_INGRESSI_USCITE.md"),
+        (["results/liq/tables.md"], "backtest/liq_template.md", "LIQUIDAZIONI.md"))
 for tables, template, out in JOBS:
     src = "\n".join((ROOT / t).read_text() for t in tables)
-    parts = re.split(r"^## ([A-Z]\d) .*$", src, flags=re.M)
+    parts = re.split(r"^## ([A-Z]\d+) .*$", src, flags=re.M)
     tabs = {parts[i]: parts[i + 1].strip() for i in range(1, len(parts), 2)}
     txt = (ROOT / template).read_text()
     for k, v in tabs.items():

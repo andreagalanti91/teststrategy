@@ -4,6 +4,7 @@ Confronto di strategie di trading con backtest dal 01/01/2021, a partire dall'an
 [`andreagalanti91/radar`](https://github.com/andreagalanti91/radar).
 
 - **[`STRATEGIE.md`](STRATEGIE.md)** — confronto di 16 strategie e 4 portafogli dal 2021, robustezza, proposta e domande aperte.
+- **[`LIQUIDAZIONI.md`](LIQUIDAZIONI.md)** — il prezzo di BTC segue le liquidazioni? Come verificarlo, risultati, lettura della mappa di Coinglass.
 - **[`W32_INGRESSI_USCITE.md`](W32_INGRESSI_USCITE.md)** — W3.2 operazione per operazione: quando entra, quando esce, prove di DCA in ingresso e in uscita.
 - **[`CONFRONTO_W32.md`](CONFRONTO_W32.md)** — algoritmi di analisi tecnica contro W3.2 del radar, con l'elenco di tutte le movimentazioni.
 - **[`REGOLE_AT.md`](REGOLE_AT.md)** — come funziona l'analisi tecnica, 15 regole classiche verificate su BTC, regole operative, nuovo algoritmo a tre schermi, confronto e motivo di ogni operazione.
