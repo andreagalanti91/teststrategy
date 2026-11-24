@@ -7,7 +7,7 @@ Per ogni operazione di W3.2:
   valore intrinseco al prezzo di regolamento (media Binance 07:30-08:00 UTC del giorno di scadenza);
 - il prezzo dell'opzione e' ricalcolato con la formula di Black alla volatilita' VERA scambiata e al prezzo di BTC di W3.2
   (gli scambi non avvengono nell'istante esatto dell'ingresso); in piu' una versione "grezza" che usa direttamente il primo
-  scambio dopo l'ingresso e l'ultimo prima dell'uscita.
+  scambio dopo l'ingresso e quello piu' vicino all'uscita (anche dopo).
 Uscite: results/opzioni_w32/tables_reale.md, operazioni_reale.csv; cache degli scambi in data/opzioni/deribit/.
 """
 from __future__ import annotations
@@ -73,6 +73,25 @@ def parse(name: str) -> tuple:
     return pd.Timestamp(yr, mon, day, 8), float(k), 1 if cp == "C" else -1
 
 
+def basis(a: pd.DataFrame, K: float, cp: int, exp: pd.Timestamp) -> float:
+    """Rapporto prezzo a termine / indice implicito negli scambi: Deribit calcola la volatilita' sul future della scadenza e quota
+    in BTC = Black(F) / F. Per ogni scambio si cerca l'F che riproduce il prezzo; si prende la mediana di F / indice."""
+    out = []
+    for z in a.itertuples():
+        tau = (exp - pd.Timestamp(z.ts, unit="ms")).total_seconds() / 86400 / 365
+        if tau <= 0 or not np.isfinite(z.iv) or z.iv <= 0:
+            continue
+        f = lambda F: R.bs(F, K, tau, z.iv / 100, cp) / F - z.price
+        lo, hi = 0.85 * z.index_, 1.25 * z.index_
+        if f(lo) * f(hi) > 0:
+            continue
+        for _ in range(50):
+            mid = 0.5 * (lo + hi)
+            lo, hi = (mid, hi) if f(lo) * f(mid) > 0 else (lo, mid)
+        out.append(0.5 * (lo + hi) / z.index_)
+    return float(np.median(out)) if out else 1.0
+
+
 def main() -> None:
     B.END = "2026-12-31"
     c = B.load()["close"]
@@ -106,7 +125,8 @@ def main() -> None:
         a = a[a.K == K].sort_values("ts")
         name, tau0 = a.instrument.iloc[0], (exp - t_in).total_seconds() / 86400 / 365
         iv0 = float(a.iv.median()) / 100
-        p0 = R.bs(s0, K, tau0, iv0, cp)
+        g0b = basis(a.rename(columns={"index": "index_"}), K, cp, exp)
+        p0 = R.bs(s0 * g0b, K, tau0, iv0, cp)                                             # premio in dollari sul prezzo a termine (opzioni lineari)
         unit = p0 * (1 + SPREAD) + min(FEE * s0, FEE_CAP * p0)
         # versione grezza: primo scambio dopo l'ingresso (o il piu' vicino), prezzo in BTC x indice
         aft = a[a.ts >= t_in.timestamp() * 1000]
@@ -116,34 +136,39 @@ def main() -> None:
         t_out = t.esce if pd.notna(t.esce) else c.index[-1] + 24 * H
         how, ivm = "", float(iv_model.reindex([t_in - 24 * H], method="ffill").iloc[0]) if t_in - 24 * H >= iv_model.index[0] else np.nan
         if t_out >= exp or (open_ and c.index[-1] + 24 * H >= exp):                       # scade prima che W3.2 esca
-            px = m15.loc[exp - 0.5 * H:exp]
+            px = m15.loc[exp - 0.5 * H:exp - 0.25 * H]                                    # candele aperte alle 07:30 e 07:45: chiusure 07:45 e 08:00
             s1 = float(px.mean()) if len(px) else float(c.loc[:exp].iloc[-1])
             it = max(0.0, cp * (s1 - K))
             got, raw_out, how, iv1 = it - min(EX_FEE * s1, FEE_CAP * it), it, "scadenza", np.nan
         else:
             s1 = float(t.prezzo_out) if not open_ else float(c.iloc[-1])
             tx = t_out if not open_ else c.index[-1] + 24 * H
+            if not open_ and "fine periodo" in str(t.uscita):                             # chiusa alla chiusura del giorno, non all'apertura
+                tx = tx + 24 * H
             lo, hi = (tx - 12 * H, tx + 12 * H) if not open_ else (tx - 48 * H, tx)
             if not open_ and "trailing" in str(t.uscita):                                 # stop infrasettimanale: scambi del giorno d'uscita
                 lo, hi = tx, tx + 24 * H
+                tx = tx + 12 * H
             b = trades(f"get_last_trades_by_instrument_and_time?instrument_name={name}", lo, hi, f"uscita_{name}_{tx.date()}")
             if b.empty:
                 b = trades(f"get_last_trades_by_instrument_and_time?instrument_name={name}", lo - 72 * H, hi + 72 * H, f"uscita_largo_{name}_{tx.date()}")
                 how = "uscita: scambi entro 4 giorni"
-            tau1 = max(0.0, (exp - tx).total_seconds() / 86400 / 365)
+            tau1, g1b = max(0.0, (exp - tx).total_seconds() / 86400 / 365), 1.0
             if b.empty or b.iv[b.iv > 0].dropna().empty:
                 iv1 = float(iv_model.reindex([tx - 24 * H], method="ffill").iloc[0])
                 how, raw_out = "uscita: nessuno scambio, volatilità del modello", max(0.0, cp * (s1 - K))    # grezzo: solo il valore intrinseco
             else:
                 iv1 = float(b.iv[b.iv > 0].median()) / 100
+                g1b = basis(b.rename(columns={"index": "index_"}), K, cp, exp)
                 how = how or "venduta"
                 bb = b.iloc[(b.ts - tx.timestamp() * 1000).abs().argmin()]
                 raw_out = float(bb.price * bb["index"])
-            p1 = R.bs(s1, K, tau1, iv1, cp)
+            p1 = R.bs(s1 * g1b, K, tau1, iv1, cp)
             got = max(0.0, p1 * (1 - SPREAD) - min(FEE * s1, FEE_CAP * p1))
         pm = R.bs(s0, K, tau0, ivm, cp) if np.isfinite(ivm) else np.nan
+        base_in = g0b - 1
         rows.append({"n": n, "verso": t.verso, "entra": t_in.date(), "esce": "aperta" if open_ else t.esce.date(), "contratto": name, "gg": (exp - t_in).days, "K_su_S": K / s0 - 1, "iv_vera": iv0,
-                     "iv_modello": ivm, "premio": p0 / s0, "premio_modello": pm / s0 if np.isfinite(pm) else np.nan, "scambi": len(a), "esito": how, "w32": t.sul_capitale,
+                     "iv_modello": ivm, "premio": p0 / s0, "premio_modello": pm / s0 if np.isfinite(pm) else np.nan, "scambi": len(a), "base": base_in, "esito": how, "w32": t.sul_capitale,
                      "mult": got / unit, "mult_grezzo": (raw_out * (1 - SPREAD)) / (raw_in * (1 + SPREAD)) if np.isfinite(raw_out) else np.nan, "nota": largo})
         print(n, name, how, round(got / unit, 2), flush=True)
     o = pd.DataFrame(rows)
@@ -187,7 +212,7 @@ def main() -> None:
     z = y19[np.isfinite(y19.iv_modello)]
     T.append(f"\nVolatilità all'ingresso, dal 2019: vera {z.iv_vera.mean() * 100:.0f}% in media, modello {z.iv_modello.mean() * 100:.0f}%; rapporto mediano vera / modello {num(float((z.iv_vera / z.iv_modello).median()))} "
              f"(fra {num(float((z.iv_vera / z.iv_modello).min()))} e {num(float((z.iv_vera / z.iv_modello).max()))}). Premio medio pagato: {pct(float(z.premio.mean())).lstrip('+')} del prezzo di BTC "
-             f"(modello: {pct(float(z.premio_modello.mean())).lstrip('+')}). Scadenza media dei contratti veri: {z.gg.mean():.0f} giorni (fra {int(z.gg.min())} e {int(z.gg.max())}).")
+             f"(modello: {pct(float(z.premio_modello.mean())).lstrip('+')}). Prezzo a termine sopra il prezzo corrente, in mediana: {pct(float(z.base.median()))} (massimo {pct(float(z.base.max()))}). Scadenza media dei contratti veri: {z.gg.mean():.0f} giorni (fra {int(z.gg.min())} e {int(z.gg.max())}).")
     (OUT / "tables_reale.md").write_text("\n".join(T) + "\n")
     print("\n".join(T))
 

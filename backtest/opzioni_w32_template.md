@@ -8,8 +8,7 @@ Dati fino al 23/11/2026; quotazioni OKX del 24/11/2026.
 ## 1. Sintesi
 
 **La strategia è semplice: a ogni segnale di W3.2 si compra una sola opzione a circa 30 giorni (call se long, put se short)
-spendendo il 5% del capitale. Rifatta con i prezzi veri delle opzioni dal 2018, rende quanto W3.2 a metà dimensione: non di
-più. Quello che cambia è che la perdita per operazione è fissata al 5% in partenza, senza stop e senza leva. Si opera da
+spendendo il 5% del capitale. Rifatta con i prezzi veri delle opzioni dal 2018, rende un po' meno di W3.2 a metà dimensione. Quello che cambia è che la perdita per operazione è fissata al 5% in partenza, senza stop e senza leva. Si opera da
 OKX, che usi già.**
 
 | Domanda | Risposta |
@@ -17,16 +16,17 @@ OKX, che usi già.**
 | Cos'è | Un contratto che dà il diritto di comprare (call) o vendere (put) BTC a un prezzo fissato, entro una data. Si paga un premio. Se va male si perde il premio e basta |
 | La strategia | Segnale di W3.2 → una call o una put a circa 30 giorni, al prezzo corrente, con il 5% del capitale. Si vende quando W3.2 esce, o si incassa a scadenza |
 | Si può backtestare? | Sì, e con prezzi veri: l'archivio pubblico di Deribit ha gli scambi di tutte le opzioni scadute. Ho rifatto le 23 operazioni di W3.2 dal 2018 con i contratti realmente scambiati quel giorno |
-| Risultato con prezzi veri, dal 2018 | 10.000 $ → 55.000 $. W3.2 a metà dimensione: 53.000 $. W3.2 intera: 209.000 $ |
+| Risultato con prezzi veri | Dal 2018: 10.000 $ → 51.000 $, contro 53.000 $ di W3.2 a metà dimensione e 209.000 $ di W3.2 intera. Dal 2019: 49.000 $ contro 57.000 $ |
 | Cosa cambia rispetto a W3.2 a metà | Perdita peggiore per operazione −5% invece di −12,5%; serie peggiore di perdite −8% invece di −14%. Ma operazioni in guadagno 65% invece di 78% |
-| E con il 10%? | 228.000 $ contro 209.000 $ di W3.2 intera, perdita peggiore −10% invece di −25%, serie peggiore −16% invece di −27% |
+| E con il 10%? | 197.000 $ contro 209.000 $ di W3.2 intera, perdita peggiore −10% invece di −25%, serie peggiore −16% invece di −27% |
 | Quanto è solido | 23 operazioni, e le tre migliori fanno metà del risultato. La singola operazione dipende molto dalla scadenza disponibile quel giorno. Se i segnali di W3.2 peggiorano (metà delle operazioni in guadagno) il risultato a tre anni scende a +32% e una volta su sei si perde |
-| Il modello era giusto? | Sì: la volatilità vera all'ingresso è stata in mediana 1,02 volte quella del modello. La differenza di risultato viene dalle scadenze: nella realtà esistono solo i venerdì, fra 25 e 46 giorni |
+| Il modello era giusto? | Sulla volatilità sì (vera 1,02 volte il modello in mediana). Era un po' ottimista sul resto: nella realtà esistono solo le scadenze del venerdì, fra 25 e 46 giorni, e le call costano qualche punto in più perché sono prezzate sul future. Risultato dal 2019: 55.000 $ a modello, 49.000 $ con prezzi veri |
 | Da dove si opera | OKX Europe offre opzioni su BTC ai clienti al dettaglio: contratto minimo 0,01 BTC (circa 35 $ di premio), premio e incasso in dollari. Bitget non ha opzioni |
 | Come partire | Prima sulla carta: annotare il prezzo vero a ogni segnale. Poi con un contratto. Il 5% solo dopo aver visto almeno 3–4 operazioni |
 
 Una verifica indipendente ha riprodotto i calcoli del backtest a modello e ne ha ridimensionato le conclusioni; il backtest
-con i prezzi veri, fatto dopo, conferma il quadro: equivale a W3.2 a metà dimensione, con un profilo di perdita diverso.
+con i prezzi veri, fatto dopo e verificato a sua volta, conferma il quadro: non rende più di W3.2 a metà dimensione, ha un
+profilo di perdita diverso.
 
 ## 2. Le opzioni in una pagina
 
@@ -183,20 +183,24 @@ scaduti. Per ogni operazione di W3.2:
 
 {{Q2}}
 
-- **Dal 2018, con prezzi veri, l'opzione al 5% e W3.2 a metà dimensione finiscono pari**: 55.000 $ e 53.000 $.
+- **Con prezzi veri l'opzione al 5% rende un po' meno di W3.2 a metà dimensione**: 51.000 $ contro 53.000 $ dal 2018, 49.000 $
+  contro 57.000 $ dal 2019. Con 23 operazioni la differenza non è significativa: togliendone una sola il totale cambia fino al
+  14% in più o in meno.
 - **Il profilo è diverso.** L'opzione perde più spesso (35% delle operazioni contro 22%) ma poco per volta: mai più del 5%, e
-  la serie peggiore di perdite è −8% contro −14%. Nel 2018 W3.2 apre con −25% alla prima operazione; l'opzione con −4,9%.
-- **Al 10%** il risultato supera W3.2 intera (228.000 $ contro 209.000 $) con perdite più contenute. Sono però gli stessi
-  segnali con più leva: vale tutto quello che dice § 6 sulla dipendenza da poche operazioni.
-- **Il modello era centrato.** Volatilità vera in media 65%, modello 64%. Il risultato a modello (55.000 $ dal 2019) e quello
-  vero (53.000 $) sono vicini.
+  la serie peggiore di perdite è −8% contro −14%. Nel 2018 W3.2 apre con −25% alla prima operazione; l'opzione con −5%.
+- **Al 10%** il risultato è vicino a W3.2 intera (197.000 $ contro 209.000 $) con perdite più contenute: peggiore operazione
+  −10% invece di −25%. Sono gli stessi segnali: vale tutto quello che dice § 6 sulla dipendenza da poche operazioni.
+- **Il modello era centrato sulla volatilità** (vera 65% in media, modello 64%) **e un po' ottimista sul totale**: 55.000 $ dal
+  2019 contro 49.000 $ veri. Le opzioni vere sono prezzate sul future, che sta sopra il prezzo corrente (0,5% in mediana, fino
+  al 2,6% nel 2021): le call costano qualche punto in più.
 - **La scadenza non si sceglie.** I contratti veri avevano fra 18 e 74 giorni di vita: fino al 2019 esistevano poche scadenze.
   Dal 2020 in poi si resta fra 25 e 46 giorni.
-- **Usando direttamente il primo scambio dopo l'ingresso** invece della volatilità mediana, il risultato dal 2019 è 46.000 $:
+- **Usando direttamente il primo scambio dopo l'ingresso** invece della volatilità mediana, il risultato dal 2019 è 45.000 $:
   il momento esatto dell'ordine conta.
 
 Limiti di questo backtest: i prezzi sono ricostruiti dalla volatilità scambiata, non sono il book del momento; la
-differenza denaro-lettera è una stima (3% per lato; oggi è circa 0,5%); nel 2018–2019 gli scambi erano pochi.
+differenza denaro-lettera è una stima prudente (3% per lato; negli scambi veri è stata sotto l'1%); nel 2018–2019 gli scambi
+erano pochi, in un caso uno solo; il prezzo di regolamento è quello di Binance, non l'indice Deribit.
 
 ### Controllo sui prezzi di OKX
 

@@ -8,8 +8,7 @@ Dati fino al 23/11/2026; quotazioni OKX del 24/11/2026.
 ## 1. Sintesi
 
 **La strategia è semplice: a ogni segnale di W3.2 si compra una sola opzione a circa 30 giorni (call se long, put se short)
-spendendo il 5% del capitale. Rifatta con i prezzi veri delle opzioni dal 2018, rende quanto W3.2 a metà dimensione: non di
-più. Quello che cambia è che la perdita per operazione è fissata al 5% in partenza, senza stop e senza leva. Si opera da
+spendendo il 5% del capitale. Rifatta con i prezzi veri delle opzioni dal 2018, rende un po' meno di W3.2 a metà dimensione. Quello che cambia è che la perdita per operazione è fissata al 5% in partenza, senza stop e senza leva. Si opera da
 OKX, che usi già.**
 
 | Domanda | Risposta |
@@ -17,16 +16,17 @@ OKX, che usi già.**
 | Cos'è | Un contratto che dà il diritto di comprare (call) o vendere (put) BTC a un prezzo fissato, entro una data. Si paga un premio. Se va male si perde il premio e basta |
 | La strategia | Segnale di W3.2 → una call o una put a circa 30 giorni, al prezzo corrente, con il 5% del capitale. Si vende quando W3.2 esce, o si incassa a scadenza |
 | Si può backtestare? | Sì, e con prezzi veri: l'archivio pubblico di Deribit ha gli scambi di tutte le opzioni scadute. Ho rifatto le 23 operazioni di W3.2 dal 2018 con i contratti realmente scambiati quel giorno |
-| Risultato con prezzi veri, dal 2018 | 10.000 $ → 55.000 $. W3.2 a metà dimensione: 53.000 $. W3.2 intera: 209.000 $ |
+| Risultato con prezzi veri | Dal 2018: 10.000 $ → 51.000 $, contro 53.000 $ di W3.2 a metà dimensione e 209.000 $ di W3.2 intera. Dal 2019: 49.000 $ contro 57.000 $ |
 | Cosa cambia rispetto a W3.2 a metà | Perdita peggiore per operazione −5% invece di −12,5%; serie peggiore di perdite −8% invece di −14%. Ma operazioni in guadagno 65% invece di 78% |
-| E con il 10%? | 228.000 $ contro 209.000 $ di W3.2 intera, perdita peggiore −10% invece di −25%, serie peggiore −16% invece di −27% |
+| E con il 10%? | 197.000 $ contro 209.000 $ di W3.2 intera, perdita peggiore −10% invece di −25%, serie peggiore −16% invece di −27% |
 | Quanto è solido | 23 operazioni, e le tre migliori fanno metà del risultato. La singola operazione dipende molto dalla scadenza disponibile quel giorno. Se i segnali di W3.2 peggiorano (metà delle operazioni in guadagno) il risultato a tre anni scende a +32% e una volta su sei si perde |
-| Il modello era giusto? | Sì: la volatilità vera all'ingresso è stata in mediana 1,02 volte quella del modello. La differenza di risultato viene dalle scadenze: nella realtà esistono solo i venerdì, fra 25 e 46 giorni |
+| Il modello era giusto? | Sulla volatilità sì (vera 1,02 volte il modello in mediana). Era un po' ottimista sul resto: nella realtà esistono solo le scadenze del venerdì, fra 25 e 46 giorni, e le call costano qualche punto in più perché sono prezzate sul future. Risultato dal 2019: 55.000 $ a modello, 49.000 $ con prezzi veri |
 | Da dove si opera | OKX Europe offre opzioni su BTC ai clienti al dettaglio: contratto minimo 0,01 BTC (circa 35 $ di premio), premio e incasso in dollari. Bitget non ha opzioni |
 | Come partire | Prima sulla carta: annotare il prezzo vero a ogni segnale. Poi con un contratto. Il 5% solo dopo aver visto almeno 3–4 operazioni |
 
 Una verifica indipendente ha riprodotto i calcoli del backtest a modello e ne ha ridimensionato le conclusioni; il backtest
-con i prezzi veri, fatto dopo, conferma il quadro: equivale a W3.2 a metà dimensione, con un profilo di perdita diverso.
+con i prezzi veri, fatto dopo e verificato a sua volta, conferma il quadro: non rende più di W3.2 a metà dimensione, ha un
+profilo di perdita diverso.
 
 ## 2. Le opzioni in una pagina
 
@@ -283,59 +283,63 @@ Operazioni di W3.2: 23; con un'opzione vera vicina al prezzo scambiata all'ingre
 
 | # | Verso | Entra | Esce | Contratto vero | Giorni alla scadenza | Volatilità vera | Volatilità del modello | Come finisce | W3.2 originale | Opzione, 5% del capitale: prezzi veri | Modello a 30 giorni |
 |---|---|---|---|---|---|---|---|---|---|---|---|
-| 1 | long | 2018-01-08 | 2018-01-16 | BTC-26JAN18-16000-C (scadenza fuori da 20–50 giorni) | 18 | 142% | n/d | venduta | -25,1% | -4,9% | n/d |
+| 1 | long | 2018-01-08 | 2018-01-16 | BTC-26JAN18-16000-C (scadenza fuori da 20–50 giorni) | 18 | 142% | n/d | venduta | -25,1% | -5,0% | n/d |
 | 2 | long | 2018-04-30 | 2018-05-14 | BTC-25MAY18-9000-C | 25 | 85% | n/d | venduta | -3,3% | -3,6% | n/d |
-| 3 | short | 2018-10-15 | 2019-04-02 | BTC-28DEC18-6250-P (scadenza fuori da 20–50 giorni) | 74 | 64% | n/d | scadenza | +16,7% | +14,0% | n/d |
-| 4 | long | 2019-05-13 | 2019-06-27 | BTC-28JUN19-7000-C | 46 | 78% | 92% | uscita: nessuno scambio, volatilità del modello | +51,1% | +16,9% | +1,0% |
+| 3 | short | 2018-10-15 | 2019-04-02 | BTC-28DEC18-6250-P (scadenza fuori da 20–50 giorni) | 74 | 64% | n/d | scadenza | +16,7% | +13,9% | n/d |
+| 4 | long | 2019-05-13 | 2019-06-27 | BTC-28JUN19-7000-C | 46 | 78% | 92% | uscita: nessuno scambio, volatilità del modello | +51,1% | +17,1% | +1,0% |
 | 5 | long | 2020-02-10 | 2020-02-17 | BTC-27MAR20-10000-C | 46 | 61% | 54% | venduta | -2,6% | -1,3% | -1,3% |
 | 6 | short | 2020-03-16 | 2020-04-27 | BTC-24APR20-5500-P | 39 | 149% | 171% | scadenza | -17,9% | -5,0% | -5,0% |
-| 7 | long | 2020-05-04 | 2020-08-03 | BTC-29MAY20-9000-C | 25 | 72% | 72% | scadenza | +16,0% | -0,9% | -0,9% |
-| 8 | long | 2020-10-26 | 2020-11-23 | BTC-27NOV20-13000-C | 32 | 52% | 50% | venduta | +40,8% | +26,0% | +28,5% |
-| 9 | long | 2020-12-14 | 2020-12-31 | BTC-29JAN21-19000-C | 46 | 65% | 53% | venduta | +50,4% | +21,3% | +34,5% |
-| 10 | long | 2021-02-01 | 2021-02-22 | BTC-26FEB21-34000-C | 25 | 111% | 110% | uscita: scambi entro 4 giorni | +52,2% | +26,4% | +22,5% |
-| 11 | long | 2021-08-02 | 2021-09-27 | BTC-27AUG21-40000-C | 25 | 80% | 78% | scadenza | +4,3% | +5,8% | +4,8% |
-| 12 | long | 2021-10-04 | 2021-11-08 | BTC-29OCT21-50000-C | 25 | 77% | 72% | scadenza | +20,9% | +11,3% | +13,2% |
-| 13 | short | 2022-01-03 | 2022-03-28 | BTC-28JAN22-48000-P | 25 | 66% | 65% | scadenza | +1,0% | +9,6% | +6,7% |
-| 14 | short | 2022-08-15 | 2023-01-16 | BTC-30SEP22-24000-P | 46 | 66% | 64% | scadenza | +8,3% | +5,1% | +6,2% |
+| 7 | long | 2020-05-04 | 2020-08-03 | BTC-29MAY20-9000-C | 25 | 72% | 72% | scadenza | +16,0% | -1,1% | -0,9% |
+| 8 | long | 2020-10-26 | 2020-11-23 | BTC-27NOV20-13000-C | 32 | 52% | 50% | venduta | +40,8% | +23,7% | +28,5% |
+| 9 | long | 2020-12-14 | 2020-12-31 | BTC-29JAN21-19000-C | 46 | 65% | 53% | venduta | +50,4% | +18,7% | +34,5% |
+| 10 | long | 2021-02-01 | 2021-02-22 | BTC-26FEB21-34000-C | 25 | 111% | 110% | uscita: scambi entro 4 giorni | +52,2% | +25,8% | +22,5% |
+| 11 | long | 2021-08-02 | 2021-09-27 | BTC-27AUG21-40000-C | 25 | 80% | 78% | scadenza | +4,3% | +5,4% | +4,8% |
+| 12 | long | 2021-10-04 | 2021-11-08 | BTC-29OCT21-50000-C | 25 | 77% | 72% | scadenza | +20,9% | +10,3% | +13,2% |
+| 13 | short | 2022-01-03 | 2022-03-28 | BTC-28JAN22-48000-P | 25 | 66% | 65% | scadenza | +1,0% | +9,9% | +6,7% |
+| 14 | short | 2022-08-15 | 2023-01-16 | BTC-30SEP22-24000-P | 46 | 66% | 64% | scadenza | +8,3% | +5,2% | +6,2% |
 | 15 | long | 2023-01-23 | 2023-08-17 | BTC-24FEB23-23000-C | 32 | 58% | 49% | scadenza | +13,3% | -2,3% | +1,5% |
-| 16 | long | 2023-10-23 | 2024-01-01 | BTC-24NOV23-30000-C | 32 | 47% | 41% | scadenza | +40,5% | +16,2% | +14,4% |
-| 17 | long | 2024-02-12 | 2024-03-11 | BTC-29MAR24-48000-C | 46 | 50% | 48% | venduta | +42,2% | +22,9% | +31,5% |
-| 18 | long | 2024-09-23 | 2025-02-26 | BTC-25OCT24-64000-C | 32 | 50% | 49% | scadenza | +30,8% | -0,3% | +0,1% |
-| 19 | long | 2025-04-28 | 2025-10-10 | BTC-30MAY25-94000-C | 32 | 45% | 47% | scadenza | +11,3% | +5,7% | +9,6% |
+| 16 | long | 2023-10-23 | 2024-01-01 | BTC-24NOV23-30000-C | 32 | 47% | 41% | scadenza | +40,5% | +15,0% | +14,4% |
+| 17 | long | 2024-02-12 | 2024-03-11 | BTC-29MAR24-48000-C | 46 | 50% | 48% | venduta | +42,2% | +21,5% | +31,5% |
+| 18 | long | 2024-09-23 | 2025-02-26 | BTC-25OCT24-64000-C | 32 | 50% | 49% | scadenza | +30,8% | -0,5% | +0,1% |
+| 19 | long | 2025-04-28 | 2025-10-10 | BTC-30MAY25-94000-C | 32 | 45% | 47% | scadenza | +11,3% | +5,3% | +9,6% |
 | 20 | short | 2025-12-01 | 2026-04-27 | BTC-26DEC25-90000-P | 25 | 48% | 47% | scadenza | +11,9% | -3,5% | -3,2% |
-| 21 | short | 2026-05-25 | 2026-08-20 | BTC-26JUN26-76000-P | 32 | 35% | 35% | scadenza | +5,7% | +23,0% | +17,5% |
-| 22 | long | 2026-08-24 | 2026-11-09 | BTC-25SEP26-78000-C | 32 | 41% | 40% | scadenza | -4,1% | +2,9% | +6,3% |
-| 23 | short | 2026-11-16 | aperta | BTC-25DEC26-65000-P | 39 | 40% | 41% | venduta | +5,9% | +2,9% | +2,7% |
+| 21 | short | 2026-05-25 | 2026-08-20 | BTC-26JUN26-76000-P | 32 | 35% | 35% | scadenza | +5,7% | +23,4% | +17,5% |
+| 22 | long | 2026-08-24 | 2026-11-09 | BTC-25SEP26-78000-C | 32 | 41% | 40% | scadenza | -4,1% | +2,5% | +6,3% |
+| 23 | short | 2026-11-16 | aperta | BTC-25DEC26-65000-P | 39 | 40% | 41% | venduta | +5,9% | +3,1% | +2,7% |
 
 | Periodo e versione | Operazioni | 10.000 $ → | Operazioni in guadagno | Operazione peggiore | Migliore | Serie peggiore di perdite | Senza le tre migliori |
 |---|---|---|---|---|---|---|---|
 | Dal 2019 · W3.2 originale | 20 | 246.794 | 85% | -17,9% | +52,2% | -20,0% | ×7,1 |
 | Dal 2019 · W3.2 a metà dimensione | 20 | 56.931 | 85% | -9,0% | +26,1% | -10,1% | ×2,9 |
-| Dal 2019 · opzioni 5%, prezzi veri | 20 | 52.647 | 70% | -5,0% | +26,4% | -7,0% | ×2,7 |
+| Dal 2019 · opzioni 5%, prezzi veri | 20 | 48.543 | 70% | -5,0% | +25,8% | -7,2% | ×2,5 |
 | Dal 2019 · opzioni 5%, modello (30 giorni esatti) | 20 | 55.465 | 80% | -5,0% | +34,5% | -7,1% | ×2,4 |
-| Dal 2019 · opzioni 10%, prezzi veri | 20 | 212.842 | 70% | -10,0% | +52,8% | -13,9% | ×6,3 |
-| Dal 2019 · opzioni 5%, scambi grezzi (primo dopo l'ingresso, più vicino all'uscita) | 20 | 45.882 | 70% | -5,0% | +23,3% | -6,9% | ×2,5 |
+| Dal 2019 · opzioni 10%, prezzi veri | 20 | 184.678 | 70% | -10,0% | +51,6% | -14,2% | ×5,6 |
+| Dal 2019 · opzioni 5%, scambi grezzi (primo dopo l'ingresso, più vicino all'uscita) | 20 | 45.446 | 70% | -5,0% | +23,3% | -7,1% | ×2,5 |
 | Dal 2018 · W3.2 originale | 23 | 208.703 | 78% | -25,1% | +52,2% | -27,5% | ×6,0 |
 | Dal 2018 · W3.2 a metà dimensione | 23 | 53.064 | 78% | -12,5% | +26,1% | -14,0% | ×2,7 |
-| Dal 2018 · opzioni 5%, prezzi veri | 23 | 55.038 | 65% | -5,0% | +26,4% | -8,3% | ×2,8 |
-| Dal 2018 · opzioni 10%, prezzi veri | 23 | 228.157 | 65% | -10,0% | +52,8% | -16,3% | ×6,7 |
+| Dal 2018 · opzioni 5%, prezzi veri | 23 | 50.642 | 65% | -5,0% | +25,8% | -8,4% | ×2,6 |
+| Dal 2018 · opzioni 10%, prezzi veri | 23 | 197.205 | 65% | -10,0% | +51,6% | -16,4% | ×6,0 |
 
-Volatilità all'ingresso, dal 2019: vera 65% in media, modello 64%; rapporto mediano vera / modello 1,02 (fra 0,85 e 1,23). Premio medio pagato: 7,7% del prezzo di BTC (modello: 7,7%). Scadenza media dei contratti veri: 34 giorni (fra 25 e 46).
+Volatilità all'ingresso, dal 2019: vera 65% in media, modello 64%; rapporto mediano vera / modello 1,02 (fra 0,85 e 1,23). Premio medio pagato: 8,0% del prezzo di BTC (modello: 7,7%). Prezzo a termine sopra il prezzo corrente, in mediana: +0,5% (massimo +2,6%). Scadenza media dei contratti veri: 34 giorni (fra 25 e 46).
 
-- **Dal 2018, con prezzi veri, l'opzione al 5% e W3.2 a metà dimensione finiscono pari**: 55.000 $ e 53.000 $.
+- **Con prezzi veri l'opzione al 5% rende un po' meno di W3.2 a metà dimensione**: 51.000 $ contro 53.000 $ dal 2018, 49.000 $
+  contro 57.000 $ dal 2019. Con 23 operazioni la differenza non è significativa: togliendone una sola il totale cambia fino al
+  14% in più o in meno.
 - **Il profilo è diverso.** L'opzione perde più spesso (35% delle operazioni contro 22%) ma poco per volta: mai più del 5%, e
-  la serie peggiore di perdite è −8% contro −14%. Nel 2018 W3.2 apre con −25% alla prima operazione; l'opzione con −4,9%.
-- **Al 10%** il risultato supera W3.2 intera (228.000 $ contro 209.000 $) con perdite più contenute. Sono però gli stessi
-  segnali con più leva: vale tutto quello che dice § 6 sulla dipendenza da poche operazioni.
-- **Il modello era centrato.** Volatilità vera in media 65%, modello 64%. Il risultato a modello (55.000 $ dal 2019) e quello
-  vero (53.000 $) sono vicini.
+  la serie peggiore di perdite è −8% contro −14%. Nel 2018 W3.2 apre con −25% alla prima operazione; l'opzione con −5%.
+- **Al 10%** il risultato è vicino a W3.2 intera (197.000 $ contro 209.000 $) con perdite più contenute: peggiore operazione
+  −10% invece di −25%. Sono gli stessi segnali: vale tutto quello che dice § 6 sulla dipendenza da poche operazioni.
+- **Il modello era centrato sulla volatilità** (vera 65% in media, modello 64%) **e un po' ottimista sul totale**: 55.000 $ dal
+  2019 contro 49.000 $ veri. Le opzioni vere sono prezzate sul future, che sta sopra il prezzo corrente (0,5% in mediana, fino
+  al 2,6% nel 2021): le call costano qualche punto in più.
 - **La scadenza non si sceglie.** I contratti veri avevano fra 18 e 74 giorni di vita: fino al 2019 esistevano poche scadenze.
   Dal 2020 in poi si resta fra 25 e 46 giorni.
-- **Usando direttamente il primo scambio dopo l'ingresso** invece della volatilità mediana, il risultato dal 2019 è 46.000 $:
+- **Usando direttamente il primo scambio dopo l'ingresso** invece della volatilità mediana, il risultato dal 2019 è 45.000 $:
   il momento esatto dell'ordine conta.
 
 Limiti di questo backtest: i prezzi sono ricostruiti dalla volatilità scambiata, non sono il book del momento; la
-differenza denaro-lettera è una stima (3% per lato; oggi è circa 0,5%); nel 2018–2019 gli scambi erano pochi.
+differenza denaro-lettera è una stima prudente (3% per lato; negli scambi veri è stata sotto l'1%); nel 2018–2019 gli scambi
+erano pochi, in un caso uno solo; il prezzo di regolamento è quello di Binance, non l'indice Deribit.
 
 ### Controllo sui prezzi di OKX
 
