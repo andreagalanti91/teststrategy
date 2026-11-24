@@ -4,6 +4,7 @@ Confronto di strategie di trading con backtest dal 01/01/2021, a partire dall'an
 [`andreagalanti91/radar`](https://github.com/andreagalanti91/radar).
 
 - **[`STRATEGIE.md`](STRATEGIE.md)** — confronto di 16 strategie e 4 portafogli dal 2021, robustezza, proposta e domande aperte.
+- **[`RICERCA_NUOVA.md`](RICERCA_NUOVA.md)** — cosa manca: affidabilità statistica dei risultati (Sharpe deflazionato), leva (Kelly), premio di volatilità, opzioni vendute e comprate.
 - **[`LIVELLI_BTC.md`](LIVELLI_BTC.md)** — supporti, resistenze e liquidazioni di BTC oggi; cosa succede quando un supporto cede.
 - **[`LIQUIDAZIONI.md`](LIQUIDAZIONI.md)** — il prezzo di BTC segue le liquidazioni? Come verificarlo, risultati, lettura della mappa di Coinglass.
 - **[`W32_INGRESSI_USCITE.md`](W32_INGRESSI_USCITE.md)** — W3.2 operazione per operazione: quando entra, quando esce, prove di DCA in ingresso e in uscita.

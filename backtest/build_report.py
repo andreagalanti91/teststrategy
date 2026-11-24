@@ -12,7 +12,8 @@ JOBS = ((["results/tables.md"], "backtest/report_template.md", "STRATEGIE.md"),
         (["results/w32/tables.md"], "backtest/w32_template.md", "CONFRONTO_W32.md"),
         (["results/w32_inout/tables.md"], "backtest/w32_inout_template.md", "W32_INGRESSI_USCITE.md"),
         (["results/liq/tables.md"], "backtest/liq_template.md", "LIQUIDAZIONI.md"),
-        (["results/livelli/tables.md"], "backtest/livelli_template.md", "LIVELLI_BTC.md"))
+        (["results/livelli/tables.md"], "backtest/livelli_template.md", "LIVELLI_BTC.md"),
+        (["results/ricerca/tables.md"], "backtest/ricerca_template.md", "RICERCA_NUOVA.md"))
 for tables, template, out in JOBS:
     src = "\n".join((ROOT / t).read_text() for t in tables)
     parts = re.split(r"^## ([A-Z]\d+) .*$", src, flags=re.M)
