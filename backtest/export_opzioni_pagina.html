@@ -1,0 +1,103 @@
+<!doctype html>
+<html lang="it">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Riferimento · sezione Opzioni</title>
+<style>
+/* Riferimento per la sezione "Opzioni" di Radar: due stati (oggi, giorno del segnale). In Radar va rifatta con i componenti e i colori della dashboard. */
+:root { --bg: #f7f8fa; --surface: #ffffff; --fg: #14181f; --muted: #5b6472; --line: #dde1e7; --accent: #2a78d6; --chip: #eef1f5; --good: #0a7d33; --bad: #c0392b; --warn: #9a6400;
+  --font: system-ui, -apple-system, "Segoe UI", sans-serif; }
+@media (prefers-color-scheme: dark) { :root { --bg: #10141a; --surface: #181d25; --fg: #e8ebf0; --muted: #9aa3b0; --line: #2b323d; --accent: #5b9bea; --chip: #222934;
+  --good: #4cc27a; --bad: #f0786a; --warn: #e0b050; color-scheme: dark } }
+* { box-sizing: border-box; }
+body { margin: 0; background: var(--bg); color: var(--fg); font-family: var(--font); font-size: 14px; line-height: 1.45; }
+.wrap { max-width: 1080px; margin: 0 auto; padding: 20px 16px 40px; display: flex; flex-direction: column; gap: 18px; }
+h1 { font-size: 20px; margin: 0; } h2 { font-size: 16px; margin: 0 0 4px; } h3 { font-size: 13px; margin: 18px 0 8px; color: var(--muted); font-weight: 600; text-transform: uppercase; letter-spacing: .04em; }
+.sub { color: var(--muted); margin: 4px 0 0; }
+.card { background: var(--surface); border: 1px solid var(--line); border-radius: 8px; padding: 16px; min-width: 0; }
+.banner { display: flex; gap: 12px; align-items: flex-start; padding: 12px; border-radius: 8px; background: var(--chip); }
+.tag { font-weight: 700; font-size: 12px; letter-spacing: .06em; padding: 4px 10px; border-radius: 999px; color: #fff; flex: none; }
+.tag.compra, .tag.vendi { background: var(--accent); } .tag.tieni { background: var(--good); } .tag.fuori, .tag.attesa { background: var(--muted); }
+.banner b { display: block; } .banner div span { color: var(--muted); }
+.tiles { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 10px; margin-top: 12px; }
+.tile { border: 1px solid var(--line); border-radius: 8px; padding: 10px 12px; min-width: 0; }
+.tile .k { color: var(--muted); font-size: 12px; } .tile .v { font-size: 18px; font-weight: 600; font-variant-numeric: tabular-nums; } .tile .d { color: var(--muted); font-size: 12px; }
+.scroll { overflow-x: auto; }
+table { border-collapse: collapse; width: 100%; font-variant-numeric: tabular-nums; }
+th, td { padding: 7px 10px; text-align: right; border-bottom: 1px solid var(--line); white-space: nowrap; }
+th:first-child, td:first-child, .l { text-align: left; }
+th { color: var(--muted); font-weight: 500; font-size: 12px; }
+.pos { color: var(--good); } .neg { color: var(--bad); }
+.note { color: var(--muted); font-size: 12px; margin: 10px 0 0; }
+ol { margin: 0; padding-left: 20px; } details summary { cursor: pointer; color: var(--accent); margin-top: 14px; }
+</style>
+<div class="wrap">
+  <header><h1>Riferimento per la sezione «Opzioni» di Radar</h1>
+    <p class="sub">Due stati della stessa sezione, con le quotazioni vere di OKX del 24/11/2026 e un capitale d'esempio di 45.000 $.</p></header>
+  <div id="out"></div>
+</div>
+<script>
+/*DATI*/
+const mig = v => String(Math.round(Math.abs(v))).replace(/\B(?=(\d{3})+(?!\d))/g, ".");
+const usd = v => v == null ? "–" : (v < 0 ? "−" : "") + mig(v) + " $";
+const sgn = v => v == null ? "–" : (v > 0 ? "+" : v < 0 ? "−" : "") + mig(v) + " $";
+const pct = (v, d = 1) => v == null ? "–" : (v > 0 ? "+" : v < 0 ? "−" : "") + Math.abs(v).toFixed(d).replace(".", ",") + "%";
+const cls = v => v > 0 ? "pos" : v < 0 ? "neg" : "";
+const day = s => s ? s.slice(8, 10) + "/" + s.slice(5, 7) + "/" + s.slice(0, 4) : "–";
+const tile = (k, v, d = "", c = "") => `<div class="tile"><div class="k">${k}</div><div class="v ${c}">${v}</div><div class="d">${d}</div></div>`;
+const NOMI = { compra: "COMPRA", vendi: "VENDI", tieni: "TIENI", fuori: "FUORI", attesa: "ATTESA" };
+
+function proposta(p, s) {
+  const c = p.contratto, q = p.quantita;
+  return `<div class="tiles">
+    ${tile("Contratto", `${c.tipo === "call" ? "Call" : "Put"} ${usd(c.strike)}`, c.id)}
+    ${tile("Scadenza", day(c.scadenza), `${Math.round(c.giorni)} giorni · ore ${c.scadenza_ora_utc} UTC`)}
+    ${tile("Prezzo (lettera)", usd(c.lettera), `denaro ${usd(c.denaro)} · differenza ${String(q.differenziale_pct).replace(".", ",")}%`)}
+    ${tile("Da comprare", `${q.contratti} contratti`, `${String(q.btc).replace(".", ",")} BTC · controvalore ${usd(q.controvalore)}`)}
+    ${tile("Spesa", usd(q.spesa), `${s.quota_pct}% di ${usd(s.capitale)} · commissioni ${usd(q.commissioni)}`)}
+    ${tile("Perdita massima", usd(q.perdita_massima), `${String(q.perdita_massima_pct).replace(".", ",")}% del capitale`, "neg")}
+    ${tile("Pareggio a scadenza", usd(q.pareggio), `BTC ${pct(q.pareggio_pct)}`)}
+    ${tile("Volatilità implicita", c.vol_pct + "%", "più è alta, più l'opzione costa")}
+  </div>
+  <h3>Cosa succede alla scadenza</h3>
+  <div class="scroll"><table><thead><tr><th>BTC alla scadenza</th><th>Variazione</th><th>Valore delle opzioni</th><th>Guadagno o perdita</th><th>Sul capitale</th></tr></thead><tbody>
+  ${p.scenari.map(x => `<tr><td>${usd(x.btc)}</td><td>${x.mossa_pct === 0 ? "invariato" : pct(x.mossa_pct, 0)}</td><td>${usd(x.valore)}</td><td class="${cls(x.risultato)}">${sgn(x.risultato)}</td><td class="${cls(x.risultato)}">${pct(x.sul_capitale_pct)}</td></tr>`).join("")}
+  </tbody></table></div>`;
+}
+function posizione(p, s) {
+  return `<div class="tiles">
+    ${tile("Contratto", `${p.tipo === "call" ? "Call" : "Put"} ${usd(p.strike)}`, p.id)}
+    ${tile("Scadenza", day(p.scadenza), `fra ${Math.round(p.giorni)} giorni`)}
+    ${tile("Comprata a", usd(p.prezzo_in), `il ${day(p.entra)} · ${p.contratti} contratti`)}
+    ${tile("Vale ora (denaro)", usd(p.prezzo_ora), `BTC ${usd(s.w3.prezzo)}`)}
+    ${tile("Risultato", sgn(p.risultato), `${pct(p.risultato_pct)} del capitale`, cls(p.risultato))}
+    ${tile("Spesa = perdita massima", usd(p.spesa), `${s.quota_pct}% di ${usd(s.capitale)}`)}
+  </div>${p.nota ? `<p class="note">Nota: ${p.nota}.</p>` : ""}`;
+}
+function registro(r) {
+  if (!r.length) return `<p class="note">Registro vuoto: la prima riga nasce al prossimo ingresso di W3.2.</p>`;
+  return `<div class="scroll"><table><thead><tr><th class="l">Segnale</th><th class="l">Verso</th><th class="l">Contratto</th><th>Comprata a</th><th>Chiusa a</th><th class="l">Stato</th><th>Spesa</th><th>Risultato</th><th>Sul capitale</th></tr></thead><tbody>
+  ${r.map(x => `<tr><td>${day(x.segnale)}</td><td class="l">${x.verso}</td><td class="l">${x.id || "–"}</td><td>${usd(x.prezzo_in)}</td><td>${usd(x.prezzo_out)}</td><td class="l">${x.stato}</td><td>${usd(x.spesa)}</td><td class="${cls(x.risultato)}">${sgn(x.risultato)}</td><td class="${cls(x.risultato)}">${pct(x.risultato_pct)}</td></tr>`).join("")}
+  </tbody></table></div>`;
+}
+function storico(t) {
+  const a = t.reduce((m, x) => m * (1 + x.opzione_pct / 100), 1), b = t.reduce((m, x) => m * (1 + x.w32_pct / 200), 1);
+  return `<details><summary>Storico dal 2018 con i prezzi veri (${t.length} operazioni)</summary>
+  <p class="note">10.000 $ → ${usd(10000 * a)} con le opzioni al 5%; ${usd(10000 * b)} con W3.2 a metà dimensione. Operazioni in guadagno: ${Math.round(100 * t.filter(x => x.opzione_pct > 0).length / t.length)}%. Perdita peggiore: −5%.</p>
+  <div class="scroll"><table><thead><tr><th>#</th><th class="l">Verso</th><th class="l">Entra</th><th class="l">Esce</th><th class="l">Contratto</th><th>Giorni</th><th>W3.2</th><th>Opzione, 5%</th></tr></thead><tbody>
+  ${t.map(x => `<tr><td>${x.n}</td><td class="l">${x.verso}</td><td class="l">${day(x.entra)}</td><td class="l">${x.esce === "aperta" ? "aperta" : day(x.esce)}</td><td class="l">${x.contratto}</td><td>${x.giorni}</td><td class="${cls(x.w32_pct)}">${pct(x.w32_pct)}</td><td class="${cls(x.opzione_pct)}">${pct(x.opzione_pct)}</td></tr>`).join("")}
+  </tbody></table></div></details>`;
+}
+function sezione(s, nome) {
+  return `<section class="card"><h2>Opzioni · W3.2 a rischio definito</h2><p class="sub">${nome} · aggiornato ${s.aggiornato.replace("T", " ").slice(0, 16)} UTC · sulla carta, nessun ordine inviato</p>
+  <div class="banner" style="margin-top:12px"><span class="tag ${s.azione}">${NOMI[s.azione]}</span><div><b>${s.titolo}</b><span>${s.testo}</span></div></div>
+  ${s.posizione ? posizione(s.posizione, s) : ""}${s.proposta ? proposta(s.proposta, s) : ""}
+  <h3>Registro su carta</h3>${registro(s.registro)}
+  ${s.storico.length ? storico(s.storico) : ""}
+  <h3>Regole</h3><ol>${s.regole.map(x => `<li>${x}</li>`).join("")}</ol>
+  <p class="note">Nel backtest con prezzi veri dal 2018 questa strategia non rende più di W3.2: rende circa quanto W3.2 a metà dimensione, con la perdita per operazione fissata al 5%. Perde anche quando BTC resta fermo. Ricerca su dati storici, non una raccomandazione.</p>
+  </section>`;
+}
+document.getElementById("out").innerHTML = `<div style="display:flex;flex-direction:column;gap:18px">${sezione(STATI.oggi, "Stato di oggi: posizione aperta")}${sezione(STATI.segnale, "Esempio: giorno di un segnale long")}</div>`;
+</script>
+</html>
