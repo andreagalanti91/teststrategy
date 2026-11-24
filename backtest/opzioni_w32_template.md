@@ -8,18 +8,23 @@ Dati fino al 23/11/2026; quotazioni OKX del 24/11/2026.
 ## 1. Sintesi
 
 **La strategia è semplice: a ogni segnale di W3.2 si compra una sola opzione a 30 giorni (call se long, put se short) spendendo
-il 5% del capitale. Nel backtest rende circa metà di W3.2 con meno della metà del drawdown, e la perdita per operazione non
-può superare il 5%. Non rende di più: fa rendere in modo più controllato. Si opera da OKX, che usi già.**
+il 5% del capitale. Nel backtest equivale a W3.2 a metà dimensione: stesso rendimento, drawdown simile. Non rende di più.
+Quello che cambia è che la perdita per operazione è fissata al 5% in partenza, senza stop e senza leva. Si opera da OKX,
+che usi già.**
 
 | Domanda | Risposta |
 |---|---|
 | Cos'è | Un contratto che dà il diritto di comprare (call) o vendere (put) BTC a un prezzo fissato, entro una data. Si paga un premio. Se va male si perde il premio e basta |
 | La strategia | Segnale di W3.2 → una call o una put a 30 giorni, al prezzo corrente, con il 5% del capitale. Si vende quando W3.2 esce, o si incassa a scadenza |
-| Risultato dal 2019 | 10.000 $ → 55.000 $ (+24% annuo), drawdown −14%, peggiore operazione −5%. W3.2 originale: 236.000 $ (+49%), drawdown −37%, peggiore −18% |
+| Risultato dal 2019 | 10.000 $ → 55.000 $ (+24% annuo), drawdown −14%, peggiore operazione −5%. W3.2 a metà dimensione: 54.000 $ (+24%), drawdown −20%, peggiore −9% |
+| Risultato dal 2018 (volatilità stimata) | +19% annuo, drawdown −20%. W3.2 a metà dimensione: +20%, −20%. Nessuna differenza |
 | Si può backtestare? | Sì, ma con prezzi delle opzioni calcolati da una formula: lo storico vero dei contratti scaduti non è gratuito. Dove esistono prezzi veri (OKX, ottobre–novembre 2026) il modello sbaglia dell'1% in mediana |
-| Quanto è solido | 20 operazioni. Regge a opzioni più care del 20% (+18% annuo) e a costi doppi (+23%). Non regge se i segnali di W3.2 peggiorano: con metà delle operazioni in guadagno il risultato a tre anni è +31% e la probabilità di perdere è del 16% |
+| Quanto è solido | 20 operazioni, e le tre migliori fanno metà del risultato. Ogni 10% in più sul prezzo delle opzioni toglie circa 3 punti annui. Se i segnali di W3.2 peggiorano (metà delle operazioni in guadagno invece dell'80%) il risultato a tre anni scende a +32% e una volta su sei si perde |
 | Da dove si opera | OKX Europe offre opzioni su BTC ai clienti al dettaglio: contratto minimo 0,01 BTC (circa 35 $ di premio), premio e incasso in dollari. Bitget non ha opzioni |
 | Come partire | Prima sulla carta: annotare il prezzo vero a ogni segnale. Poi con un contratto. Il 5% solo dopo aver visto almeno 3–4 operazioni |
+
+Una verifica indipendente ha riprodotto i calcoli e ha ridimensionato le conclusioni: il vantaggio sul drawdown che si vede
+dal 2019 sparisce se si include il 2018, e il risultato delle singole operazioni dipende dal giorno esatto di scadenza.
 
 ## 2. Le opzioni in una pagina
 
@@ -84,7 +89,8 @@ lo stop scatta. Con l'opzione cambia il modo di prendere lo stesso rischio:
 | Se BTC si muove in fretta nella direzione giusta | Guadagno | Guadagno, amplificato |
 | Durata | Finché W3.2 non esce | Al massimo 30 giorni |
 
-W3.2 guadagna soprattutto nelle prime settimane dopo il segnale: per questo un'opzione breve ne cattura una buona parte.
+W3.2 guadagna spesso nelle prime settimane dopo il segnale: per questo un'opzione breve ne cattura una buona parte. Quando
+invece il movimento arriva dopo il primo mese, l'opzione è già scaduta.
 
 ## 4. La strategia
 
@@ -108,13 +114,15 @@ posizione.
 
 {{P1}}
 
-- **Una sola opzione batte il rinnovo.** Rinnovare ogni mese costa: nelle operazioni lunghe e lente (2022–2023, 2025) si
+- **Il confronto giusto è con W3.2 a metà dimensione**, non con W3.2 intera: l'opzione al 5% rende lo stesso (+24% annuo) con
+  drawdown −14% invece di −20%. Al 10% rende quanto W3.2 intera con drawdown −26% invece di −37%. Vedi però § 6: includendo
+  il 2018 la differenza di drawdown sparisce.
+- **Il rinnovo peggiora il drawdown, sempre.** Rinnovare ogni mese costa: nelle operazioni lunghe e lente (2022–2023, 2025) si
   spende il 25–35% del capitale in premi per un movimento piccolo. È il motivo della regola 7.
-- **La scadenza breve batte la lunga.** A parità di spesa, l'opzione a 30 giorni muove più controvalore.
-- **5% contro 10%.** Il 10% rende quanto W3.2 originale (230.000 $) con drawdown −26% invece di −37%. Ma una serie di quattro
-  perdite piene fa −34%. Il 5% è la quota coerente con il tuo limite di drawdown e con i 2–3.000 $ che già destini alla leva.
-- **Rispetto a W3.2 a metà dimensione** il rendimento è simile: la differenza è il drawdown più basso e la perdita per
-  operazione fissata in partenza.
+- **Scadenza breve o lunga: è soprattutto leva.** A parità di spesa l'opzione a 30 giorni muove più controvalore di quella a
+  90. Fra 21 e 45 giorni il rendimento non cambia in modo distinguibile (§ 6).
+- **5% contro 10%.** Il 5% è una scelta prudente, non un calcolo: dà un drawdown di −14/−20%. Il tuo limite di −35% si
+  raggiunge verso il 9–10% (−26% dal 2019, −37% dal 2018). Il 5% corrisponde anche ai 2–3.000 $ che già destini alla leva.
 
 Operazione per operazione, versione base:
 
@@ -126,17 +134,37 @@ guadagna più di W3.2, che chiude in pari o in perdita, perché il movimento giu
 
 ## 6. Quanto è solido
 
+### Prezzo dell'opzione, costi, scadenza
+
 {{P3}}
 
-- Il risultato non dipende dal prezzo esatto dell'opzione: con volatilità pagata il 20% in più si scende da +24% a +18% annuo.
-- Dipende invece dalla scelta del prezzo d'esercizio meno di quanto sembri: fuori dal prezzo rende di più con meno operazioni
-  in guadagno, dentro il prezzo il contrario. Alla pari è la scelta di mezzo, non la migliore a posteriori.
+- **Prezzo dell'opzione.** Pagare la volatilità il 20% in più toglie un terzo del capitale finale (da 55.000 a 37.000 $):
+  circa 3 punti di rendimento annuo ogni 10% di prezzo. Il risultato resta positivo, ma non è indifferente.
+- **Costi.** Raddoppiare la differenza denaro-lettera costa meno di 2 punti annui.
+- **Giorno di scadenza.** Fra 21 e 45 giorni il rendimento sta fra +22% e +26%: nessuna scadenza è chiaramente migliore. Ma
+  il drawdown va da −10% a −17% e le operazioni in guadagno dal 65% all'80%: l'80% della versione a 30 giorni è il valore più
+  alto della griglia. Su OKX le scadenze sono solo il venerdì, quindi il giorno esatto non si sceglie.
+- **Poche operazioni contano molto.** Senza le tre migliori il rendimento scende a +12% annuo, senza le cinque migliori a +7%.
+
+### Il 2018, che nel backtest principale manca
+
+{{P7}}
+
+Con il 2018 dentro, l'opzione al 5% e W3.2 a metà dimensione sono uguali: +19–20% annuo, drawdown −20%. Le tre operazioni
+del 2018 perdono tutte con l'opzione, compresa quella che W3.2 chiude a +16,7%: lo short di ottobre scade il giorno prima
+del crollo di novembre. Con due giorni in più di scadenza sarebbe stata in guadagno. È un esempio di quanto pesa il caso
+sulla singola operazione.
+
+### Se i segnali peggiorano
 
 {{P4}}
 
-Il punto debole è uno solo: **la strategia vale quanto i segnali di W3.2**. Dal 2019 l'80% delle operazioni ha chiuso in
-guadagno. Se quella quota scende al 50%, a tre anni il risultato mediano è +31% e una volta su sei si chiude in perdita. Se
-scende al 35% la strategia non guadagna più. La perdita resta comunque lenta: 5% per volta.
+- Nei percorsi simulati l'opzione al 5% e W3.2 a metà dimensione sono vicine: rendimento mediano a tre anni +95% e +98%,
+  drawdown mediano −9% e −11%.
+- **La strategia vale quanto i segnali di W3.2.** Dal 2019 l'80% delle operazioni ha chiuso in guadagno. Se quella quota
+  scende al 50%, a tre anni il risultato mediano è +32% e una volta su sei si chiude in perdita. Se scende al 35% non si
+  guadagna più. La perdita resta lenta: 5% per volta.
+- Gli altri punti deboli sono quelli visti sopra: prezzi da modello, poche operazioni decisive, il caso sulla scadenza.
 
 ## 7. Il modello contro i prezzi veri
 
@@ -182,11 +210,12 @@ carico tuo (quadri RT e RW).
 ## 9. Cosa può andare storto
 
 - **Segnali peggiori che in passato.** È il rischio principale (§ 6).
-- **Campione piccolo e favorevole.** 20 operazioni dal 2019. Il 2018 non c'è perché mancano i dati di volatilità, ed è stato
-  l'anno peggiore di W3.2 (due perdite e un guadagno).
-- **Scadenza scelta dopo aver visto i risultati.** Fra 30, 60 e 90 giorni la migliore è 30. Con 90 giorni il risultato è
-  +18% annuo invece di +24%.
-- **Prezzi da modello.** § 7 misura lo scarto solo sul 2026.
+- **Campione piccolo e favorevole.** 20 operazioni dal 2019. Con il 2018 (volatilità stimata) il vantaggio sul drawdown
+  sparisce (§ 6).
+- **Il caso sulla scadenza.** La singola operazione può passare da perdita piena a guadagno per uno o due giorni di differenza.
+- **Prezzi da modello.** § 7 misura lo scarto solo su cinque settimane del 2026. Fino a marzo 2021 la volatilità usata è un
+  dato settimanale tenuto fermo: riguarda 7 operazioni su 20, fra cui due delle tre migliori.
+- **Un'operazione tagliata.** La n. 6 è chiusa il 31/12/2020 per un cambio di dati nel backtest di W3.2, non per un segnale.
 - **Liquidità delle opzioni lineari.** Su OKX le quotazioni ci sono, con una differenza denaro-lettera dell'1%, ma gli scambi
   sono pochi: per importi sopra qualche BTC il prezzo può peggiorare. Per 0,5–1 BTC non è un problema.
 - **Capitale fermo.** Il 95% resta in dollari senza rendere. È una scelta: è il motivo per cui il drawdown è basso.

@@ -5,6 +5,8 @@ Operazioni di W3.2 dal 2019-05-13: 20 (l'ultima è aperta). Durata mediana: 63 g
 | Versione | 10.000 $ → | CAGR | Max DD (giornaliero) | Operazioni in guadagno | Operazione peggiore | Migliore | Serie peggiore di perdite | Premio speso per operazione | Opzioni per operazione |
 |---|---|---|---|---|---|---|---|---|---|
 | W3.2 originale (spot e perp, rischio 25% allo stop) | 236.413 | +49,4% | -37,3% | 85% | -17,9% | +52,2% | -20,0% | – | – |
+| W3.2 a metà dimensione (riferimento a rischio simile) | 53.793 | +23,8% | -20,0% | 85% | -9,0% | +26,1% | – | – | – |
+| W3.2 a un quinto della dimensione (riferimento a rischio simile) | 20.084 | +9,3% | -8,3% | 85% | -3,6% | +10,4% | – | – | – |
 | Opzione a 30 giorni, 5% del capitale, una sola | 55.465 | +24,3% | -14,1% | 80% | -5,0% | +34,5% | -7,1% | 5,0% | 1,0 |
 | Opzione a 30 giorni, 10% del capitale, una sola | 230.273 | +48,9% | -26,2% | 80% | -10,0% | +69,0% | -14,0% | 10,0% | 1,0 |
 | Opzione a 60 giorni, 5% del capitale, una sola | 45.952 | +21,4% | -18,3% | 65% | -5,0% | +28,5% | -9,6% | 5,0% | 1,0 |
@@ -55,23 +57,43 @@ Operazioni di W3.2 dal 2019-05-13: 20 (l'ultima è aperta). Durata mediana: 63 g
 | Tutto insieme: DVOL in acquisto, alla pari in vendita, differenziale 6% | 43.475 | +20,5% | -13,9% | 75% | -5,0% |
 | Opzione 5% fuori dal prezzo (più economica, serve più movimento) | 79.800 | +30,2% | -16,5% | 65% | -5,0% |
 | Opzione 5% dentro il prezzo (più cara, perde valore più lentamente) | 40.012 | +19,2% | -12,3% | 85% | -5,0% |
+| Scadenza a 21 giorni invece di 30 | 54.711 | +24,1% | -11,9% | 65% | -5,0% |
+| Scadenza a 25 giorni invece di 30 | 59.706 | +25,5% | -15,8% | 70% | -5,0% |
+| Scadenza a 35 giorni invece di 30 | 51.483 | +23,1% | -10,0% | 80% | -5,0% |
+| Scadenza a 45 giorni invece di 30 | 47.050 | +21,7% | -17,4% | 70% | -5,0% |
 
-Dipendenza dalle operazioni migliori: tutte le 20 operazioni danno ×5,5; senza la migliore ×4,1; senza le tre migliori ×2,4. Per W3.2 originale: ×24,7, ×16,2, ×7,1.
+Dipendenza dalle operazioni migliori: tutte le 20 operazioni danno ×5,5; senza la migliore ×4,1; senza le tre migliori ×2,4 (+12,0% annuo); senza le cinque migliori ×1,7 (+6,9% annuo). Per W3.2 originale: ×24,7, ×16,2, ×7,1.
 
 ## P4 bootstrap
 
-Si estraggono a caso 8 operazioni (circa tre anni) dalle 20 dello storico, 20.000 volte. Il drawdown qui è misurato solo alla chiusura delle operazioni.
+Si estraggono a caso 8 operazioni (circa tre anni) dalle 20 dello storico, 5.000 volte, ognuna con il suo percorso giornaliero: il drawdown comprende anche le oscillazioni a operazione aperta.
 
-| Versione | Risultato mediano a 3 anni | 5° percentile | Probabilità di chiudere in perdita | Probabilità di una serie di perdite oltre −20% | oltre −35% |
+| Versione | Risultato mediano a 3 anni | 5° percentile | Probabilità di chiudere in perdita | Drawdown mediano | Probabilità di drawdown oltre −20% | oltre −35% |
+|---|---|---|---|---|---|---|
+| W3.2 originale | +263% | +61% | 0% | -21% | 58% | 4% |
+| W3.2 a metà dimensione | +98% | +33% | 0% | -11% | 2% | 0% |
+| Opzioni a 30 giorni, 5%, una sola (base) | +95% | +26% | 0% | -9% | 0% | 0% |
+| Opzioni a 30 giorni, 10%, una sola | +245% | +52% | 0% | -16% | 11% | 0% |
+| Opzioni a 30 giorni, 10%, con rinnovo | +178% | +1% | 5% | -36% | 100% | 55% |
+| Opzioni a 90 giorni, 10%, una sola | +169% | +39% | 1% | -21% | 53% | 1% |
+| Base, se le operazioni in guadagno scendono dall'80% al 65% | +61% | +3% | 4% | -10% | 2% | 0% |
+| Base, se scendono al 50% | +32% | -14% | 16% | -13% | 11% | 0% |
+| Base, se scendono al 35% | +6% | -26% | 41% | -17% | 32% | 0% |
+
+## P7 dal2018
+
+Per il 2018 non esistono dati di volatilità implicita: si usa la volatilità realizzata dei 30 giorni precedenti aumentata del 10%. Operazioni: 23.
+
+| Dal 2018 | 10.000 $ → | CAGR | Max DD (giornaliero) | Operazioni in guadagno | Operazione peggiore |
 |---|---|---|---|---|---|
-| W3.2 originale | +260% | +63% | 0% | 9% | 0% |
-| Opzioni a 30 giorni, 5%, una sola (base) | +97% | +26% | 0% | 0% | 0% |
-| Opzioni a 30 giorni, 10%, una sola | +247% | +55% | 0% | 1% | 0% |
-| Opzioni a 30 giorni, 10%, con rinnovo | +180% | +3% | 4% | 32% | 5% |
-| Opzioni a 90 giorni, 10%, una sola | +165% | +37% | 1% | 3% | 0% |
-| Base, se le operazioni in guadagno scendono dall'80% al 65% | +60% | +2% | 4% | 1% | 0% |
-| Base, se scendono al 50% | +31% | -14% | 16% | 6% | 0% |
-| Base, se scendono al 35% | +6% | -26% | 41% | 23% | 0% |
+| W3.2 originale | 209.002 | +40,8% | -37,3% | 78% | -25,1% |
+| W3.2 a metà dimensione | 50.981 | +20,1% | -20,0% | 78% | -12,5% |
+| Opzioni a 30 giorni, 5% | 48.333 | +19,4% | -20,0% | 70% | -5,0% |
+| Opzioni a 30 giorni, 10% | 173.688 | +37,9% | -36,7% | 70% | -10,0% |
+| Opzioni a 35 giorni, 5% | 50.132 | +19,9% | -12,0% | 74% | -5,0% |
+| Opzioni a 25 giorni, 5% | 51.807 | +20,3% | -21,3% | 61% | -5,0% |
+
+Le tre operazioni del 2018: long del 2018-01-08, W3.2 -25,1%, opzione -4,7%; long del 2018-04-30, W3.2 -3,3%, opzione -3,7%; short del 2018-10-15, W3.2 +16,7%, opzione -5,0%.
 
 ## P5 reale
 

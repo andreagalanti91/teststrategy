@@ -111,6 +111,11 @@ def main() -> None:
     T.append("|---|---|---|---|---|---|---|---|---|---|")
     T.append(f"| W3.2 originale (spot e perp, rischio 25% allo stop) | {usd(10000 * float(w.iloc[-1]))} | {pct(float(w.iloc[-1]) ** (1 / wy) - 1)} | {pct(float((w / w.cummax() - 1).min()))} | {(rw > 0).mean() * 100:.0f}% | "
              f"{pct(rw.min())} | {pct(rw.max())} | {pct(min(np.prod(1 + rw[i:j]) - 1 for i in range(len(rw)) for j in range(i + 1, len(rw) + 1)))} | – | – |")
+    wd = w.pct_change().fillna(0.0)
+    for f_ in (0.5, 0.2):
+        e_ = (1 + f_ * wd).cumprod()
+        T.append(f"| W3.2 a {'metà' if f_ == 0.5 else 'un quinto della'} dimensione (riferimento a rischio simile) | {usd(10000 * float(e_.iloc[-1]))} | {pct(float(e_.iloc[-1]) ** (1 / wy) - 1)} | {pct(float((e_ / e_.cummax() - 1).min()))} | "
+                 f"{(rw > 0).mean() * 100:.0f}% | {pct(f_ * rw.min())} | {pct(f_ * rw.max())} | – | – | – |")
     G, E = {}, {}
     for roll in (False, True):
         for tenor in (30, 60, 90):
@@ -149,43 +154,82 @@ def main() -> None:
         eq, o = simulate(tr, c, tenor=BASE[0], bud=BASE[1], roll=BASE[2], **kw)
         s = stats(eq, o)
         T.append(f"| {lab} | {usd(10000 * s['fin'])} | {pct(s['cagr'])} | {pct(s['dd'])} | {s['win'] * 100:.0f}% | {pct(s['worst'])} |")
+    for tn in (21, 25, 35, 45):
+        eq, o = simulate(tr, c, iv, iv, tn, BASE[1], False)
+        s = stats(eq, o)
+        T.append(f"| Scadenza a {tn} giorni invece di 30 | {usd(10000 * s['fin'])} | {pct(s['cagr'])} | {pct(s['dd'])} | {s['win'] * 100:.0f}% | {pct(s['worst'])} |")
     # senza le migliori
     r = ob.ris.to_numpy()
     srt = np.sort(r)[::-1]
+    yb = (E[BASE].index[-1] - E[BASE].index[0]).days / 365.25
     T.append(f"\nDipendenza dalle operazioni migliori: tutte le {len(r)} operazioni danno ×{num(float(np.prod(1 + r)), 1)}; senza la migliore ×{num(float(np.prod(1 + srt[1:])), 1)}; "
-             f"senza le tre migliori ×{num(float(np.prod(1 + srt[3:])), 1)}. Per W3.2 originale: ×{num(float(np.prod(1 + rw)), 1)}, ×{num(float(np.prod(1 + np.sort(rw)[::-1][1:])), 1)}, "
+             f"senza le tre migliori ×{num(float(np.prod(1 + srt[3:])), 1)} ({pct(float(np.prod(1 + srt[3:])) ** (1 / yb) - 1)} annuo); senza le cinque migliori ×{num(float(np.prod(1 + srt[5:])), 1)} "
+             f"({pct(float(np.prod(1 + srt[5:])) ** (1 / yb) - 1)} annuo). Per W3.2 originale: ×{num(float(np.prod(1 + rw)), 1)}, ×{num(float(np.prod(1 + np.sort(rw)[::-1][1:])), 1)}, "
              f"×{num(float(np.prod(1 + np.sort(rw)[::-1][3:])), 1)}.")
 
-    # ---------- P4 bootstrap sulle operazioni
+    # ---------- P4 bootstrap sulle operazioni, con il percorso giornaliero dentro ogni operazione
     T.append("\n## P4 bootstrap\n")
     rng = np.random.default_rng(7)
-    NS, NT = 20000, 8                           # circa 2,6 operazioni l'anno: 8 in tre anni
-    T.append(f"Si estraggono a caso {NT} operazioni (circa tre anni) dalle {len(r)} dello storico, 20.000 volte. Il drawdown qui è misurato solo alla chiusura delle operazioni.\n")
-    T.append("| Versione | Risultato mediano a 3 anni | 5° percentile | Probabilità di chiudere in perdita | Probabilità di una serie di perdite oltre −20% | oltre −35% |")
-    T.append("|---|---|---|---|---|---|")
+    NS, NT = 5000, 8                            # circa 2,6 operazioni l'anno: 8 in tre anni
+    T.append(f"Si estraggono a caso {NT} operazioni (circa tre anni) dalle {len(r)} dello storico, {usd(NS)} volte, ognuna con il suo percorso giornaliero: il drawdown comprende anche le oscillazioni a operazione aperta.\n")
+    T.append("| Versione | Risultato mediano a 3 anni | 5° percentile | Probabilità di chiudere in perdita | Drawdown mediano | Probabilità di drawdown oltre −20% | oltre −35% |")
+    T.append("|---|---|---|---|---|---|---|")
 
-    def boot(x, lab):
-        p = x[rng.integers(0, len(x), size=(NS, NT))]
-        e = np.cumprod(1 + p, axis=1)
-        e0 = np.concatenate([np.ones((NS, 1)), e], axis=1)
-        dd = (e0 / np.maximum.accumulate(e0, axis=1) - 1).min(axis=1)
-        T.append(f"| {lab} | {pct(float(np.median(e[:, -1])) - 1, 0)} | {pct(float(np.percentile(e[:, -1], 5)) - 1, 0)} | {(e[:, -1] < 1).mean() * 100:.0f}% | {(dd < -0.20).mean() * 100:.0f}% | {(dd < -0.35).mean() * 100:.0f}% |")
+    def segs(e, trd):                           # percorso giornaliero relativo di ogni operazione (1 = capitale prima dell'ingresso)
+        out = []
+        for t in trd.itertuples():
+            x = e.loc[t.entra - DAY:t.esce].to_numpy()
+            out.append(x / x[0])
+        return out
 
-    boot(rw, "W3.2 originale")
+    def boot(sg, lab, mod=None):
+        fin, dds = np.empty(NS), np.empty(NS)
+        for i in range(NS):
+            cur, peak, dd = 1.0, 1.0, 0.0
+            for j in rng.integers(0, len(sg), NT):
+                x = sg[j] if mod is None else mod(sg[j])
+                v = cur * x
+                pk = np.maximum(peak, np.maximum.accumulate(v))
+                dd = min(dd, float((v / pk - 1).min()))
+                cur, peak = float(v[-1]), float(pk[-1])
+            fin[i], dds[i] = cur, dd
+        T.append(f"| {lab} | {pct(float(np.median(fin)) - 1, 0)} | {pct(float(np.percentile(fin, 5)) - 1, 0)} | {(fin < 1).mean() * 100:.0f}% | {pct(float(np.median(dds)), 0)} | {(dds < -0.20).mean() * 100:.0f}% | {(dds < -0.35).mean() * 100:.0f}% |")
+
+    boot(segs(w, tr), "W3.2 originale")
+    boot(segs((1 + 0.5 * wd).cumprod(), tr), "W3.2 a metà dimensione")
     for k, lab in (((30, 0.05, False), "Opzioni a 30 giorni, 5%, una sola (base)"), ((30, 0.10, False), "Opzioni a 30 giorni, 10%, una sola"), ((30, 0.10, True), "Opzioni a 30 giorni, 10%, con rinnovo"),
                    ((90, 0.10, False), "Opzioni a 90 giorni, 10%, una sola")):
-        boot(G[k][1].ris.to_numpy(), lab)
-    # con il tasso di successo ridotto: si sostituiscono a caso operazioni vincenti con una perdita piena
-    x = ob.ris.to_numpy().copy()
-    full = -BASE[1]
+        boot(segs(E[k], tr), lab)
+    # con meno operazioni in guadagno: una parte delle vincenti estratte diventa una perdita piena del premio
+    sgb, winshare = segs(E[BASE], tr), float((ob.ris > 0).mean())
+    lose = np.array([1.0, 1 - BASE[1]])
     for share, lab in ((0.65, "Base, se le operazioni in guadagno scendono dall'80% al 65%"), (0.5, "Base, se scendono al 50%"), (0.35, "Base, se scendono al 35%")):
-        p = x[rng.integers(0, len(x), size=(NS, NT))]
-        cut = (rng.random((NS, NT)) > share / (x > 0).mean()) & (p > 0)
-        p = np.where(cut, full, p)
-        e = np.cumprod(1 + p, axis=1)
-        e0 = np.concatenate([np.ones((NS, 1)), e], axis=1)
-        dd = (e0 / np.maximum.accumulate(e0, axis=1) - 1).min(axis=1)
-        T.append(f"| {lab} | {pct(float(np.median(e[:, -1])) - 1, 0)} | {pct(float(np.percentile(e[:, -1], 5)) - 1, 0)} | {(e[:, -1] < 1).mean() * 100:.0f}% | {(dd < -0.20).mean() * 100:.0f}% | {(dd < -0.35).mean() * 100:.0f}% |")
+        boot(sgb, lab, mod=lambda x, sh=share: lose if (x[-1] > 1 and rng.random() > sh / winshare) else x)
+
+    # ---------- P7 lo stesso dal 2018, con la volatilita' stimata per l'anno che manca
+    lr = np.log(c / c.shift(1))
+    est = (np.sqrt((lr ** 2).rolling(30).mean() * 365) * 1.1).loc["2018-01-01":iv.index[0] - DAY]
+    iv18 = pd.concat([est, iv])
+    tr18 = pd.read_csv(ROOT / "results" / "w32" / "movimenti_w32.csv")
+    tr18["entra"] = pd.to_datetime(tr18["entra"])
+    tr18["esce"] = pd.to_datetime(tr18["esce"]).fillna(c.index[-1])
+    w18 = pd.read_csv(ROOT / "results" / "w32" / "equity.csv", index_col=0, parse_dates=True)["W3.2 radar (rischio 25%)"]
+    w18 = w18 / w18.iloc[0]
+    y18 = (w18.index[-1] - w18.index[0]).days / 365.25
+    T.append("\n## P7 dal2018\n")
+    T.append(f"Per il 2018 non esistono dati di volatilità implicita: si usa la volatilità realizzata dei 30 giorni precedenti aumentata del 10%. Operazioni: {len(tr18)}.\n")
+    T.append("| Dal 2018 | 10.000 $ → | CAGR | Max DD (giornaliero) | Operazioni in guadagno | Operazione peggiore |")
+    T.append("|---|---|---|---|---|---|")
+    r18 = tr18.sul_capitale.to_numpy()
+    for f_, lab in ((1.0, "W3.2 originale"), (0.5, "W3.2 a metà dimensione")):
+        e_ = (1 + f_ * w18.pct_change().fillna(0.0)).cumprod()
+        T.append(f"| {lab} | {usd(10000 * float(e_.iloc[-1]))} | {pct(float(e_.iloc[-1]) ** (1 / y18) - 1)} | {pct(float((e_ / e_.cummax() - 1).min()))} | {(r18 > 0).mean() * 100:.0f}% | {pct(f_ * r18.min())} |")
+    for tn, bd in ((30, 0.05), (30, 0.10), (35, 0.05), (25, 0.05)):
+        eq, o = simulate(tr18, c, iv18, iv18, tn, bd, False)
+        s = stats(eq, o)
+        T.append(f"| Opzioni a {tn} giorni, {bd * 100:.0f}% | {usd(10000 * s['fin'])} | {pct(s['cagr'])} | {pct(s['dd'])} | {s['win'] * 100:.0f}% | {pct(s['worst'])} |")
+    o18 = simulate(tr18, c, iv18, iv18, 30, 0.05, False)[1].head(3)
+    T.append("\nLe tre operazioni del 2018: " + "; ".join(f"{r_.verso} del {r_.entra.date()}, W3.2 {pct(r_.w32)}, opzione {pct(r_.ris)}" for r_ in o18.itertuples()) + ".")
 
     # ---------- P5 il modello contro i prezzi veri di OKX (contratti ancora vivi: storia dal giorno di quotazione)
     okx = ROOT / "data" / "opzioni" / "okx"
