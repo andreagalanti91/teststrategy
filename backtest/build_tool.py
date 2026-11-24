@@ -41,6 +41,9 @@ add("Straddle coperto, premio al DVOL", o["· controllo: premio incassato al liv
     "Come sopra, ma vendendo al livello dell'indice DVOL: ipotesi ottimistica.")
 add("Straddle venduto senza copertura", o["Straddle venduto alla pari, 1x"], "Opzioni", "Senza copertura: mostra quanto pesa la direzione.")
 add("Put venduta −10%", o["Put venduta −10% con liquidità a garanzia"], "Opzioni", "Put a 30 giorni a −10% dal prezzo, con liquidità a garanzia.")
+q = pd.read_csv(ROOT / "results" / "opzioni_w32" / "equity.csv", index_col=0, parse_dates=True) * 10000
+add("W3.2 con opzioni comprate, 5%", q["Opzioni 30 giorni, 5%"], "Opzioni", "A ogni segnale di W3.2 una call o una put a 30 giorni con il 5% del capitale. Prezzi da modello. Dal 2019.")
+add("W3.2 con opzioni comprate, 10%", q["Opzioni 30 giorni, 10%"], "Opzioni", "Come sopra con il 10% del capitale per operazione.")
 
 T = {}
 w = pd.read_csv(ROOT / "results" / "w32" / "movimenti_w32.csv")
