@@ -75,7 +75,15 @@ Si estraggono a caso 8 operazioni (circa tre anni) dalle 20 dello storico, 20.00
 
 ## P5 reale
 
-Storico OKX non ancora scaricato (python backtest/fetch_okx_options.py --candele).
+Prezzi di chiusura giornalieri veri su OKX dei contratti oggi ancora quotati, con prezzo d'esercizio entro il 3% dal prezzo di BTC e almeno un contratto scambiato nel giorno (dal 2025-12-26 al 2026-11-17), divisi per il prezzo del modello nello stesso giorno. Sopra 1: l'opzione vera costava più del modello.
+
+| Giorni alla scadenza | Osservazioni | Prezzo vero / modello (mediana) | Un quarto dei casi sotto | Un quarto sopra | Prezzo vero / modello al livello del DVOL (mediana) |
+|---|---|---|---|---|---|
+| 7–20 | 153 | 1,05 | 0,97 | 1,16 | 0,99 |
+| 20–45 (la scadenza della strategia) | 318 | 1,01 | 0,96 | 1,07 | 0,95 |
+| 45–90 | 403 | 1,03 | 0,96 | 1,11 | 0,97 |
+| 90–180 | 404 | 1,06 | 0,97 | 1,16 | 1,00 |
+| oltre 180 | 434 | 1,09 | 0,98 | 1,22 | 1,04 |
 
 ## P6 oggi
 
@@ -97,10 +105,9 @@ Esempio: capitale 45.000 $, segnale short di W3.2, quota 5% = 2.250 $. Put con p
 | 42.101 $ | -30% | 11.808 $ | +9.572 $ | +21,3% | +11.909 $ |
 | 48.115 $ | -20% | 7.838 $ | +5.601 $ | +12,4% | +7.939 $ |
 | 54.130 $ | -10% | 3.867 $ | +1.631 $ | +3,6% | +3.970 $ |
-| 56.776 $ | -5,6% | 2.120 $ | −116 $ | -0,3% | +2.223 $ |
-| 60.144 $ | +0% | 0 $ | −2.236 $ | -5,0% | +0 $ |
+| 56.612 $ | -5,9% (pareggio) | 2.229 $ | −7 $ | -0,0% | +2.331 $ |
+| 60.144 $ | invariato | 0 $ | −2.236 $ | -5,0% | 0 $ |
 | 66.159 $ | +10% | 0 $ | −2.236 $ | -5,0% | −3.970 $ |
 | 72.173 $ | +20% | 0 $ | −2.236 $ | -5,0% | −7.939 $ |
-| 78.187 $ | +30% | 0 $ | −2.236 $ | -5,0% | −11.909 $ |
 
 Pareggio a scadenza: BTC a 56.612 $ (-5,9%). Perdita massima: 2.236 $ (-5,0% del capitale), qualunque cosa faccia BTC.

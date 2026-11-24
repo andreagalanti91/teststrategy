@@ -16,7 +16,7 @@ può superare il 5%. Non rende di più: fa rendere in modo più controllato. Si 
 | Cos'è | Un contratto che dà il diritto di comprare (call) o vendere (put) BTC a un prezzo fissato, entro una data. Si paga un premio. Se va male si perde il premio e basta |
 | La strategia | Segnale di W3.2 → una call o una put a 30 giorni, al prezzo corrente, con il 5% del capitale. Si vende quando W3.2 esce, o si incassa a scadenza |
 | Risultato dal 2019 | 10.000 $ → 55.000 $ (+24% annuo), drawdown −14%, peggiore operazione −5%. W3.2 originale: 236.000 $ (+49%), drawdown −37%, peggiore −18% |
-| Si può backtestare? | Sì, ma con prezzi delle opzioni calcolati da una formula: lo storico vero dei contratti scaduti non è gratuito. {{X1}} |
+| Si può backtestare? | Sì, ma con prezzi delle opzioni calcolati da una formula: lo storico vero dei contratti scaduti non è gratuito. Dove esistono prezzi veri (OKX, ottobre–novembre 2026) il modello sbaglia dell'1% in mediana |
 | Quanto è solido | 20 operazioni. Regge a opzioni più care del 20% (+18% annuo) e a costi doppi (+23%). Non regge se i segnali di W3.2 peggiorano: con metà delle operazioni in guadagno il risultato a tre anni è +31% e la probabilità di perdere è del 16% |
 | Da dove si opera | OKX Europe offre opzioni su BTC ai clienti al dettaglio: contratto minimo 0,01 BTC (circa 35 $ di premio), premio e incasso in dollari. Bitget non ha opzioni |
 | Come partire | Prima sulla carta: annotare il prezzo vero a ogni segnale. Poi con un contratto. Il 5% solo dopo aver visto almeno 3–4 operazioni |
@@ -142,7 +142,16 @@ scende al 35% la strategia non guadagna più. La perdita resta comunque lenta: 5
 
 {{P5}}
 
-{{X2}}
+- **Sulla scadenza della strategia il modello è centrato**: 318 prezzi veri fra il 13/10 e il 17/11/2026, mediana 1,01, metà
+  dei casi fra 0,96 e 1,07. Le opzioni vere costavano l'1% in più del modello.
+- **Al livello del DVOL il modello sarebbe troppo caro del 5%**: conferma che la volatilità giusta è quella delle opzioni alla
+  pari, più bassa dell'indice.
+- **Sulle scadenze lunghe le opzioni vere costano di più** (fino al 9% oltre i 180 giorni): il modello usa la volatilità a 30
+  giorni anche per quelle. È un altro motivo per restare sulle scadenze brevi.
+- **Il limite**: OKX conserva lo storico solo dei contratti ancora vivi. Per i 30 giorni il confronto copre cinque settimane
+  del 2026, non il 2019–2025. Per coprire tutto servono i prezzi storici di Deribit, che non sono raggiungibili da questo
+  ambiente, oppure il tempo: lo script di § 10 costruisce lo storico da oggi in avanti.
+- La differenza denaro-lettera vera oggi è l'1% del premio in totale; il backtest usa il 3% per lato, cioè sei volte tanto.
 
 ## 8. Da dove si opera
 
