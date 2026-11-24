@@ -230,7 +230,7 @@ function render() {
 }
 
 const LV = { supporto: ["Supporto", "#1baf7a", []], resistenza: ["Resistenza", "#e34948", []], liq_long: ["Liquidazioni di long", "#eda100", []], liq_short: ["Liquidazioni di short", "#6250d6", []],
-  media: ["Media mobile", "#8a93a0", [5, 4]], fibonacci: ["Fibonacci", "#2a78d6", [2, 3]] };
+  media: ["Media mobile", "#8a93a0", [5, 4]], fibonacci: ["Fibonacci", "#2a78d6", [2, 3]], storico: ["Livello storico", "#e87ba4", [5, 4]] };
 function oggi() {
   const o = D.oggi, px = o.prezzo, it = d => d.split("-").reverse().join("/");
   const lv = o.livelli.filter(x => x.prezzo > px * 0.72 && x.prezzo < px * 1.6);
@@ -254,7 +254,7 @@ function oggi() {
     o.zone.slice().sort((a, b) => b.a - a.a).map(z => `<tr><td>${fmtInt(z.da)}–${fmtUsd(z.a)}</td><td>${fmtPct(z.da / px - 1, 0)} / ${fmtPct(z.a / px - 1, 0)}</td><td>${z.n}</td>` +
       `<td class="l" style="white-space:normal">${z.tipi.map(t => LV[t][0].toLowerCase()).join(", ")}</td><td>${z.liq ? z.liq.toFixed(2).replace(".", ",") + " mld $" : "–"}</td></tr>`).join("") + "</tbody>";
   document.getElementById("onote").textContent = `Supporti e resistenze: massimi e minimi di swing settimanali non ancora rotti. Liquidazioni: stime di Coinglass del ${o.coinglass}, non dati reali. ` +
-    "Nei test i livelli descrivono il mercato ma non danno un segnale: dopo la rottura di un supporto il prezzo è sceso ancora, nel punto peggiore dei 14 giorni successivi, dell'11% in mediana, ma nel 40% dei casi è rientrato sopra il livello entro 5 giorni.";
+    "Nei test i livelli descrivono il mercato ma non danno un segnale: dopo la rottura di un supporto (15 casi dal 2018) il prezzo è sceso ancora di circa l'11% nel punto peggiore dei 14 giorni successivi, più o meno quanto dopo un qualsiasi forte calo, e in 6 casi su 15 è rientrato sopra il livello entro 5 giorni.";
   const c = o.candele, lo = Math.floor(px * 0.72 / 5000) * 5000, hi = Math.ceil(px * 1.6 / 5000) * 5000;
   const lines = { id: "lines", afterDatasetsDraw(ch) {
     const { ctx, chartArea: a, scales: { y } } = ch; ctx.save(); ctx.font = "11px Inter, system-ui, sans-serif"; ctx.textBaseline = "middle";

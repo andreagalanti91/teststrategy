@@ -56,9 +56,12 @@ def events(d: pd.DataFrame, sw) -> pd.DataFrame:
         beyond = (seg["close"] < lvl) if kind == "supporto" else (seg["close"] > lvl)
         if beyond.iloc[0]:
             continue                                            # gia' oltre il livello alla conferma
-        touch = (seg["low"] <= lvl * 1.01) if kind == "supporto" else (seg["high"] >= lvl * 0.99)
-        tt = touch[touch].index[0] if touch.any() else pd.NaT
+        # tocco "pulito": il prezzo arriva entro l'1% dal livello ma chiude ancora dal lato giusto (uno sfondamento diretto non e' un tocco)
+        touch = ((seg["low"] <= lvl * 1.01) & (seg["close"] >= lvl)) if kind == "supporto" else ((seg["high"] >= lvl * 0.99) & (seg["close"] <= lvl))
         tb = beyond[beyond].index[0] if beyond.any() else pd.NaT
+        if pd.notna(tb):
+            touch = touch[touch.index < tb]                      # conta solo un tocco avvenuto prima della rottura
+        tt = touch[touch].index[0] if touch.any() else pd.NaT
         rows.append({"tipo": kind, "livello": lvl, "formato": t0, "confermato": conf, "tocco": tt, "rottura": tb})
     return pd.DataFrame(rows)
 
@@ -85,7 +88,7 @@ def main():
 
     # ---------------- 1: i livelli tengono?
     T.append("## V1 tengono\n")
-    T.append("| Livello | Quanti (dal 2018) | Toccati entro 3 anni | Di quelli toccati: rotti in chiusura entro 10 giorni dal primo tocco | Rotti prima o poi | Mai rotti |")
+    T.append("| Livello | Quanti (dal 2018) | Ritoccati senza rompere (entro l'1%, chiusura dal lato giusto) | Di quelli: rotti in chiusura entro 10 giorni dal primo tocco | Rotti prima o poi | Mai rotti |")
     T.append("|---|---|---|---|---|---|")
     for kind in ("supporto", "resistenza"):
         x = ev[ev.tipo == kind]
@@ -115,6 +118,11 @@ def main():
         same = (x.f7 < 0) if kind == "supporto" else (x.f7 > 0)
         T.append(f"| {lab} | {len(x)} | {pct(x.giorno.mean())} | {pct(x.f3.mean())} | {pct(x.f7.mean())} | {pct(x.f14.mean())} | {pct(x.f30.mean())} | {same.mean() * 100:.0f}% | "
                  f"{x.rientro5.mean() * 100:.0f}% | {pct(x.ext14.median())} |")
+    xs = br[br.tipo == "supporto"]
+    xr = br[br.tipo == "resistenza"]
+    spread = (f"\nDispersione: dopo la rottura di un supporto il rendimento a 7 giorni va da {pct(xs.f7.min(), 0)} a {pct(xs.f7.max(), 0)} (mediana {pct(xs.f7.median())}); "
+              f"il giorno della rottura è in mediana {pct(xs.giorno.median())} (la media è abbassata dal 12/03/2020). Dopo la rottura di una resistenza: mediana a 7 giorni "
+              f"{pct(xr.f7.median())}, a 30 giorni {pct(xr.f30.median())}.")
     # riferimenti: giorni di calo/rialzo simile che NON sono rotture
     bdays = set(br.rottura)
     for kind, lab, m in (("supporto", "Riferimento: giorni con un calo simile (oltre −4%) senza rottura", (r1 <= -0.04)), ("resistenza", "Riferimento: giorni con un rialzo simile (oltre +4%) senza rottura", (r1 >= 0.04))):
@@ -124,8 +132,15 @@ def main():
         same = (allf[7].reindex(idx) < 0) if kind == "supporto" else (allf[7].reindex(idx) > 0)
         T.append(f"| {lab} | {len(idx)} | {pct(r1.reindex(idx).mean())} | {pct(allf[3].reindex(idx).mean())} | {pct(allf[7].reindex(idx).mean())} | {pct(allf[14].reindex(idx).mean())} | "
                  f"{pct(allf[30].reindex(idx).mean())} | {same.mean() * 100:.0f}% | – | {pct(e14.median())} |")
+    for thr in (-0.06,):
+        m = (r1 <= thr) & ~r1.index.isin(bdays) & (r1.index >= "2018-01-01")
+        idx = m[m].index
+        e14 = pd.Series([ext(t, 14, "supporto") for t in idx])
+        T.append(f"| Riferimento: giorni con un calo oltre −6% senza rottura | {len(idx)} | {pct(r1.reindex(idx).mean())} | {pct(allf[3].reindex(idx).mean())} | {pct(allf[7].reindex(idx).mean())} | "
+                 f"{pct(allf[14].reindex(idx).mean())} | {pct(allf[30].reindex(idx).mean())} | {(allf[7].reindex(idx) < 0).mean() * 100:.0f}% | – | {pct(e14.median())} |")
     T.append(f"| Riferimento: tutti i giorni dal 2018 | {len(allf[7].dropna())} | {pct(r1.loc['2018-01-01':].mean(), 2)} | {pct(allf[3].mean())} | {pct(allf[7].mean())} | {pct(allf[14].mean())} | {pct(allf[30].mean())} | – | – | – |")
 
+    T.append(spread)
     # per regime e per periodo
     T.append("\n## V3 regime\n")
     s200 = B.sma(C, 200)
@@ -166,7 +181,7 @@ def main():
         lv.append({"prezzo": ath - f_ * (ath - lo_c), "tipo": "fibonacci", "cosa": f"ritracciamento di Fibonacci {nm} del ciclo 2022–2025", "fonte": "prezzo"})
     for nm, v in (("SMA 200 settimane", B.sma(wk["close"], 200).iloc[-1]), ("SMA 40 settimane", B.sma(wk["close"], 40).iloc[-1]), ("SMA 200 giorni", B.sma(C, 200).iloc[-1]), ("SMA 50 giorni", B.sma(C, 50).iloc[-1])):
         lv.append({"prezzo": float(v), "tipo": "media", "cosa": nm, "fonte": "prezzo"})
-    lv.append({"prezzo": float(d.loc[:"2022-01-01", "high"].max()), "tipo": "resistenza", "cosa": "massimo del ciclo 2021", "fonte": "prezzo"})
+    lv.append({"prezzo": float(d.loc[:"2022-01-01", "high"].max()), "tipo": "storico", "cosa": "massimo del ciclo 2021, superato a marzo 2024: livello storico, non una resistenza attiva", "fonte": "prezzo"})
     for p, b in COINGLASS["long"]:
         lv.append({"prezzo": p, "tipo": "liq_long", "cosa": f"liquidazioni di long stimate: {num(b)} miliardi $", "fonte": "Coinglass " + COINGLASS["quando"], "usd": b})
     for p, b in COINGLASS["short"]:
@@ -197,7 +212,7 @@ def main():
     T.append(f"Prezzo di riferimento: {usd(px)} $ (chiusura del {last.strftime('%d/%m/%Y')}). ATR giornaliero: {usd(atr)} $ ({num(atr / px * 100, 1)}%).\n")
     T.append("| Livello | Distanza | Tipo | Che cos'è | Fonte |")
     T.append("|---|---|---|---|---|")
-    NAME = {"supporto": "supporto", "resistenza": "resistenza", "fibonacci": "Fibonacci", "media": "media mobile", "liq_long": "liquidazioni long", "liq_short": "liquidazioni short"}
+    NAME = {"supporto": "supporto", "resistenza": "resistenza", "fibonacci": "Fibonacci", "media": "media mobile", "liq_long": "liquidazioni long", "liq_short": "liquidazioni short", "storico": "livello storico"}
     done = False
     for x_ in lv:
         if not done and x_["prezzo"] < px:

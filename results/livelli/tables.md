@@ -1,9 +1,9 @@
 ## V1 tengono
 
-| Livello | Quanti (dal 2018) | Toccati entro 3 anni | Di quelli toccati: rotti in chiusura entro 10 giorni dal primo tocco | Rotti prima o poi | Mai rotti |
+| Livello | Quanti (dal 2018) | Ritoccati senza rompere (entro l'1%, chiusura dal lato giusto) | Di quelli: rotti in chiusura entro 10 giorni dal primo tocco | Rotti prima o poi | Mai rotti |
 |---|---|---|---|---|---|
-| Supporto | 27 | 18 (67%) | 14 su 18 (78%) | 16 (59%) | 11 |
-| Resistenza | 27 | 24 (89%) | 18 su 24 (75%) | 24 (89%) | 3 |
+| Supporto | 27 | 15 (56%) | 11 su 15 (73%) | 16 (59%) | 11 |
+| Resistenza | 27 | 15 (56%) | 9 su 15 (60%) | 24 (89%) | 3 |
 
 ## V2 dopo
 
@@ -13,7 +13,10 @@
 | Rottura di una resistenza | 21 | +6,7% | +1,6% | +2,6% | +6,4% | +15,1% | 67% | 38% | +8,8% |
 | Riferimento: giorni con un calo simile (oltre −4%) senza rottura | 231 | -6,6% | +0,2% | -0,1% | +0,0% | +1,5% | 48% | – | -8,8% |
 | Riferimento: giorni con un rialzo simile (oltre +4%) senza rottura | 271 | +6,6% | +0,5% | +1,5% | +2,9% | +4,0% | 52% | – | +8,0% |
+| Riferimento: giorni con un calo oltre −6% senza rottura | 107 | -8,4% | +0,4% | -0,5% | -0,8% | +1,1% | 50% | – | -10,3% |
 | Riferimento: tutti i giorni dal 2018 | 3242 | +0,10% | +0,3% | +0,7% | +1,5% | +3,5% | – | – | – |
+
+Dispersione: dopo la rottura di un supporto il rendimento a 7 giorni va da -24% a +28% (mediana +2,9%); il giorno della rottura è in mediana -4,6% (la media è abbassata dal 12/03/2020). Dopo la rottura di una resistenza: mediana a 7 giorni +1,8%, a 30 giorni +7,1%.
 
 ## V3 regime
 
@@ -51,7 +54,7 @@ Prezzo di riferimento: 61.271 $ (chiusura del 23/11/2026). ATR giornaliero: 3.09
 | 72.291 $ | +18% | media mobile | SMA 200 giorni | prezzo |
 | 71.971 $ | +17% | media mobile | SMA 40 settimane | prezzo |
 | 70.838 $ | +16% | Fibonacci | ritracciamento di Fibonacci 50% del ciclo 2022–2025 | prezzo |
-| 69.000 $ | +13% | resistenza | massimo del ciclo 2021 | prezzo |
+| 69.000 $ | +13% | livello storico | massimo del ciclo 2021, superato a marzo 2024: livello storico, non una resistenza attiva | prezzo |
 | 68.176 $ | +11% | media mobile | SMA 200 settimane | prezzo |
 | **61.271 $** | – | **prezzo** | – | – |
 | 57.800 $ | -6% | supporto | minimo di swing settimanale del 07/2026 | prezzo |
@@ -71,7 +74,7 @@ Prezzo di riferimento: 61.271 $ (chiusura del 23/11/2026). ATR giornaliero: 3.09
 |---|---|---|---|---|
 | 91.076–93.853 $ | +53% / +49% | 3 | liquidazioni short | 2,66 miliardi $ |
 | 76.257–76.915 $ | +26% / +24% | 2 | liquidazioni short, media mobile | 0,72 miliardi $ |
-| 68.176–72.291 $ | +18% / +11% | 5 | Fibonacci, media mobile, resistenza | – |
+| 68.176–72.291 $ | +18% / +11% | 5 | Fibonacci, media mobile, livello storico | – |
 | 57.772–57.800 $ | -6% / -6% | 2 | Fibonacci, supporto | – |
 | 53.312–55.130 $ | -10% / -13% | 3 | liquidazioni long, supporto | 1,46 miliardi $ |
 | 49.000–51.368 $ | -16% / -20% | 3 | liquidazioni long, supporto | 2,18 miliardi $ |
