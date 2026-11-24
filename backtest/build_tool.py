@@ -33,6 +33,15 @@ for col, name, grp, note in (("W3.1 radar (rischio 10%)", "W3.1 radar", "BTC", "
 c = pd.read_csv(ROOT / "results" / "algo" / "equity_finale.csv", index_col=0, parse_dates=True)["equity"]
 add("MACD a regime (altcoin)", c, "Altcoin", "MACD settimanale con filtri di trend su moneta e BTC, 30 monete più liquide, solo long.")
 
+# opzioni (results/ricerca, da backtest/ricerca_nuova.py): prezzi da modello, non osservati
+o = pd.read_csv(ROOT / "results" / "ricerca" / "equity_opzioni.csv", index_col=0, parse_dates=True) * 10000
+add("Straddle venduto, delta coperto", o["Straddle venduto con copertura giornaliera del delta, 1x"], "Opzioni",
+    "Straddle a 30 giorni, delta coperto ogni giorno sul perp, funding incluso. Prezzi da modello alla volatilità delle opzioni alla pari.")
+add("Straddle coperto, premio al DVOL", o["· controllo: premio incassato al livello del DVOL (ottimistico)"], "Opzioni",
+    "Come sopra, ma vendendo al livello dell'indice DVOL: ipotesi ottimistica.")
+add("Straddle venduto senza copertura", o["Straddle venduto alla pari, 1x"], "Opzioni", "Senza copertura: mostra quanto pesa la direzione.")
+add("Put venduta −10%", o["Put venduta −10% con liquidità a garanzia"], "Opzioni", "Put a 30 giorni a −10% dal prezzo, con liquidità a garanzia.")
+
 T = {}
 w = pd.read_csv(ROOT / "results" / "w32" / "movimenti_w32.csv")
 T["W3.2 radar"] = [{"verso": r.verso, "entra": r.entra, "esce": r.esce if isinstance(r.esce, str) else None, "in": round(r.prezzo_in), "out": round(r.prezzo_out),

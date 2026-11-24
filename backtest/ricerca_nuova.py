@@ -86,6 +86,12 @@ def part_a() -> dict:
         res[k] = sr_a
         T.append(f"| {k} | {len(r) / 52:.1f} | {num(sr_a)} | {num(float(r.skew()), 1)} | {psr(r) * 100:.1f}% | {d[0] * 100:.0f}% | {d[1] * 100:.0f}% | {d[2] * 100:.0f}% | {num(min_trl_years(r), 1)} |".replace(".", ",", 1) if False else
                  f"| {k} | {num(len(r) / 52, 1)} | {num(sr_a)} | {num(float(r.skew()), 1)} | {num(psr(r) * 100, 1)}% | {d[0] * 100:.0f}% | {d[1] * 100:.0f}% | {d[2] * 100:.0f}% | {num(min_trl_years(r), 1)} |")
+    rw = weekly_ret(a["W3.2 radar (rischio 25%)"])
+    T.append(f"\nW3.2 2018–2026 con la dispersione misurata invece di 0,5: con 0,37 il deflazionato è "
+             + " / ".join(f"{psr(rw, sr0(n, 0.37) / math.sqrt(52)) * 100:.0f}%" for n in (10, 100, 1000)) + "; con 0,31 è "
+             + " / ".join(f"{psr(rw, sr0(n, 0.31) / math.sqrt(52)) * 100:.0f}%" for n in (10, 100, 1000))
+             + f" (10 / 100 / 1.000 tentativi). I rendimenti settimanali di W3.2 hanno autocorrelazione {num(float(rw.autocorr()))}: tenendone conto lo Sharpe annuo scende da "
+             f"{num(rw.mean() / rw.std() * math.sqrt(52))} a circa {num(rw.mean() / rw.std() * math.sqrt(52) / math.sqrt(1 + 2 * rw.autocorr()))}.")
     return {"w32": a["W3.2 radar (rischio 25%)"], "v1": a["v1 · voto di 17 indicatori"], "btc": a["BTC comprato e tenuto"]}
 
 
@@ -117,12 +123,12 @@ def part_b(w32: pd.Series) -> None:
     T.append("| Campione | Leva | CAGR mediano a 3 anni | 5° percentile | Probabilità di chiudere in perdita | Drawdown mediano | Probabilità di drawdown oltre −35% | oltre −50% |")
     T.append("|---|---|---|---|---|---|---|---|")
     for lab, e in (("W3.2, 2018–2026", w32), ("W3.2, dal 2021", w32.loc["2021-01-01":])):
-        r = weekly_ret(e).to_numpy()
-        n, H, BL, NS = len(r), 156, 8, 4000
-        starts = rng.integers(0, n - BL, size=(NS, H // BL + 1))
+        r = e.pct_change().dropna().to_numpy()                 # rendimenti GIORNALIERI: il drawdown settimanale sottostima
+        n, H, BL, NS = len(r), 1095, 56, 4000
+        starts = rng.integers(0, n - BL + 1, size=(NS, H // BL + 1))
         paths = np.concatenate([r[s:s + BL] for s in starts.ravel()]).reshape(NS, -1)[:, :H]
         for f in (0.5, 1.0, 1.5, 2.0, 3.0):
-            x = np.clip(1 + f * paths - max(0.0, f - 1) * BORROW / 52, 0, None)
+            x = np.clip(1 + f * paths - max(0.0, f - 1) * BORROW / 365, 0, None)
             eq = np.cumprod(x, axis=1)
             cagr = eq[:, -1] ** (1 / 3) - 1
             dd = (eq / np.maximum.accumulate(np.maximum(eq, 1e-12), axis=1) - 1).min(axis=1)
@@ -152,12 +158,19 @@ def delta(S: float, K: float, tau: float, sig: float, cp: int, b: float = 0.0) -
     return g * ND.cdf(d1) if cp > 0 else g * (ND.cdf(d1) - 1.0)
 
 
-def iv_series(d: pd.DataFrame) -> pd.Series:
-    """Volatilita' implicita annua (frazione): DVOL giornaliero dal 24/03/2021; prima, IV at-the-money dei contratti scambiati
-    la domenica su Deribit (settimanale, tenuto fermo fino alla domenica dopo): approssimazione, usata solo per il 2019-2021."""
+def iv_series(d: pd.DataFrame, raw: bool = False) -> pd.Series:
+    """Volatilita' implicita annua (frazione).
+    raw=True: indice DVOL giornaliero dal 24/03/2021. Il DVOL e' un indice tipo VIX: pesa anche le opzioni lontane dal prezzo,
+    quindi sta sopra la volatilita' delle opzioni alla pari (nelle domeniche comuni il rapporto mediano e' 0,92).
+    raw=False (base dello studio): stima della volatilita' ALLA PARI = DVOL x rapporto mediano IV alla pari / DVOL delle ultime
+    8 domeniche (solo dati gia' noti). Prima del 24/03/2021, in entrambi i casi: IV alla pari degli scambi della domenica su
+    Deribit, tenuta ferma fino alla domenica dopo (approssimazione)."""
     dv = pd.read_csv(ROOT / "data" / "opzioni" / "dvol_btc_1d.csv", parse_dates=[0], index_col=0)["close"] / 100
     su = pd.read_csv(ROOT / "data" / "opzioni" / "deribit_opt_sunday.csv", parse_dates=[0], index_col=0)["atm_iv"] / 100
     idx = d.index[(d.index >= su.index[0]) & (d.index <= dv.index[-1])]
+    if not raw:
+        ratio = (su / dv.reindex(su.index)).dropna().rolling(8, min_periods=1).median()
+        dv = dv * ratio.reindex(dv.index, method="ffill").bfill()
     return dv.reindex(idx).combine_first(su.reindex(idx, method="ffill")).ffill()
 
 
@@ -203,6 +216,8 @@ def cycles(c: pd.Series, iv: pd.Series, legs: list, und: float = 0.0, notional: 
                     hpl -= abs(hn - h) * hedge_cost * s / s0
                     h = hn
                 pl += sum(q * (bs(s, m * s0, tau, IV[i + k], cp, CA[i + k]) - p) for (cp, m, q), p in zip(legs, prem)) / s0 - cost / s0 + hpl
+                if k == tenor:                                               # commissione di regolamento sulle gambe che scadono con valore
+                    pl -= sum(abs(q) * min(0.00015 * s, 0.125 * max(0.0, cp * (s - m * s0))) for cp, m, q in legs) / s0
             eq[i + k] = max(0.0, e * (1 + notional * pl))
         out.append((days[i], on, eq[i + tenor] / e - 1))
         e = eq[i + tenor]
@@ -211,9 +226,9 @@ def cycles(c: pd.Series, iv: pd.Series, legs: list, und: float = 0.0, notional: 
 
 
 def portfolio(c, iv, legs, und=0.0, notional=1.0, filt=None, tenor=30, hedge=False, carry=None):
-    """Quattro comparti da un quarto del capitale, partiti a 0, 7, 15 e 22 giorni: riduce la dipendenza dal giorno di partenza."""
+    """Sei comparti da un sesto del capitale, partiti a 5 giorni l'uno dall'altro: riduce la dipendenza dal giorno di partenza."""
     parts, cyc = [], []
-    for off in (0, 7, 15, 22):
+    for off in (0, 5, 10, 15, 20, 25):
         e, o = cycles(c, iv, legs, und, notional, off, tenor, filt, hedge=hedge, carry=hedge if carry is None else carry)
         parts.append(e)
         cyc += o
@@ -233,21 +248,22 @@ def perf(e: pd.Series, a=None, b=None) -> dict:
 
 def part_c(d: pd.DataFrame, w32: pd.Series) -> dict:
     c = d["close"]
-    iv = iv_series(d)
+    iv, ivraw = iv_series(d), iv_series(d, raw=True)
     lr = np.log(c / c.shift(1))
     rv_f = np.sqrt((lr ** 2).rolling(30).mean().shift(-30) * 365)          # realizzata nei 30 giorni DOPO
     rv_p = np.sqrt((lr ** 2).rolling(30).mean() * 365)                     # realizzata nei 30 giorni PRIMA
-    x = pd.DataFrame({"iv": iv, "rvf": rv_f.reindex(iv.index), "rvp": rv_p.reindex(iv.index)}).dropna()
+    x = pd.DataFrame({"iv": ivraw, "atm": iv, "rvf": rv_f.reindex(iv.index), "rvp": rv_p.reindex(iv.index)}).dropna()
     x["vrp"] = x.iv - x.rvf
+    x["vrp_atm"] = x.atm - x.rvf
     x.to_csv(OUT / "iv_rv.csv")
     T.append("\n## C1 premio\n")
-    T.append("| Periodo | Giorni | Volatilità implicita media | Realizzata nei 30 giorni dopo | Differenza media | Mediana | Giorni in cui l'implicita è stata più alta | Giorno peggiore (realizzata − implicita) |")
-    T.append("|---|---|---|---|---|---|---|---|")
+    T.append("| Periodo | Giorni | Volatilità implicita media (indice DVOL) | Realizzata nei 30 giorni dopo | Differenza media | Mediana | Giorni in cui l'implicita è stata più alta | Giorno peggiore (realizzata − implicita) | Implicita delle opzioni alla pari (stima) | Differenza media alla pari | Giorni in cui è stata più alta |")
+    T.append("|---|---|---|---|---|---|---|---|---|---|---|")
     for lab, a, b in (("2019 – 03/2021 (IV approssimata)", "2019-01-01", "2021-03-23"), ("03/2021 – 2023 (DVOL)", "2021-03-24", "2023-12-31"), ("2024 – 2026 (DVOL)", "2024-01-01", None),
                       ("Tutto", None, None)):
         y = x.loc[a:b]
         T.append(f"| {lab} | {len(y)} | {y.iv.mean() * 100:.0f}% | {y.rvf.mean() * 100:.0f}% | {num(y.vrp.mean() * 100, 1)} punti | {num(y.vrp.median() * 100, 1)} | {(y.vrp > 0).mean() * 100:.0f}% | "
-                 f"{num(-y.vrp.min() * 100, 0)} punti il {y.vrp.idxmin().date()} |")
+                 f"{num(-y.vrp.min() * 100, 0)} punti il {y.vrp.idxmin().date()} | {y.atm.mean() * 100:.0f}% | {num(y.vrp_atm.mean() * 100, 1)} punti | {(y.vrp_atm > 0).mean() * 100:.0f}% |")
     T.append(f"\nCorrelazione fra il premio (implicita − realizzata dopo) e il rendimento di BTC negli stessi 30 giorni: {num(x.vrp.corr((c.shift(-30) / c - 1).reindex(x.index)))}. "
              f"Con il valore assoluto del rendimento: {num(x.vrp.corr((c.shift(-30) / c - 1).abs().reindex(x.index)))}.")
 
@@ -259,6 +275,7 @@ def part_c(d: pd.DataFrame, w32: pd.Series) -> dict:
         "Straddle venduto, 0,25x": dict(legs=[(1, 1.0, -1), (-1, 1.0, -1)], notional=0.25),
         "Straddle venduto con copertura giornaliera del delta, 1x": dict(legs=[(1, 1.0, -1), (-1, 1.0, -1)], hedge=True),
         "· controllo: senza funding (copertura con il future della stessa scadenza)": dict(legs=[(1, 1.0, -1), (-1, 1.0, -1)], hedge=True, carry=False),
+        "· controllo: premio incassato al livello del DVOL (ottimistico)": dict(legs=[(1, 1.0, -1), (-1, 1.0, -1)], hedge=True, raw=True),
         "Straddle coperto, solo se implicita > realizzata passata": dict(legs=[(1, 1.0, -1), (-1, 1.0, -1)], hedge=True, filt=ivhi),
         "Straddle coperto, solo se implicita sopra la sua mediana a un anno": dict(legs=[(1, 1.0, -1), (-1, 1.0, -1)], hedge=True, filt=ivrank),
         "Strangle ±15% con copertura giornaliera del delta, 1x": dict(legs=[(1, 1.15, -1), (-1, 0.85, -1)], hedge=True),
@@ -270,11 +287,11 @@ def part_c(d: pd.DataFrame, w32: pd.Series) -> dict:
         "BTC comprato e tenuto (riferimento)": dict(legs=[], und=1.0),
     }
     T.append("\n## C2 strategie\n")
-    T.append("| Strategia (scadenze a 30 giorni, 4 comparti sfalsati) | 10.000 $ → | CAGR | Max DD | Sharpe | Mese peggiore | Cicli in guadagno | CAGR / DD 2019–03/2021 | CAGR / DD 03/2021–2023 | CAGR / DD 2024–2026 |")
+    T.append("| Strategia (scadenze a 30 giorni, 6 comparti sfalsati) | 10.000 $ → | CAGR | Max DD | Sharpe | Mese peggiore | Cicli in guadagno | CAGR / DD 2019–03/2021 | CAGR / DD 03/2021–2023 | CAGR / DD 2024–2026 |")
     T.append("|---|---|---|---|---|---|---|---|---|---|")
     E = {}
     for k, kw in STR.items():
-        e, cyc = portfolio(c, iv, **kw)
+        e, cyc = portfolio(c, ivraw if kw.pop("raw", False) else iv, **kw)
         E[k] = e
         on = [z for z in cyc if z[1]]
         p, pa, pb, pc = perf(e), perf(e, None, "2021-03-23"), perf(e, "2021-03-24", "2023-12-31"), perf(e, "2024-01-01", None)
@@ -299,11 +316,11 @@ def part_c(d: pd.DataFrame, w32: pd.Series) -> dict:
             cmb = (1 + (1 - wgt) * wr.reindex(sr_.index).fillna(0) + wgt * sr_).cumprod()
             pp = perf(cmb)
             T.append(f"| 80% W3.2 + 20% {k.lower()} | {pct(pp['cagr'])} | {pct(pp['dd'])} | {num(pp['sharpe'])} | {num(mm)} |")
-    return {"iv": iv, "E": E, "x": x}
+    return {"iv": iv, "ivraw": ivraw, "E": E, "x": x}
 
 
 # ================================================================== D · W3.2 con opzioni comprate
-def part_d(d: pd.DataFrame, iv: pd.Series) -> None:
+def part_d(d: pd.DataFrame, iv: pd.Series, ivraw: pd.Series) -> None:
     c = d["close"]
     tr = pd.read_csv(ROOT / "results" / "w32" / "movimenti_w32.csv")
     tr["entra"] = pd.to_datetime(tr["entra"])
@@ -332,29 +349,30 @@ def part_d(d: pd.DataFrame, iv: pd.Series) -> None:
     r1 = np.array([p_ for e_, p_ in t1 if pd.Timestamp(e_) >= iv.index[0]])
     T.append(f"| W3.1 (stessi segnali, rischio 10% allo stop) | {usd(10000 * float(np.prod(1 + r1)))} | {(r1 > 0).mean() * 100:.0f}% | {pct(r1.min())} | {pct(r1.max())} | fino a −10% (stop) | {pct(worst_run(r1))} |")
     rows = {}
-    for tenor in (90, 180):
-        for bud in (0.03, 0.06, 0.10):
+    for tenor, bud, ivx, suf in [(tn, bd, iv, "") for tn in (30, 90, 180) for bd in (0.06, 0.10)] + [(30, 0.10, ivraw, ", pagata al livello del DVOL"), (90, 0.10, ivraw, ", pagata al livello del DVOL")]:
+        if True:
             rets = []
             for t in tr.itertuples():
                 cp = 1 if t.verso == "long" else -1
-                s0, v0 = float(c.loc[t.entra - pd.Timedelta(days=1)]), float(iv.reindex([t.entra - pd.Timedelta(days=1)], method="ffill").iloc[0])
+                s0, v0 = float(c.loc[t.entra - pd.Timedelta(days=1)]), float(ivx.reindex([t.entra - pd.Timedelta(days=1)], method="ffill").iloc[0])
                 p0 = bs(s0, s0, tenor / 365, v0, cp) * 1.04
                 exp = t.entra + pd.Timedelta(days=tenor)
                 te = min(t.esce, exp)
-                s1 = float(c.loc[:te - pd.Timedelta(days=1)].iloc[-1])
+                # prezzo d'uscita: quello a cui W3.2 chiude davvero (stop o apertura del lunedi'); se l'opzione scade prima, la chiusura
+                s1 = float(t.prezzo_out) if (te == t.esce and t.uscita != "aperta") else float(c.loc[:te - pd.Timedelta(days=1)].iloc[-1])
                 tau = max(0.0, (exp - te).days / 365)
-                p1 = bs(s1, s0, tau, float(iv.reindex([te - pd.Timedelta(days=1)], method="ffill").iloc[0]), cp) * (0.96 if tau > 0 else 1.0)
+                p1 = bs(s1, s0, tau, float(ivx.reindex([te - pd.Timedelta(days=1)], method="ffill").iloc[0]), cp) * (0.96 if tau > 0 else 1.0)
                 rets.append(bud * (p1 / p0 - 1))
             r = np.array(rets)
-            rows[(tenor, bud)] = r
-            T.append(f"| Opzione a {tenor} giorni, {bud * 100:.0f}% del capitale per operazione | {usd(10000 * float(np.prod(1 + r)))} | {(r > 0).mean() * 100:.0f}% | {pct(r.min())} | {pct(r.max())} | "
+            rows[(tenor, bud, suf)] = r
+            T.append(f"| Opzione a {tenor} giorni, {bud * 100:.0f}% del capitale per operazione{suf} | {usd(10000 * float(np.prod(1 + r)))} | {(r > 0).mean() * 100:.0f}% | {pct(r.min())} | {pct(r.max())} | "
                      f"−{bud * 100:.0f}% | {pct(worst_run(r))} |")
-    best = rows[(90, 0.06)]
+    best, b30 = rows[(90, 0.10, "")], rows[(30, 0.10, "")]
     T.append("\n## D2 dettaglio\n")
-    T.append("| Operazione W3.2 | Verso | Entra | Esce | W3.2 originale | Con opzione a 90 giorni (6% del capitale) |")
-    T.append("|---|---|---|---|---|---|")
-    for t, r in zip(tr.itertuples(), best):
-        T.append(f"| {t.Index + 1} | {t.verso} | {t.entra.date()} | {'aperta' if t.uscita == 'aperta' else t.esce.date()} | {pct(t.sul_capitale)} | {pct(float(r))} |")
+    T.append("| Operazione W3.2 | Verso | Entra | Esce | W3.2 originale | Con opzione a 30 giorni (10% del capitale) | Con opzione a 90 giorni (10% del capitale) |")
+    T.append("|---|---|---|---|---|---|---|")
+    for t, r, r3 in zip(tr.itertuples(), best, b30):
+        T.append(f"| {t.Index + 1} | {t.verso} | {t.entra.date()} | {'aperta' if t.uscita == 'aperta' else t.esce.date()} | {pct(t.sul_capitale)} | {pct(float(r3))} | {pct(float(r))} |")
 
 
 # ================================================================== E · prove di sforzo e segnali dal mercato delle opzioni
@@ -380,9 +398,10 @@ def part_e(d: pd.DataFrame, iv: pd.Series, E: dict) -> None:
     T.append("\n## E2 esame\n")
     T.append("| Serie | Anni | Sharpe annuo (settimanale) | Asimmetria | Giorno peggiore | Settimana peggiore | Probabilità che lo Sharpe vero sia > 0 | Deflazionato, 10 tentativi | 100 tentativi |")
     T.append("|---|---|---|---|---|---|---|---|---|")
-    k = "Straddle venduto con copertura giornaliera del delta, 1x"
-    for lab, a, b in (("Straddle coperto, 2019–2026", None, None), ("Straddle coperto, solo DVOL (dal 24/03/2021)", "2021-03-24", None), ("Straddle coperto, 2024–2026", "2024-01-01", None)):
-        e = E[k].loc[a:b]
+    k, ko = "Straddle venduto con copertura giornaliera del delta, 1x", "· controllo: premio incassato al livello del DVOL (ottimistico)"
+    for lab, kk, a, b in (("Straddle coperto, 2019–2026", k, None, None), ("Straddle coperto, dal 24/03/2021", k, "2021-03-24", None),
+                          ("Con il premio al livello del DVOL, 2019–2026", ko, None, None), ("Con il premio al livello del DVOL, dal 24/03/2021", ko, "2021-03-24", None)):
+        e = E[kk].loc[a:b]
         r = weekly_ret(e)
         sr = r.mean() / r.std()
         T.append(f"| {lab} | {num(len(r) / 52, 1)} | {num(sr * math.sqrt(52))} | {num(float(r.skew()), 1)} | {pct(float(e.pct_change().min()), 1)} | {pct(float(r.min()), 1)} | {num(psr(r) * 100, 1)}% | "
@@ -422,18 +441,19 @@ def chart(x: pd.DataFrame, E: dict) -> None:
                          "ytick.color": MUTED, "axes.spines.top": False, "axes.spines.right": False, "figure.facecolor": SURF,
                          "axes.facecolor": SURF, "savefig.facecolor": SURF})
     fig, (a1, a2) = plt.subplots(2, 1, figsize=(10, 8), gridspec_kw={"height_ratios": [2, 3], "hspace": 0.28})
-    a1.plot(x.index, x.iv * 100, color="#2a78d6", lw=1.6, label="Implicita (attesa dal mercato)")
+    a1.plot(x.index, x.iv * 100, color="#2a78d6", lw=1.6, label="Implicita (indice DVOL)")
     a1.plot(x.index, x.rvf * 100, color="#eb6834", lw=1.3, label="Realizzata nei 30 giorni dopo")
     a1.set_title("Volatilità di BTC: implicita contro realizzata (%, annua)", loc="left", color=INK, fontsize=12, fontweight="bold")
     a1.legend(frameon=False, loc="upper right", fontsize=9)
     a1.grid(axis="y", color=GRID, lw=0.8)
-    sel = [("Straddle venduto con copertura giornaliera del delta, 1x", "#2a78d6"), ("Put venduta −10% con liquidità a garanzia", "#eb6834"), ("BTC + call venduta +10% (covered call)", "#eda100"),
+    sel = [("Straddle venduto con copertura giornaliera del delta, 1x", "#2a78d6"), ("· controllo: premio incassato al livello del DVOL (ottimistico)", "#e87ba4"),
+           ("Put venduta −10% con liquidità a garanzia", "#eb6834"), ("BTC + call venduta +10% (covered call)", "#eda100"),
            ("Straddle venduto alla pari, 1x", "#6250d6"), ("BTC comprato e tenuto (riferimento)", "#1baf7a")]
     ends = []
     for k, col in sel:
         e = E[k].dropna() * 10000
         a2.plot(e.index, e, color=col, lw=1.8)
-        ends.append((float(e.iloc[-1]), k.split(" (")[0].split(",")[0].replace("con copertura giornaliera del delta", "con delta coperto"), col, e.index[-1]))
+        ends.append((float(e.iloc[-1]), k.split(" (")[0].split(",")[0].replace("con copertura giornaliera del delta", "con delta coperto").replace("· controllo: premio incassato al livello del DVOL", "Idem, premio al livello del DVOL"), col, e.index[-1]))
     yy = []
     for v, lab, col, last in sorted(ends):
         y = v if not yy else max(v, yy[-1] * 1.45)
@@ -459,7 +479,7 @@ if __name__ == "__main__":
     s = part_a()
     part_b(s["w32"])
     r = part_c(d, s["w32"])
-    part_d(d, r["iv"])
+    part_d(d, r["iv"], r["ivraw"])
     part_e(d, r["iv"], r["E"])
     (OUT / "tables.md").write_text("\n".join(T) + "\n")
     print("\n".join(T))
