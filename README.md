@@ -35,6 +35,6 @@ python backtest/build_report.py
 Ricerca su dati storici, non una raccomandazione d'investimento.
 
 
-Esportazioni per il repo radar: `export/radar-opzioni/` (sezione "Opzioni": prompt, modulo, test, dati) e `export/radar-livelli/` (sezione "Livelli").
+Esportazioni per il repo radar: `export/radar-v1/` (switch W3.2 · v1 · Confronto), `export/radar-opzioni/` (sezione "Opzioni": prompt, modulo, test, dati) e `export/radar-livelli/` (sezione "Livelli").
 
 Strumento di confronto: `tool/index.html` con `tool/data.json` (rigenerabile con `python backtest/build_tool.py`).

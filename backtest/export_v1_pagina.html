@@ -1,0 +1,174 @@
+<!doctype html>
+<html lang="it">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Riferimento · W3.2 e v1</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+<style>
+/* Riferimento per radar: switch W3.2 · v1 · Confronto. In radar va rifatto con i componenti, i colori e lightweight-charts della dashboard. */
+:root { --bg: #f7f8fa; --surface: #ffffff; --fg: #14181f; --muted: #5b6472; --line: #dde1e7; --accent: #2a78d6; --chip: #eef1f5; --good: #0a7d33; --bad: #c0392b;
+  --w32: #2a78d6; --v1: #eb6834; --mix: #6250d6; --btc: #8a8f98; --font: system-ui, -apple-system, "Segoe UI", sans-serif; }
+@media (prefers-color-scheme: dark) { :root { --bg: #10141a; --surface: #181d25; --fg: #e8ebf0; --muted: #9aa3b0; --line: #2b323d; --accent: #5b9bea; --chip: #222934;
+  --good: #4cc27a; --bad: #f0786a; --w32: #5b9bea; --v1: #f08a5d; --mix: #8c7cf0; --btc: #9aa3b0; color-scheme: dark } }
+* { box-sizing: border-box; }
+body { margin: 0; background: var(--bg); color: var(--fg); font-family: var(--font); font-size: 14px; line-height: 1.45; }
+.wrap { max-width: 1100px; margin: 0 auto; padding: 20px 16px 40px; display: flex; flex-direction: column; gap: 16px; }
+h1 { font-size: 20px; margin: 0; } h2 { font-size: 16px; margin: 0 0 8px; } h3 { font-size: 12px; margin: 18px 0 8px; color: var(--muted); font-weight: 600; text-transform: uppercase; letter-spacing: .05em; }
+.sub { color: var(--muted); margin: 4px 0 0; }
+.card { background: var(--surface); border: 1px solid var(--line); border-radius: 10px; padding: 16px; min-width: 0; }
+.seg { display: inline-flex; background: var(--chip); border-radius: 10px; padding: 3px; gap: 2px; }
+.seg button { font: inherit; font-weight: 600; border: 0; background: transparent; color: var(--muted); padding: 7px 14px; border-radius: 8px; cursor: pointer; }
+.seg button[aria-pressed="true"] { background: var(--surface); color: var(--fg); box-shadow: 0 1px 3px rgba(0,0,0,.12); }
+.seg.small button { padding: 5px 10px; font-weight: 500; }
+.banner { display: flex; gap: 12px; align-items: flex-start; padding: 12px; border-radius: 8px; background: var(--chip); }
+.tag { font-weight: 700; font-size: 12px; letter-spacing: .06em; padding: 4px 10px; border-radius: 999px; color: #fff; flex: none; background: var(--muted); }
+.tag.long { background: var(--good); } .tag.short { background: var(--bad); }
+.banner b { display: block; } .banner div span { color: var(--muted); }
+.tiles { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 10px; margin-top: 12px; }
+.tile { border: 1px solid var(--line); border-radius: 8px; padding: 10px 12px; min-width: 0; }
+.tile .k { color: var(--muted); font-size: 12px; } .tile .v { font-size: 18px; font-weight: 600; font-variant-numeric: tabular-nums; } .tile .d { color: var(--muted); font-size: 12px; }
+.gauge { position: relative; height: 34px; margin: 18px 6px 26px; }
+.gauge .bar { position: absolute; top: 12px; left: 0; right: 0; height: 10px; border-radius: 5px; background: linear-gradient(90deg, var(--bad) 0 5%, var(--chip) 5% 75%, var(--good) 75% 100%); }
+.gauge .mk { position: absolute; top: 4px; width: 2px; height: 26px; background: var(--muted); }
+.gauge .mk span { position: absolute; top: 28px; transform: translateX(-50%); font-size: 11px; color: var(--muted); white-space: nowrap; }
+.gauge .now { position: absolute; top: 0; width: 14px; height: 34px; margin-left: -7px; border-radius: 4px; background: var(--fg); }
+.gauge .now span { position: absolute; top: -20px; left: 50%; transform: translateX(-50%); font-weight: 700; font-size: 12px; white-space: nowrap; }
+.fam { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 10px; }
+.ind { display: flex; justify-content: space-between; gap: 10px; padding: 6px 0; border-bottom: 1px solid var(--line); }
+.ind small { color: var(--muted); display: block; }
+.pill { font-weight: 700; font-size: 12px; padding: 2px 8px; border-radius: 999px; height: fit-content; flex: none; }
+.pill.p { background: color-mix(in srgb, var(--good) 18%, transparent); color: var(--good); } .pill.n { background: color-mix(in srgb, var(--bad) 18%, transparent); color: var(--bad); }
+.pill.z { background: var(--chip); color: var(--muted); }
+.scroll { overflow-x: auto; }
+table { border-collapse: collapse; width: 100%; font-variant-numeric: tabular-nums; }
+th, td { padding: 7px 10px; text-align: right; border-bottom: 1px solid var(--line); white-space: nowrap; }
+th:first-child, td:first-child, .l { text-align: left; }
+th { color: var(--muted); font-weight: 500; font-size: 12px; }
+.pos { color: var(--good); } .neg { color: var(--bad); }
+.note { color: var(--muted); font-size: 12px; margin: 10px 0 0; }
+.chart { position: relative; height: 300px; } .chart.s { height: 180px; }
+.two { display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 16px; }
+.dot { display: inline-block; width: 10px; height: 10px; border-radius: 50%; margin-right: 6px; vertical-align: middle; }
+[hidden] { display: none !important; }
+</style>
+<div class="wrap">
+  <header><h1>Riferimento per radar · switch delle strategie</h1>
+    <p class="sub">W3.2 resta la strategia in uso. La v1 è mostrata per confronto: nessun avviso, nessun ordine. Dati al <span id="dt"></span>.</p></header>
+  <div class="seg" role="group" aria-label="Strategia"><button data-s="w32" aria-pressed="false">W3.2</button><button data-s="v1" aria-pressed="true">v1 · voto</button><button data-s="cf" aria-pressed="false">Confronto</button></div>
+  <section id="s-w32" class="card" hidden></section>
+  <section id="s-v1" class="card"></section>
+  <section id="s-cf" hidden></section>
+</div>
+<script>
+/*DATI*/
+const $ = id => document.getElementById(id);
+const mig = v => String(Math.round(Math.abs(v))).replace(/\B(?=(\d{3})+(?!\d))/g, ".");
+const usd = v => v == null ? "–" : (v < 0 ? "−" : "") + mig(v) + " $";
+const pct = (v, d = 1) => v == null ? "–" : (v > 0 ? "+" : v < 0 ? "−" : "") + Math.abs(v * 100).toFixed(d).replace(".", ",") + "%";
+const pq = v => v == null ? "–" : Math.round(v * 100) + "%";
+const num = (v, d = 2) => v == null ? "–" : (v < 0 ? "−" : "") + Math.abs(v).toFixed(d).replace(".", ",");
+const cls = v => v > 0 ? "pos" : v < 0 ? "neg" : "";
+const day = s => s ? s.slice(8, 10) + "/" + s.slice(5, 7) + "/" + s.slice(2, 4) : "aperta";
+const css = n => getComputedStyle(document.documentElement).getPropertyValue(n).trim();
+const tile = (k, v, d = "", c = "") => `<div class="tile"><div class="k">${k}</div><div class="v ${c}">${v}</div><div class="d">${d}</div></div>`;
+const COL = { "W3.2": "--w32", "v1": "--v1", "50% W3.2 + 50% v1": "--mix", "BTC comprato e tenuto": "--btc" };
+const charts = {};
+$("dt").textContent = day(V1.data);
+
+// ---------- W3.2 (in radar c'è già: qui solo il segnaposto con lo stato e le metriche del confronto)
+function w32() {
+  const m = CF.metriche[0].righe["W3.2"];
+  $("s-w32").innerHTML = `<h2>W3.2 · strategia in uso</h2>
+  <div class="banner"><span class="tag ${W3.verso}">${W3.verso.toUpperCase()}</span><div><b>Aperta dal ${day(W3.entra)} a ${usd(W3.prezzo_in)}</b><span>${W3.stop} · esposizione ${num(W3.esposizione)}x</span></div></div>
+  <div class="tiles">${tile("10.000 $ dal 2018", usd(m.finale_10k))}${tile("Rendimento annuo", pct(m.cagr))}${tile("Drawdown massimo", pct(m.dd), "", "neg")}${tile("Operazioni", m.operazioni, pq(m.in_guadagno) + " in guadagno")}</div>
+  <p class="note">In radar questa vista è la card W3.2 di oggi, invariata.</p>`;
+}
+
+// ---------- v1
+function v1() {
+  const v = V1, m = v.storico.m_2018, m21 = v.storico.m_2021, x = (v.voto + 1) / 2 * 100;
+  const titolo = v.posizione === "fuori" ? "Fuori mercato" : `${v.posizione === "long" ? "Long" : "Short"} da ${v.da_giorni} giorni`;
+  const dist = v.posizione === "fuori" ? `Per il long servono ${v.distanze.per_long} indicatori che cambiano verso; per lo short ${v.distanze.per_short}.`
+    : `Per uscire servono ${v.distanze.per_uscire} indicatori che cambiano verso.`;
+  const mk = (t, lab) => `<div class="mk" style="left:${(t + 1) / 2 * 100}%"><span>${lab}</span></div>`;
+  const fam = ["trend", "momentum", "rottura", "volume"].map(f => `<div><h3>${f}</h3>${v.componenti.filter(c => c.famiglia === f).map(c =>
+    `<div class="ind"><div>${c.nome}<small>long se ${c.long_se} · così dal ${day(c.da)}</small></div><span class="pill ${c.voto > 0 ? "p" : c.voto < 0 ? "n" : "z"}">${c.voto > 0 ? "LONG" : c.voto < 0 ? "SHORT" : "0"}</span></div>`).join("")}</div>`).join("");
+  $("s-v1").innerHTML = `<h2>v1 · voto di 17 indicatori <small style="color:var(--muted);font-weight:500">· confronto, non in uso</small></h2>
+  <div class="banner"><span class="tag ${v.posizione}">${v.posizione.toUpperCase()}</span><div><b>${titolo}${v.evento_oggi ? " · " + v.evento_oggi + " oggi" : ""}</b><span>Voto ${num(v.voto)} (ieri ${num(v.voto_ieri)}): ${v.conteggio.long} long, ${v.conteggio.short} short, ${v.conteggio.neutri} neutri. ${dist}</span></div></div>
+  <div class="gauge" aria-label="Voto da −1 a +1"><div class="bar"></div>${mk(-0.9, "short −0,90")}${mk(-0.25, "esce −0,25")}${mk(0.25, "esce +0,25")}${mk(0.5, "long +0,50")}<div class="now" style="left:${x}%"><span>${num(v.voto)}</span></div></div>
+  <div class="fam">${fam}</div>
+  <h3>Voto nel tempo</h3><div class="chart s"><canvas id="cVoto"></canvas></div>
+  <div class="tiles">${tile("10.000 $ dal 2018", usd(m.finale_10k), "dal 2021: " + usd(m21.finale_10k))}${tile("Rendimento annuo", pct(m.cagr), "dal 2021: " + pct(m21.cagr))}${tile("Drawdown massimo", pct(m.dd), "dal 2021: " + pct(m21.dd), "neg")}${tile("Operazioni", m.operazioni, pq(m.in_guadagno) + " in guadagno")}</div>
+  <h3>Operazioni dal 2018</h3><div class="scroll"><table><thead><tr><th>#</th><th class="l">Verso</th><th class="l">Entra</th><th class="l">Esce</th><th>Giorni</th><th>Prezzo</th><th>Voto all'ingresso</th><th>Risultato</th><th class="l">Uscita</th></tr></thead><tbody>
+  ${v.storico.operazioni.map((t, i) => `<tr><td>${i + 1}</td><td class="l">${t.verso}</td><td class="l">${day(t.entra)}</td><td class="l">${day(t.esce)}</td><td>${t.giorni}</td><td>${usd(t.prezzo_in)} → ${usd(t.prezzo_out)}</td><td>${num(t.voto_in)}</td><td class="${cls(t.risultato)}">${pct(t.risultato)}</td><td class="l">${t.motivo}</td></tr>`).reverse().join("")}
+  </tbody></table></div>
+  <p class="note">Regole fisse, scelte sul 2018–2021: long con voto ≥ +0,50, short con voto ≤ −0,90, uscita quando il voto torna oltre ±0,25. Decisione alla chiusura giornaliera, esposizione 1x. Nessun avviso Telegram.</p>`;
+  const h = v.voto_storico;
+  charts.v = new Chart($("cVoto"), { type: "line", data: { labels: h.d, datasets: [
+    { data: h.v, borderColor: css("--v1"), borderWidth: 1.5, pointRadius: 0 },
+    ...[[0.5, "--good"], [0.25, "--muted"], [-0.25, "--muted"], [-0.9, "--bad"]].map(([y, c]) => ({ data: h.d.map(() => y), borderColor: css(c), borderWidth: 1, borderDash: [4, 4], pointRadius: 0 }))] },
+    options: { animation: false, maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { x: { ticks: { maxTicksLimit: 8, color: css("--muted") }, grid: { display: false } }, y: { min: -1, max: 1, ticks: { color: css("--muted") }, grid: { color: css("--line") } } } } });
+}
+
+// ---------- confronto
+let per = 0;
+function cf() {
+  const c = CF;
+  $("s-cf").innerHTML = `<div class="card"><h2>Confronto W3.2 · v1</h2><p class="sub">Dal ${day(c.periodo.dal)} al ${day(c.periodo.al)}. ${c.lettura.join(" ")}</p>
+    <div class="seg small" id="per" style="margin-top:12px">${c.metriche.map((m, i) => `<button data-p="${i}" aria-pressed="${i === per}">${m.periodo.split(" (")[0]}</button>`).join("")}</div>
+    <div class="scroll" style="margin-top:10px"><table id="tMet"></table></div></div>
+  <div class="card"><h2>Capitale e drawdown</h2><div class="chart"><canvas id="cEq"></canvas></div><div class="chart s" style="margin-top:12px"><canvas id="cDd"></canvas></div><div class="chart s" style="height:110px;margin-top:12px"><canvas id="cPos"></canvas></div>
+    <p class="note">In basso: posizione di ognuna (+1 long, −1 short, 0 fuori), settimana per settimana.</p></div>
+  <div class="card"><h2>Anno per anno</h2><div class="scroll"><table>${annoT()}</table></div></div>
+  <div class="card"><h2>Quando sono d'accordo</h2><p class="sub">Stesso verso nel ${pq(c.accordo.stesso_verso_quota)} dei giorni · correlazione mensile ${num(c.accordo.corr_mensile)}</p>
+    <div class="scroll"><table><thead><tr><th>Situazione</th><th>Giorni</th><th>Quota</th><th>BTC, annuo</th><th>W3.2, annuo</th><th>v1, annuo</th></tr></thead><tbody>
+    ${c.accordo.stati.map(s => `<tr><td>${s.stato}</td><td>${mig(s.giorni)}</td><td>${pq(s.quota)}</td><td class="${cls(s.btc_annuo)}">${pct(s.btc_annuo, 0)}</td><td class="${cls(s.w32_annuo)}">${pct(s.w32_annuo, 0)}</td><td class="${cls(s.v1_annuo)}">${pct(s.v1_annuo, 0)}</td></tr>`).join("")}
+    </tbody></table></div><p class="note">Rendimento annualizzato nei soli giorni di ciascuna situazione.</p></div>
+  <div class="two"><div class="card"><h2>Operazioni di W3.2: cosa diceva la v1</h2><div class="scroll"><table><thead><tr><th class="l">Verso</th><th class="l">Entra</th><th>W3.2</th><th>Voto v1</th><th class="l">v1 all'ingresso</th><th>v1 nello stesso verso</th><th>v1 nel periodo</th></tr></thead><tbody>
+    ${c.operazioni_w32.map(t => `<tr><td class="l">${t.verso}</td><td class="l">${day(t.entra)}</td><td class="${cls(t.w32)}">${pct(t.w32)}</td><td>${num(t.voto_v1)}</td><td class="l">${t.v1_all_ingresso}</td><td>${pq(t.v1_stesso_verso_quota)}</td><td class="${cls(t.v1_nel_periodo)}">${pct(t.v1_nel_periodo)}</td></tr>`).reverse().join("")}
+    </tbody></table></div></div>
+    <div class="card"><h2>Operazioni della v1: cosa faceva W3.2</h2><div class="scroll"><table><thead><tr><th class="l">Verso</th><th class="l">Entra</th><th>v1</th><th class="l">W3.2 all'ingresso</th><th>W3.2 nello stesso verso</th><th>W3.2 nel periodo</th></tr></thead><tbody>
+    ${c.operazioni_v1.map(t => `<tr><td class="l">${t.verso}</td><td class="l">${day(t.entra)}</td><td class="${cls(t.v1)}">${pct(t.v1)}</td><td class="l">${t.w32_all_ingresso}</td><td>${pq(t.w32_stesso_verso_quota)}</td><td class="${cls(t.w32_nel_periodo)}">${pct(t.w32_nel_periodo)}</td></tr>`).reverse().join("")}
+    </tbody></table></div></div></div>
+  <div class="card"><h2>I 17 indicatori</h2><p class="sub">Quanto spesso ognuno è stato d'accordo con W3.2 nei giorni in cui W3.2 era in posizione, e cosa avrebbe fatto da solo (1x long/short, stessi costi).</p>
+    <div class="scroll"><table><thead><tr><th>Indicatore</th><th class="l">Famiglia</th><th>D'accordo con W3.2</th><th>Da solo: annuo</th><th>Da solo: drawdown</th><th>Oggi</th></tr></thead><tbody>
+    ${[...c.indicatori].sort((a, b) => b.accordo_con_w32 - a.accordo_con_w32).map(i => `<tr><td>${i.nome}</td><td class="l">${i.famiglia}</td><td>${pq(i.accordo_con_w32)}</td><td class="${cls(i.da_solo_cagr)}">${pct(i.da_solo_cagr)}</td><td class="neg">${pct(i.da_solo_dd, 0)}</td><td><span class="pill ${i.oggi > 0 ? "p" : i.oggi < 0 ? "n" : "z"}">${i.oggi > 0 ? "LONG" : i.oggi < 0 ? "SHORT" : "0"}</span></td></tr>`).join("")}
+    </tbody></table></div></div>
+  <div class="card"><h2>Quanto ci si può fidare</h2><div class="scroll"><table><thead><tr><th>Strategia</th><th>Sharpe annuo (settimanale)</th><th>Probabilità che sia > 0</th><th>Deflazionato, 10 tentativi</th><th>100 tentativi</th><th>Capitale ×, tutte le operazioni</th><th>senza le 3 migliori</th></tr></thead><tbody>
+    ${Object.entries(c.affidabilita).map(([k, a]) => `<tr><td>${k}</td><td>${num(a.sharpe_annuo)}</td><td>${pq(a.prob_sharpe_positivo)}</td><td>${pq(a.deflazionato_10)}</td><td>${pq(a.deflazionato_100)}</td><td>${a.con_tutte ? "×" + num(a.con_tutte, 1) : "–"}</td><td>${a.senza_le_3_migliori ? "×" + num(a.senza_le_3_migliori, 1) : "–"}</td></tr>`).join("")}
+    </tbody></table></div><p class="note">Lo Sharpe deflazionato tiene conto di quante varianti sono state provate prima di scegliere: più tentativi, più è facile trovare per caso un buon risultato.</p></div>`;
+  metT();
+  $("per").onclick = e => { const b = e.target.closest("button"); if (!b) return; per = +b.dataset.p; [...$("per").children].forEach(x => x.setAttribute("aria-pressed", x === b)); metT(); };
+  lines();
+}
+function metT() {
+  const R = CF.metriche[per].righe, K = Object.keys(R);
+  const rows = [["10.000 $ →", k => usd(R[k].finale_10k)], ["Rendimento annuo", k => pct(R[k].cagr)], ["Drawdown massimo", k => pct(R[k].dd)], ["Rendimento / drawdown", k => num(R[k].mar)],
+    ["Sharpe", k => num(R[k].sharpe)], ["Anno peggiore", k => pct(R[k].anno_peggiore)], ["Operazioni", k => R[k].operazioni ?? "–"], ["In guadagno", k => pq(R[k].in_guadagno)],
+    ["Media vincenti", k => pct(R[k].media_vincenti)], ["Media perdenti", k => pct(R[k].media_perdenti)], ["Peggiore", k => pct(R[k].peggiore)]];
+  $("tMet").innerHTML = `<thead><tr><th></th>${K.map(k => `<th><span class="dot" style="background:${css(COL[k])}"></span>${k}</th>`).join("")}</tr></thead><tbody>${rows.map(([l, f]) => `<tr><td>${l}</td>${K.map(k => `<td>${f(k)}</td>`).join("")}</tr>`).join("")}</tbody>`;
+}
+function annoT() {
+  const Y = CF.anni, K = Object.keys(Y), yrs = Object.keys(Y[K[0]]);
+  return `<thead><tr><th>Anno</th>${K.map(k => `<th><span class="dot" style="background:${css(COL[k])}"></span>${k}</th>`).join("")}</tr></thead><tbody>${yrs.map(y => `<tr><td>${y}</td>${K.map(k => `<td class="${cls(Y[k][y])}">${pct(Y[k][y], 0)}</td>`).join("")}</tr>`).join("")}</tbody>`;
+}
+function lines() {
+  const S = CF.serie, base = { animation: false, maintainAspectRatio: false, interaction: { mode: "index", intersect: false }, plugins: { legend: { labels: { color: css("--fg"), boxWidth: 12 } } } };
+  const ds = (src, keys) => keys.map(k => ({ label: k, data: src[k].v, borderColor: css(COL[k]), borderWidth: k === "BTC comprato e tenuto" ? 1 : 1.8, pointRadius: 0, borderDash: k.startsWith("50%") ? [5, 3] : [] }));
+  const ax = (o = {}) => ({ x: { ticks: { maxTicksLimit: 9, color: css("--muted") }, grid: { display: false } }, y: { ticks: { color: css("--muted") }, grid: { color: css("--line") }, ...o } });
+  Object.values(charts).forEach(c => c !== charts.v && c.destroy());
+  charts.eq = new Chart($("cEq"), { type: "line", data: { labels: S.equity["W3.2"].d, datasets: ds(S.equity, Object.keys(S.equity)) }, options: { ...base, scales: ax({ type: "logarithmic", ticks: { color: css("--muted"), callback: v => [1, 2, 5, 10, 20, 50].includes(+v) ? "×" + v : "" } }) } });
+  charts.dd = new Chart($("cDd"), { type: "line", data: { labels: S.drawdown["W3.2"].d, datasets: ds(S.drawdown, ["W3.2", "v1"]) }, options: { ...base, plugins: { legend: { display: false } }, scales: ax({ ticks: { color: css("--muted"), callback: v => Math.round(v * 100) + "%" } }) } });
+  charts.pos = new Chart($("cPos"), { type: "line", data: { labels: S.posizioni["W3.2"].d, datasets: ["W3.2", "v1"].map(k => ({ label: k, data: S.posizioni[k].v.map(x => x * (k === "W3.2" ? 1 : 0.9)), borderColor: css(COL[k]), borderWidth: 1.5, pointRadius: 0, stepped: true })) },
+    options: { ...base, plugins: { legend: { display: false } }, scales: ax({ min: -1.2, max: 1.2, ticks: { stepSize: 1, color: css("--muted") } }) } });
+}
+document.querySelector(".seg").onclick = e => {
+  const b = e.target.closest("button"); if (!b) return;
+  document.querySelectorAll(".seg:first-of-type button").forEach(x => x.setAttribute("aria-pressed", x === b));
+  ["w32", "v1", "cf"].forEach(s => $("s-" + s).hidden = s !== b.dataset.s);
+  if (b.dataset.s === "cf" && !charts.eq) cf();
+};
+w32(); v1();
+if (location.hash === "#confronto") document.querySelector('[data-s="cf"]').click();
+</script>
+</html>
