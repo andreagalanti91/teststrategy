@@ -7,8 +7,8 @@ per verificare che i risultati non dipendano solo da quei dieci mesi.
 
 ## 1. Sintesi
 
-**W3.2 si estende bene: con lo stesso codice del radar funziona anche su ETH, SOL e altre monete, e un portafoglio di più
-monete riduce il drawdown. La mia strategia AE (presa di liquidità su livelli di 10 giorni nel trend di BTC, gestione alla Aldo)
+**W3.2 si estende solo in parte: con lo stesso codice del radar funziona su ETH, meno su SOL, e non funziona su TAO e DOGE.
+BTC da solo resta la versione migliore; aggiungere monete abbassa il rendimento più di quanto riduca il drawdown. La mia strategia AE (presa di liquidità su livelli di 10 giorni nel trend di BTC, gestione alla Aldo)
 è la prima regola di tutta la ricerca che batte ingressi casuali, ma rende poco e quasi solo nel 2020–2021. Per seguire Aldo
 serve uno strumento: non posso collegarmi io al canale.**
 
@@ -23,6 +23,11 @@ funding del perp. Backtest dal 2021, o da quando la moneta ha abbastanza storia 
 {{X1}}
 
 Il controllo su BTC conferma che i dati pubblici danno lo stesso risultato del radar.
+
+- **ETH**: funziona, con metà del rendimento di BTC e drawdown simile.
+- **SOL e INJ**: positivi ma con drawdown del 40–45% e storia corta; nel 2024–2026 entrambi in perdita.
+- **TAO e DOGE**: la regola non funziona. TAO ha solo un anno e mezzo di segnali (serve storia per la media a 40 settimane) e
+  una sola operazione in guadagno su 12: va molto in su e in giù senza trend settimanali puliti.
 
 {{X2}}
 
@@ -87,8 +92,8 @@ Un bot normale non può leggere il canale: Telegram lo permette solo agli ammini
 
 ## 5. Cosa farei
 
-1. **Portare W3.2 su ETH e SOL in radar** (ETH c'è già), con una quota di capitale per moneta. È l'estensione con il miglior
-   rapporto fra risultato e solidità.
+1. **W3.2 su BTC resta la base.** ETH come seconda moneta va bene (radar lo ha già); SOL solo con una quota piccola; TAO e DOGE
+   no: lì la regola settimanale non ha funzionato.
 2. **Seguire Aldo con lo strumento**, in modalità inoltro e solo sulla carta per qualche settimana: misura il ritardo reale e
    quanto rende copiarlo con ordini limite, prima di metterci soldi.
 3. **La strategia AE**, solo long sulle altcoin, sulla carta, come terzo pezzo.
