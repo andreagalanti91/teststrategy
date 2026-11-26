@@ -22,6 +22,9 @@ costruita sul suo stile non ha vantaggio su otto anni.**
 | Meglio di BTC tenuto? | No: BTC nello stesso periodo ha fatto ×2,5. Con leva 3x chi copiava avrebbe fatto ×3,5, con un rischio molto più alto |
 | La sua strategia, resa meccanica, funziona? | No: dal 2018 perde (−5% annuo su BTC e 8 altcoin, −1% solo su BTC), con 42% di operazioni in guadagno e risultato medio di zero volte il rischio. Ingressi casuali con la stessa gestione fanno meglio |
 
+Seconda analisi più approfondita (autenticità delle schermate, chi copiava con ordini limite, strategia scritta come regole,
+nuova strategia intraday con Eliz): [`ALDO_ELIZ_INTRADAY.md`](ALDO_ELIZ_INTRADAY.md).
+
 ## 2. Il trader, dai suoi messaggi
 
 {{T1}}

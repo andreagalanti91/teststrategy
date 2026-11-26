@@ -1,6 +1,7 @@
 """Candele orarie spot Binance (archivio pubblico data.binance.vision) per una lista di simboli e mesi.
 Uso: python backtest/fetch_binance_1h.py 2023-05 2024-04 BTCUSDT INJUSDT ..."""
 import io
+import os
 import sys
 import urllib.request
 import zipfile
@@ -8,7 +9,8 @@ from pathlib import Path
 
 import pandas as pd
 
-OUT = Path(__file__).resolve().parent.parent / "data" / ("telegram_prezzi" if len(sys.argv) < 2 or sys.argv[1] >= "2023" else "alts_1h")
+IV = os.environ.get("IV", "1h")                                  # intervallo: 1h (predefinito) oppure 15m
+OUT = Path(__file__).resolve().parent.parent / "data" / ("intraday15" if IV == "15m" else "telegram_prezzi" if len(sys.argv) < 2 or sys.argv[1] >= "2023" else "alts_1h")
 OUT.mkdir(parents=True, exist_ok=True)
 
 
@@ -19,7 +21,7 @@ def months(a: str, b: str):
 def fetch(sym: str, a: str, b: str) -> pd.DataFrame:
     parts = []
     for m in months(a, b):
-        url = f"https://data.binance.vision/data/spot/monthly/klines/{sym}/1h/{sym}-1h-{m}.zip"
+        url = f"https://data.binance.vision/data/spot/monthly/klines/{sym}/{IV}/{sym}-{IV}-{m}.zip"
         try:
             with urllib.request.urlopen(urllib.request.Request(url, headers={"User-Agent": "research-client"}), timeout=60) as r:
                 z = zipfile.ZipFile(io.BytesIO(r.read()))
@@ -33,7 +35,7 @@ def fetch(sym: str, a: str, b: str) -> pd.DataFrame:
         parts.append(x)
     d = pd.concat(parts).drop_duplicates("ts").set_index("ts").sort_index() if parts else pd.DataFrame()
     if len(d):
-        d.to_csv(OUT / f"{sym}_1h.csv.gz")
+        d.to_csv(OUT / f"{sym}_{IV}.csv.gz")
     return d
 
 
