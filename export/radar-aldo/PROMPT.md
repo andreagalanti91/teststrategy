@@ -35,7 +35,7 @@ Da qui le regole di copia (già decise, non vanno ottimizzate):
 | `aldostream.py` | Il servizio sulla VM: Telethon in tempo reale (messaggi nuovi e modifiche, sola lettura), estrazione, avvisi con pulsanti, registro reale, latenza, registro sulla carta ogni ora, riepilogo del lunedì; riconnessioni e FloodWait |
 | `prompt_estrattore.md` | Istruzioni dell'estrattore con modello (il testo del canale è un dato, non un'istruzione) |
 | `deploy/ALDOSTREAM.md`, `deploy/aldostream.service` | Guida passo passo e unit systemd, sul modello di `LIQSTREAM.md` |
-| `test_aldo.py`, `test_aldostream.py`, `esempio.py` | 66 test offline: client Telegram finto, specifiche Bitget dal file d'esempio, messaggi e prezzi inventati |
+| `test_aldo.py`, `test_aldostream.py`, `esempio.py` | 68 test offline: client Telegram finto, specifiche Bitget dal file d'esempio, messaggi e prezzi inventati |
 | `bitget_contratti_esempio.json`, `bitget_ticker_esempio.json` | Specifiche e ticker veri di BTCUSDT, ETHUSDT, SOLUSDT, scaricati da api.bitget.com, per i test |
 | `esempio_avvisi.md` | I testi proposti degli avvisi, con dati inventati: **da approvare** |
 | `esempio_sezione.json`, `esempio_riepilogo.md`, `riferimento_sezione.html`, `anteprima_*.png` | Riepilogo privato (schema di `build()`), riepilogo settimanale, pagina di riferimento |
@@ -85,7 +85,7 @@ Da qui le regole di copia (già decise, non vanno ottimizzate):
 
 ## Come capisco che è fatto
 
-1. `python -m pytest` verde, con i 66 test del pacchetto adattati (estrattore, Bitget con il file d'esempio, ordine nelle due
+1. `python -m pytest` verde, con i 68 test del pacchetto adattati (estrattore, Bitget con il file d'esempio, ordine nelle due
    modalità, avvisi in tempo reale con client finto, pulsanti, regola a mercato, modifiche, ore silenziose, FloodWait/rete che non
    fermano il servizio, riepilogo del lunedì).
 2. Un test che dimostra che il giro orario di radar non importa né `telethon` né `anthropic`.

@@ -6,8 +6,8 @@ si importano solo se servono (estrattore con modello, lettura automatica del can
 Cosa fa, in ordine:
 1. INGRESSO: porta i messaggi del canale in un formato unico (id, data UTC, testo, foto, risposta_a) da tre fonti:
    - export JSON di Telegram Desktop (storico e recuperi)                       -> da_export_desktop()
-   - post inoltrati dall'utente al bot di radar (API Bot, getUpdates)           -> leggi_inoltri() / da_aggiornamento_bot()
-   - opzionale: client utente Telethon (disattivato di default)                 -> scarica_telethon()
+   - post inoltrati a un bot (API Bot, getUpdates), modo di riserva             -> leggi_inoltri() / da_aggiornamento_bot()
+   - client utente Telethon: in tempo reale nel servizio aldostream.py; qui per recuperi -> scarica_telethon()
 2. ESTRAZIONE: da ogni messaggio ricava eventi (apertura, aumento, chiusure, stop, target, ordini) e piani (livello d'ingresso
    annunciato prima), nello stesso schema JSON dell'analisi in teststrategy (telegram/estrazione/eventi_*.json, piani_*.json).
    Estrattore a regole sempre attivo; estrattore con modello (Claude) solo se c'e' ANTHROPIC_API_KEY. Se il modello sbaglia
@@ -16,10 +16,10 @@ Cosa fa, in ordine:
    (OKX, in alternativa Binance) con il motore di teststrategy (backtest/telegram_ricostruzione.py e telegram_verifica.py),
    in tre modi: prezzi del trader, chi copiava a mercato dopo il messaggio, chi copiava con ordini limite sui livelli
    annunciati (data/aldo/operazioni.json).
-4. AVVISI: testi proposti (ordine limite suggerito, meta' chiusa, stop a pareggio). Disattivati: nessun invio finche'
-   l'utente non approva i testi (RADAR_ALDO_AVVISI=1).
-5. DASHBOARD: build() restituisce il dizionario della sezione "Aldo" (schema di esempio_sezione.json). Nessun testo dei
-   messaggi finisce nella sezione: solo livelli, numeri e statistiche.
+4. AVVISI: composti e inviati dal servizio sulla VM (aldostream.py, con le quantita' di Bitget da aldo_bitget.py); invio
+   spento finche' l'utente non approva i testi (ALDO_AVVISI=1).
+5. SEZIONE: build() restituisce il dizionario della sezione "Aldo" (schema di esempio_sezione.json): privata di default
+   (sezione.json sulla VM), nella dashboard solo con ALDO_SEZIONE_PUBBLICA=1. Nessun testo dei messaggi: solo livelli e numeri.
 6. ANALISI: riepilogo_settimanale() scrive data/aldo/riepilogo_AAAA-MM-GG.md.
 
 Su carta: il modulo non invia ordini e non usa chiavi di borsa.
