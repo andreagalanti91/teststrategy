@@ -93,8 +93,9 @@ def main():
     fm = Ff.set_index("trade").rendimento
     for r in Tt.itertuples():
         note = ("comunicata dopo; " if r.comunicata_dopo else "") + (str(r.note).split(":")[0] if isinstance(r.note, str) and r.note else "")
-        T.append(f"| {r.trade} | {r.asset} | {r.verso} | {r.apertura:%d/%m/%y %H:%M} | {r.giorni * 24:.0f} | {r.prezzo_medio:,.6g} | {pct(r.rendimento)} | "
-                 f"{pct(fm.get(r.trade)) if r.trade in fm.index else '–'} | {note.strip('; ')} |".replace(",", "."))
+        pm = f"{r.prezzo_medio:,.0f}".replace(",", ".") if r.prezzo_medio >= 100 else f"{r.prezzo_medio:.4g}".replace(".", ",")
+        T.append(f"| {r.trade} | {r.asset} | {r.verso} | {r.apertura:%d/%m/%y %H:%M} | {r.giorni * 24:.0f} | {pm} | {pct(r.rendimento)} | "
+                 f"{pct(fm.get(r.trade)) if r.trade in fm.index else '–'} | {note.strip('; ')} |")
 
     T.append("\n## T6 riferimenti\n")
     w = pd.read_csv(ROOT / "results" / "w32" / "equity.csv", index_col=0, parse_dates=True)

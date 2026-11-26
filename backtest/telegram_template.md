@@ -20,7 +20,7 @@ costruita sul suo stile non ha vantaggio su otto anni.**
 | Ha guadagnato? | Sì, con i suoi prezzi: ×5,7 componendo le operazioni con controvalore 1x. Ma 16 operazioni su 55 sono state mostrate solo dopo l'ingresso, quasi tutte già in guadagno (88%) |
 | E chi lo seguiva? | ×1,6 con controvalore 1x. Su BTC chi copiava ha perso (33% in guadagno); il risultato viene da poche operazioni su altcoin (DOGE +29%, INJ +11%) |
 | Meglio di BTC tenuto? | No: BTC nello stesso periodo ha fatto ×2,5. Con leva 3x chi copiava avrebbe fatto ×3,5, con un rischio molto più alto |
-| La sua strategia, resa meccanica, funziona? | No: dal 2018 perde (−1% annuo), con 43% di operazioni in guadagno e risultato medio di zero volte il rischio. Ingressi casuali con la stessa gestione fanno meglio |
+| La sua strategia, resa meccanica, funziona? | No: dal 2018 perde (−5% annuo su BTC e 8 altcoin, −1% solo su BTC), con 42% di operazioni in guadagno e risultato medio di zero volte il rischio. Ingressi casuali con la stessa gestione fanno meglio |
 
 ## 2. Il trader, dai suoi messaggi
 
@@ -95,10 +95,13 @@ La rottura diagonale non è nella regola: una linea tracciata a mano non si trad
 
 {{M3}}
 
-- **Non ha vantaggio**: su otto anni perde poco più dei costi. Il risultato medio è zero volte il rischio: la gestione a metà
-  posizione con stop a pareggio trasforma molte operazioni in piccole perdite e lascia pochi guadagni pieni.
-- **Nel periodo del canale guadagna**, ma poco: +11% (solo long) o +18% (long e short), contro ×2,5 di BTC.
-- **Ingressi casuali con la stessa gestione fanno meglio** della regola: il segnale "rottura e retest" non aggiunge informazione.
+- **Non ha vantaggio**: su otto anni perde, da −1% annuo (solo BTC) a −7% (BTC e altcoin, long e short), con drawdown fino a
+  −69%. Il risultato medio è zero volte il rischio: la gestione a metà posizione con stop a pareggio trasforma molte operazioni
+  in piccole perdite e lascia pochi guadagni pieni. Peggio dal 2022 che nel 2018–2021.
+- **Nel periodo del canale** va da −3% (solo long) a +9% (long e short), contro ×2,5 di BTC e ×1,9 di W3.2.
+- **Ingressi casuali con la stessa gestione fanno meglio** della regola (+0,21 contro −0,04 volte il rischio): il segnale
+  "rottura e retest" non aggiunge informazione.
+- **Per moneta**: nessuna si salva in modo netto; DOGE e FET leggermente positive, WOO e MATIC le peggiori.
 
 ## 5. Confronto
 
