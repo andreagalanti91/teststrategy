@@ -18,23 +18,23 @@ Nessuna.
 
 | Operazione | Asset | Verso | Apertura | Chiusura | Trader | A mercato | Con ordini limite | Note |
 |---|---|---|---|---|---|---|---|---|
-| L-261121-SOL-L | SOL | long | 2026-11-21 07:10 | aperta | +3,65% | +2,82% | +3,69% | ingresso con ordine limite |
+| L-261121-SOL-L | SOL | long | 2026-11-21 07:10 | aperta | +4,56% | +3,84% | +4,69% | ingresso con ordine limite |
 
 ## Piani annunciati nella settimana
 
 | Annunciato | Asset | Verso | Livello | Stop | Obiettivi | Esito |
 |---|---|---|---|---|---|---|
-| 2026-11-20 13:00 | SOL | long | 128,5 | 124,0 | 136,0 / 142,0 | eseguito (L-261121-SOL-L) |
+| 2026-11-20 13:00 | SOL | long | 68,50 | 66,80 | 73,50 / 76,00 | eseguito (L-261121-SOL-L) |
 | 2026-11-25 18:30 | BTC | short | 63.400 | 64.200 | 61.000 / 59.500 | non eseguito / aperto |
-| 2026-11-26 08:00 | ETH | long | 2.010 | 1.960 | – | non eseguito / aperto |
+| 2026-11-26 08:00 | ETH | long | 1.630 | 1.600 | – | non eseguito / aperto |
 
 ## Statistiche dall'inizio del registro (operazioni chiuse)
 
 | Chi | Operazioni | In guadagno | Medio per operazione | Capitale ×, controvalore 1x | Rischio 1% | Rischio 2% |
 |---|---|---|---|---|---|---|
-| Trader, prezzi suoi | 2 | 50% | +0,38% | ×1,01 | 10.111 $ | 10.217 $ |
-| Chi copiava a mercato | 2 | 50% | +0,32% | ×1,01 | 10.088 $ | 10.172 $ |
-| Chi copiava con ordini limite | 2 | 50% | +0,42% | ×1,01 | 10.131 $ | 10.256 $ |
+| Trader, prezzi suoi | 2 | 50% | +0,54% | ×1,01 | 10.109 $ | 10.214 $ |
+| Chi copiava a mercato | 2 | 50% | +0,40% | ×1,01 | 10.088 $ | 10.171 $ |
+| Chi copiava con ordini limite | 2 | 50% | +0,49% | ×1,01 | 10.130 $ | 10.255 $ |
 
 Capitale iniziale 10.000 $. Ritardo fra il prezzo d'ingresso dichiarato e il messaggio: mediana 0,3 ore, un quarto oltre 3,8 ore (3 prezzi dichiarati).
 

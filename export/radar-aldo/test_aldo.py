@@ -148,7 +148,7 @@ def test_ricostruzione_tre_modi():
     assert btc["mercato"]["prezzo_medio"] < btc["trader"]["prezzo_medio"]          # short: chi entrava dopo il messaggio, peggio
     assert btc["limite"]["rendimento_pct"] > btc["trader"]["rendimento_pct"] > btc["mercato"]["rendimento_pct"] > 0
     assert btc["stop"] == 62000                                                       # stop ereditato dal piano
-    assert eth["trader"]["rendimento_pct"] == pytest.approx((2060 / 2105 - 1 - 2 * A.COSTO) * 100, abs=0.01)   # allo stop dichiarato
+    assert eth["trader"]["rendimento_pct"] == pytest.approx((1670 / 1701 - 1 - 2 * A.COSTO) * 100, abs=0.01)   # allo stop dichiarato
     assert sol["aperta"] and sol["quota_aperta"] == pytest.approx(2 / 3, abs=0.01)
     s = ops["statistiche"]
     assert s["trader"]["operazioni"] == 2 and s["trader"]["in_guadagno_pct"] == 50 and s["limite_entrate_con_ordine"] == 2
@@ -197,33 +197,23 @@ def test_build_vuoto_e_schema_esempio():
     assert v["stato"] == "vuoto" and v["piani"] == [] and v["chiuse"] == []
     sez = E.stato_esempio()[3]
     esempio = json.loads((Path(__file__).parent / "esempio_sezione.json").read_text(encoding="utf-8"))
-    assert set(esempio) == set(sez) and esempio["piani"][0]["rischio_1"]["quantita"] == sez["piani"][0]["rischio_1"]["quantita"]
+    assert set(esempio) == set(sez) and esempio["piani"][0]["ordine"]["quantita"] == sez["piani"][0]["ordine"]["quantita"]
+    o = sez["piani"][0]["ordine"]                                                            # ordine arrotondato alle specifiche Bitget
+    assert o["simbolo"] == "ETHUSDT" and o["quantita"] == round(o["quantita"], 2) and o["modalita"] == "importo"
 
 
 def test_build_avvisa_se_il_registro_e_fermo():
     msgs, reg, ops, _ = E.stato_esempio()
     sez = A.build(reg, ops, "2026-12-05T12:00:00Z", msgs)
-    assert "resta indietro" in sez["testo"]
+    assert "servizio sulla VM" in sez["testo"]
 
 
-# ---- avvisi ----------------------------------------------------------------------------------------------------------------
+# ---- avvisi (spostati in aldostream.py) ----------------------------------------------------------------------------------
 
-def test_avvisi_solo_proposti(monkeypatch):
+def test_elabora_non_genera_avvisi(monkeypatch):
+    monkeypatch.setenv("ALDO_AVVISI", "1")
     msgs, reg, ops, sez = E.stato_esempio()
-    assert [a["tipo"] for a in reg["avvisi"]] == ["piano"]                                 # solo il messaggio delle ultime 6 ore
-    assert "ordine limite suggerito" in reg["avvisi"][0]["testo"] and "2,00 ETH" in reg["avvisi"][0]["testo"]
-    assert A.avvisi_da_inviare(reg) == [] and sez["avvisi"]["attivi"] is False
-    monkeypatch.setenv("RADAR_ALDO_AVVISI", "1")
-    assert len(A.avvisi_da_inviare(reg)) == 1
-
-
-def test_avvisi_chiusura_e_pareggio():
-    prezzi = A.Prezzi(dati=E.prezzi_finti())
-    msgs = E.messaggi_esempio("2026-11-11T09:40:00Z")
-    reg, _ = A.elabora(msgs, A.registro_vuoto(), prezzi, adesso="2026-11-11T10:00:00Z", usa_modello=False)
-    tipi = [a["tipo"] for a in reg["avvisi"]]
-    assert tipi == ["chiusura_parziale", "stop_pareggio"]
-    assert "chiuso il 50%" in reg["avvisi"][0]["testo"]
+    assert reg["avvisi"] == [] and sez["avvisi"]["attivi"] is True and not A.sezione_pubblica()
 
 
 def test_elabora_idempotente():

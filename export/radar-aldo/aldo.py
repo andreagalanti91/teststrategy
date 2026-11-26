@@ -48,13 +48,13 @@ MODELLO_PREDEFINITO = "claude-haiku-5-5"     # modello piccolo ed economico, con
 
 COSTO = 0.0008                  # per lato: 0,06% commissione taker + 0,02% slittamento (come nello studio)
 FINESTRA_RESIDUO = 30           # giorni: residuo senza chiusura dichiarata, chiuso dal modello allo stop o al primo obiettivo
-GIORNI_PIANO = 7                # un piano non eseguito resta valido per 7 giorni, poi l'ordine limite si cancella
+GIORNI_PIANO = 7                # nella ricostruzione un piano si collega a un'apertura entro 7 giorni (come nello studio)
+ORE_ORDINE = 24                 # per chi copia, l'ordine limite su un livello annunciato vale 24 ore (ORDINE_ORE)
 SOGLIA_PIANO = 0.08             # piano collegato a un'apertura se il livello e' entro l'8% del prezzo d'ingresso
 TOL = 0.0015                    # tolleranza fra borse per dire che il mercato ha toccato un prezzo
-LEVA_MAX = 10.0                 # leva massima, come nelle sue schermate Bybit
+LEVA_MAX = 10.0                 # leva massima (tetto LEVA_MAX, come nelle sue schermate Bybit)
 STOP_MANCANTE = 0.02            # stop non dichiarato: 2% oltre il livello
 CAPITALE_ESEMPIO = 10_000.0
-ORE_AVVISO = 6                  # un messaggio piu' vecchio di 6 ore non genera avvisi (importazioni di storico)
 AFFIDABILE = 0.5                # sotto questa soglia l'evento si segnala come "da rivedere"
 
 TIPI_EVENTO = ("apertura", "aumento", "chiusura_parziale", "chiusura_totale", "stop_pareggio", "stop_spostato", "stop_preso",
@@ -73,15 +73,15 @@ MINUSCOLE_OK = {"btc", "eth", "sol", "doge", "inj", "tao", "fet", "woo", "bnb", 
 ALIAS_BORSA = {"RNDR": "RENDER"}  # simboli rinominati sulle borse
 
 AVVERTENZA = ("Registro ricostruito dai messaggi del canale privato di Aldo, solo per uso personale: non ridistribuire. "
-              "Su carta: Radar non invia ordini. Nel periodo studiato (05/2023–03/2024) il trader, con i suoi prezzi, aveva il 73% di "
+              "Radar non invia ordini: gli avvisi propongono l'ordine, lo metti tu a mano. Nel periodo studiato (05/2023–03/2024) il trader, con i suoi prezzi, aveva il 73% di "
               "operazioni in guadagno; chi lo copiava a mercato dopo il messaggio il 44%, chi metteva ordini limite sui livelli "
               "annunciati il 58%. Risultati passati, non una raccomandazione.")
-REGOLE = ["Si copiano solo i livelli annunciati prima: ordine limite al livello, non a mercato dopo il messaggio",
+REGOLE = ["Livelli annunciati prima: ordine limite al livello su Bitget (USDT-M)",
+          "Ingressi senza livello: a mercato solo entro 10 minuti dal suo ingresso e con scostamento sotto lo 0,5%; altrimenti non si copia",
           "Stop: quello dichiarato; se manca, 2% oltre il livello",
-          "Rischio fisso: 1% del capitale per operazione, al massimo leva 10x",
+          "Dimensione: importo fisso per operazione (500–2.000 €) con leva fissa, oppure rischio fisso sul capitale; leva al massimo 10x",
           "Metà al primo obiettivo, poi stop a pareggio, come fa lui",
-          "Operazioni comunicate solo dopo l'ingresso: non si inseguono",
-          f"Un piano non eseguito vale {GIORNI_PIANO} giorni, poi l'ordine si cancella"]
+          f"L'ordine limite vale {ORE_ORDINE} ore, poi si cancella"]
 
 
 # ------------------------------------------------------------------------------------------------------------------------------
@@ -780,9 +780,10 @@ def aperte(registro: dict, adesso=None) -> dict:
     return {k: v for k, v in st.items() if v["dim"] > 1e-9 and _dt(v["ultimo"]) > lim}
 
 
-def piani_aperti(registro: dict, adesso=None) -> list[dict]:
-    """Piani con livello, non collegati a un'operazione, non annullati e piu' recenti di GIORNI_PIANO giorni."""
-    lim = (_dt(adesso) if adesso else datetime.now(UTC)) - timedelta(days=GIORNI_PIANO)
+def piani_aperti(registro: dict, adesso=None, ore: float | None = None) -> list[dict]:
+    """Piani con livello, non collegati a un'operazione, non annullati e piu' recenti della durata dell'ordine (24 ore)."""
+    ore = ore if ore is not None else float(os.environ.get("ORDINE_ORE", ORE_ORDINE))
+    lim = (_dt(adesso) if adesso else datetime.now(UTC)) - timedelta(hours=ore)
     return [p for p in registro["piani"] if p.get("livello_innesco") and p.get("eseguito") is None and not p.get("trade_collegato")
             and _dt(p["utc"]) > lim]
 
@@ -949,8 +950,6 @@ def elabora(messaggi: list[dict], registro: dict, prezzi=None, client=None, ades
         registro["elaborati"][m["id"]] = res["estrattore"] + (f" ({res['nota_modello']})" if res.get("nota_modello") else "")
         fatti += 1 if usa_modello else 0
         nuovi += agg
-        if adesso - _dt(m["data"]) <= timedelta(hours=ORE_AVVISO):
-            registro["avvisi"] += proponi_avvisi(agg, registro, prezzi, capitale)
     return registro, nuovi
 
 
@@ -1035,7 +1034,10 @@ class Prezzi:
         if d is not None and d.index[0] <= inizio and d.index[-1] >= fine:
             return
         da = inizio if d is None or d.index[0] > inizio else d.index[-1] - pd.Timedelta(hours=2)
-        scarica = candele_binance if self.fonte == "binance" else candele_okx
+        if self.fonte == "bitget":
+            from aldo_bitget import candele_ora as scarica          # in radar: from .aldo_bitget import candele_ora
+        else:
+            scarica = candele_binance if self.fonte == "binance" else candele_okx
         nuovo = scarica(asset, da, fine, self.get)
         if nuovo.empty:
             self.mancanti.add(asset)
@@ -1325,7 +1327,7 @@ def _r(x, d=2):
     return None if x is None or (isinstance(x, float) and not math.isfinite(x)) else round(float(x), d)
 
 
-def statistiche(df: pd.DataFrame, capitale0: float = CAPITALE_ESEMPIO) -> dict:
+def statistiche(df: pd.DataFrame, capitale0: float = CAPITALE_ESEMPIO, leva_max: float = LEVA_MAX) -> dict:
     """Sulle operazioni chiuse: quante, % in guadagno, medio e mediana per operazione (sul controvalore, dopo i costi),
     capitale componendo con controvalore 1x, e con rischio fisso 1% e 2% usando lo stop dichiarato (2% se manca), leva max 10x."""
     c = df[~df["aperta_a_fine"].astype(bool)] if len(df) else df
@@ -1338,7 +1340,7 @@ def statistiche(df: pd.DataFrame, capitale0: float = CAPITALE_ESEMPIO) -> dict:
     out = {"operazioni": int(len(r)), "in_guadagno_pct": _r(np.mean(r > 0) * 100, 0), "medio_pct": _r(r.mean() * 100),
            "mediana_pct": _r(float(np.median(r)) * 100), "capitale_1x": _r(capitale0 * np.prod(1 + r), 0)}
     for rischio, nome in ((0.01, "1"), (0.02, "2")):
-        rr = r * np.minimum(rischio / rk, LEVA_MAX)
+        rr = r * np.minimum(rischio / rk, leva_max)
         out[f"capitale_rischio_{nome}"] = _r(capitale0 * np.prod(1 + rr), 0)
         if nome == "2":
             out["peggiore_rischio_2_pct"] = _r(float(rr.min()) * 100)
@@ -1365,9 +1367,24 @@ def _riga(r, campi=("trade", "asset", "verso")) -> dict:
     return {k: r[k] for k in campi}
 
 
-def ricostruisci(registro: dict, prezzi, adesso=None, capitale: float | None = None) -> dict:
+def _ordine_piano(x: dict, contratti, copia, capitale) -> dict:
+    """Ordine pronto per un piano: con le specifiche Bitget se ci sono, altrimenti dimensione generica al rischio 1%."""
+    spec = contratti.spec(x["asset"]) if contratti is not None else None
+    if spec:
+        from aldo_bitget import ordine                                # in radar: from .aldo_bitget import ordine
+        c = dict(copia or {})
+        c = {k: v for k, v in c.items() if k in ("modalita", "importo_eur", "cambio_eur_usdt", "leva", "leva_max", "capitale_usdt", "rischio_pct", "stop_mancante")}
+        return ordine(spec, x["verso"], x["livello_innesco"], x.get("stop"), **c)
+    d = dimensiona(x["verso"], x["livello_innesco"], x.get("stop"), capitale, 0.01)
+    return {"livello": x["livello_innesco"], "stop": d.get("stop"), "stop_stimato": d.get("stop_stimato"), "quantita": d.get("quantita"),
+            "unita": x["asset"], "controvalore_usdt": d.get("controvalore"), "leva": d.get("leva"), "perdita_stop_usdt": d.get("perdita_allo_stop"),
+            "modalita": "rischio", "note": ["specifiche Bitget non disponibili: quantità non arrotondata"]}
+
+
+def ricostruisci(registro: dict, prezzi, adesso=None, capitale: float | None = None, contratti=None, copia: dict | None = None) -> dict:
     """Le tre ricostruzioni (trader, a mercato, con ordini limite), le statistiche, il ritardo, le posizioni e i piani aperti con
-    i prezzi di adesso. E' il contenuto di data/aldo/operazioni.json: JSON semplice, senza testi dei messaggi."""
+    i prezzi di adesso. E' il contenuto di operazioni.json: JSON semplice, senza testi dei messaggi.
+    `contratti` (aldo_bitget.Contratti) e `copia` (aldo_bitget.parametri_copia()): ordine pronto per Bitget accanto a ogni piano."""
     adesso = _dt(adesso) if adesso else datetime.now(UTC)
     capitale = capitale or CAPITALE_ESEMPIO
     m = Motore(prezzi, adesso)
@@ -1410,10 +1427,11 @@ def ricostruisci(registro: dict, prezzi, adesso=None, capitale: float | None = N
                       "annunciato": x["utc"], "scade": (_dt(x["utc"]) + timedelta(days=GIORNI_PIANO)).strftime("%Y-%m-%d %H:%M"),
                       "prezzo_ora": ora, "distanza_pct": _r((liv / ora - 1) * 100) if ora else None,
                       "stato": "raggiunto" if tocco[0] else "in attesa", "raggiunto_il": tocco[1].strftime("%Y-%m-%d %H:%M") if tocco[0] else None,
-                      "affidabilita": x.get("affidabilita"), "rischio_1": dimensiona(x["verso"], liv, x.get("stop"), capitale, 0.01)})
+                      "affidabilita": x.get("affidabilita"), "ordine": _ordine_piano(x, contratti, copia, capitale)})
     piani.sort(key=lambda d: d["annunciato"], reverse=True)
     return {"aggiornato": _iso(adesso), "capitale": capitale, "operazioni": ops, "posizioni": posizioni, "piani": piani,
             "statistiche": {"trader": statistiche(tr), "mercato": statistiche(fo), "limite": statistiche(li),
+                            "leva_max": LEVA_MAX,
                             "limite_entrate_con_ordine": len(filled)},
             "ritardo": {"prezzi_dichiarati": int(len(rit)), "toccati_pct": _r(rit["ok"].mean() * 100, 0) if len(rit) else None,
                         "mediana_ore": _r(float(ok["ritardo_h"].median()), 1) if len(ok) else None,
@@ -1437,52 +1455,25 @@ def _fmt(v, d=None) -> str:
 
 
 def avvisi_attivi() -> bool:
-    """Gli avvisi partono solo dopo l'approvazione dei testi da parte dell'utente: RADAR_ALDO_AVVISI=1."""
-    return os.environ.get("RADAR_ALDO_AVVISI", "0") == "1"
+    """Gli avvisi Telegram partono solo dopo l'approvazione dei testi da parte dell'utente: ALDO_AVVISI=1.
+    Testi, regole di copia e invio sono in aldostream.py (servizio sulla VM)."""
+    return os.environ.get("ALDO_AVVISI", "0") == "1"
 
 
-def proponi_avvisi(aggiunti: list[dict], registro: dict, prezzi=None, capitale: float | None = None) -> list[dict]:
-    """Testi proposti per i nuovi piani con livello, le chiusure parziali e gli stop a pareggio. Non inviati: stato 'proposto'."""
-    capitale = capitale or float(os.environ.get("RADAR_ALDO_CAPITALE", CAPITALE_ESEMPIO))
-    out = []
-    for a in aggiunti:
-        t = a.get("tipo")
-        if t == "piano" and a.get("livello_innesco"):
-            d = dimensiona(a["verso"], a["livello_innesco"], a.get("stop"), capitale, 0.01)
-            if not d:
-                continue
-            stop = f"stop {_fmt(d['stop'])}" + (" (non indicato: 2% oltre il livello)" if d["stop_stimato"] else "")
-            ob = " / ".join(_fmt(x) for x in a.get("target") or []) or "non indicati"
-            testo = (f"Aldo · ordine limite suggerito\n{a['asset']} {a['verso']} a {_fmt(a['livello_innesco'])} · {stop} · obiettivi {ob}\n"
-                     f"Rischio 1% di {_fmt(capitale)} $ = {_fmt(d['quantita'], None)} {a['asset']} (controvalore {_fmt(d['controvalore'])} $, leva {_fmt(d['leva'], 1)}x)\n"
-                     f"Valido {GIORNI_PIANO} giorni. Su carta: Radar non invia ordini.")
-        elif t == "chiusura_parziale" and a.get("trade"):
-            q = a.get("quota") or 0.5
-            testo = (f"Aldo · chiusura parziale\n{a['asset']} {a.get('verso') or ''}: chiuso il {q * 100:.0f}%"
-                     + (f" a {_fmt(a['prezzo'])}" if a.get("prezzo") else "") + ".\nChi lo copia: chiudere la stessa quota.")
-        elif t == "stop_pareggio" and a.get("trade"):
-            testo = f"Aldo · stop a pareggio\n{a['asset']} {a.get('verso') or ''}: stop spostato al prezzo d'ingresso.\nChi lo copia: spostare lo stop al proprio prezzo medio."
-        else:
-            continue
-        out.append({"chiave": f"{a['msg_id']}|{t}|{a['asset']}", "tipo": t, "msg_id": a["msg_id"], "creato": a["utc"], "testo": testo,
-                    "stato": "proposto"})
-    return out
-
-
-def avvisi_da_inviare(registro: dict) -> list[dict]:
-    """Avvisi da passare al codice Telegram di radar: vuoto finche' RADAR_ALDO_AVVISI non vale 1. Dopo l'invio, segnare
-    stato='inviato'."""
-    if not avvisi_attivi():
-        return []
-    return [a for a in registro.get("avvisi", []) if a.get("stato") == "proposto"]
+def sezione_pubblica() -> bool:
+    """La sezione "Aldo" va nella dashboard solo se ALDO_SEZIONE_PUBBLICA=1 (predefinito: no). Anche allora senza testi."""
+    return os.environ.get("ALDO_SEZIONE_PUBBLICA", "0") == "1"
 
 
 # ------------------------------------------------------------------------------------------------------------------------------
 # 5. Sezione della dashboard
 # ------------------------------------------------------------------------------------------------------------------------------
 
-def build(registro: dict, operazioni: dict | None, adesso=None, messaggi: list[dict] | None = None) -> dict:
-    """Tutto quello che la sezione "Aldo" deve mostrare (schema di esempio_sezione.json). Nessun testo dei messaggi."""
+def build(registro: dict, operazioni: dict | None, adesso=None, messaggi: list[dict] | None = None, avvisi: list[dict] | None = None,
+          reale: dict | None = None, latenza: dict | None = None, copia: dict | None = None) -> dict:
+    """Tutto quello che la sezione "Aldo" mostra (schema di esempio_sezione.json). Nessun testo dei messaggi.
+    `avvisi`, `reale` (aldostream.statistiche_reali) e `latenza` (aldostream.latenza) vengono dal servizio sulla VM.
+    Va nella dashboard pubblica solo se sezione_pubblica(); altrimenti resta un file privato sulla VM (sezione.json)."""
     adesso = _dt(adesso) if adesso else datetime.now(UTC)
     operazioni = operazioni or {}
     messaggi = messaggi or []
@@ -1504,22 +1495,24 @@ def build(registro: dict, operazioni: dict | None, adesso=None, messaggi: list[d
                "mercato_pct": (o.get("mercato") or {}).get("rendimento_pct"), "limite_pct": (o.get("limite") or {}).get("rendimento_pct"),
                "ingresso_limite": bool(o.get("ingresso_limite")), "comunicata_dopo": bool(o.get("comunicata_dopo"))} for o in chiuse]
     out = {"aggiornato": _iso(adesso), "capitale": operazioni.get("capitale", CAPITALE_ESEMPIO),
-           "capitale_esempio": "RADAR_ALDO_CAPITALE" not in os.environ,
+           "capitale_esempio": "COPIA_CAPITALE" not in os.environ, "copia": copia or {},
            "fonte": {"messaggi": len(messaggi), "ultimo_messaggio": ultimo, "per_origine": origini, "estrattore": estrattori,
                      "da_rivedere": da_rivedere, "prezzi_mancanti": operazioni.get("prezzi_mancanti", [])},
            "piani": piani, "posizioni": pos, "chiuse": chiuse, "statistiche": operazioni.get("statistiche", {}),
            "ritardo": operazioni.get("ritardo", {}),
-           "avvisi": {"attivi": avvisi_attivi(), "proposti": [{"tipo": a["tipo"], "creato": a["creato"], "testo": a["testo"]}
-                                                             for a in registro.get("avvisi", [])[-5:]]},
+           "avvisi": {"attivi": avvisi_attivi(), "ultimi": [{"tipo": a["tipo"], "creato": a["creato"], "stato": a.get("stato"),
+                                                            "scelta": a.get("scelta"), "testo": a["testo"]}
+                                                           for a in (avvisi if avvisi is not None else registro.get("avvisi", []))[-5:]]},
+           "reale": reale or {}, "latenza": latenza or {},
            "regole": REGOLE, "avvertenza": AVVERTENZA}
     attesa = [p for p in piani if p["stato"] == "in attesa"]
     if not messaggi and not registro.get("eventi"):
         out.update(stato="vuoto", titolo="Nessun messaggio di Aldo registrato",
-                   testo="Inoltra i post del canale al bot di Radar, oppure importa un export di Telegram Desktop.")
+                   testo="Il servizio sulla VM non ha ancora letto messaggi dal canale (oppure importa un export di Telegram Desktop).")
     elif attesa:
         a = attesa[0]
         out.update(stato="piani", titolo=f"{len(attesa)} livell{'o' if len(attesa) == 1 else 'i'} da mettere a ordine limite",
-                   testo=f"Ultimo: {a['asset']} {a['verso']} a {_fmt(a['livello'])}. Ordine limite al livello, stop e rischio 1% indicati sotto.")
+                   testo=f"Ultimo: {a['asset']} {a['verso']} a {_fmt(a['livello'])}. Ordine limite al livello, stop e quantità Bitget indicati sotto.")
     elif pos:
         out.update(stato="posizioni", titolo=f"Aldo ha {len(pos)} posizion{'e' if len(pos) == 1 else 'i'} apert{'a' if len(pos) == 1 else 'e'}",
                    testo="Nessun livello nuovo da mettere a ordine. Chi lo copia segue chiusure parziali e stop a pareggio.")
@@ -1527,7 +1520,7 @@ def build(registro: dict, operazioni: dict | None, adesso=None, messaggi: list[d
         out.update(stato="attesa", titolo="Nessun piano e nessuna posizione aperta",
                    testo="Si aspetta il prossimo livello annunciato prima: solo quelli si copiano con un ordine limite.")
     if ultimo and adesso - _dt(ultimo) > timedelta(days=3):
-        out["testo"] += f" Ultimo messaggio registrato il {_dt(ultimo):%d/%m}: se i post non vengono inoltrati, il registro resta indietro."
+        out["testo"] += f" Ultimo messaggio registrato il {_dt(ultimo):%d/%m}: controlla che il servizio sulla VM sia acceso."
     return out
 
 
@@ -1633,7 +1626,7 @@ def giro(cartella="data/aldo", adesso=None, chiama_bot=None, chat_autorizzate=()
     Da chiamare in radar dentro _soft, cosi' un errore qui non ferma il giro."""
     adesso = _dt(adesso) if adesso else datetime.now(UTC)
     c = Path(cartella)
-    capitale = capitale or float(os.environ.get("RADAR_ALDO_CAPITALE", CAPITALE_ESEMPIO))
+    capitale = capitale or float(os.environ.get("COPIA_CAPITALE", CAPITALE_ESEMPIO))
     messaggi = carica_json(c / "messaggi.json", [])
     registro = carica_json(c / "eventi.json", registro_vuoto())
     errori = []

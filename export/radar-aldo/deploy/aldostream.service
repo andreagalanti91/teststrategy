@@ -1,0 +1,27 @@
+# Unit systemd di esempio per il lettore in tempo reale del canale di Aldo (radar/aldostream.py).
+# Copiare in /etc/systemd/system/aldostream.service, adattare User e percorsi, poi:
+#   sudo systemctl daemon-reload && sudo systemctl enable --now aldostream
+# Le credenziali NON stanno qui: /etc/aldostream.env (permessi 600), vedi deploy/ALDOSTREAM.md.
+# La sessione Telethon e i dati (testi e foto del canale) restano sulla VM, fuori dal repo.
+[Unit]
+Description=Radar - avvisi in tempo reale dal canale di Aldo (Telethon, sola lettura)
+Wants=network-online.target
+After=network-online.target
+
+[Service]
+Type=simple
+User=ubuntu
+WorkingDirectory=/home/ubuntu/radar
+EnvironmentFile=/etc/aldostream.env
+ExecStart=/home/ubuntu/radar/.venv/bin/python -u -m radar.aldostream
+Restart=always
+RestartSec=30
+KillSignal=SIGTERM
+TimeoutStopSec=30
+NoNewPrivileges=true
+PrivateTmp=true
+MemoryMax=400M
+UMask=0077
+
+[Install]
+WantedBy=multi-user.target
