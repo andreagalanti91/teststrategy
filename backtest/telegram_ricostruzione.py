@@ -56,10 +56,54 @@ def load_events() -> pd.DataFrame:
         e["utc_msg"] = e["utc"]
         e["utc"] = eff.dt.strftime("%Y-%m-%d %H:%M").where(eff.notna(), e["utc"])
     e["utc"] = pd.to_datetime(e["utc"])
-    return e.sort_values(["utc", "msg_id"]).reset_index(drop=True)
+    e = e.sort_values(["utc", "msg_id"]).reset_index(drop=True)
+    if REV:
+        e = e[~e["trade"].str.startswith("X") & ~e["trade"].isin(NON_CALCOLABILI)]
+        e = normalizza_b(e)
+    return e.reset_index(drop=True)
 
 
-SPOT = {"C00a", "C00b", "C04", "C09"}                   # accumuli spot, tenuti separati dal trader come gli H*
+def normalizza_b(e: pd.DataFrame) -> pd.DataFrame:
+    """Periodo B rivisto: in apertura/aumento la quota e' la dimensione cumulata e il prezzo dell'aumento e' il medio DOPO
+    l'aumento; le chiusure sono frazioni della posizione massima. Qui si riporta tutto alla convenzione di A e C
+    (quota = incremento dell'evento, prezzo = prezzo della tranche, chiusure = frazione della posizione piena)."""
+    e = e.copy()
+    for tid, g in e[e["trade"].str.startswith("B")].groupby("trade"):
+        size, avg, mx, senza_prezzo = 0.0, None, 0.0, []
+        for i, r in g.iterrows():
+            q = r.quota if isinstance(r.quota, (int, float)) and r.quota == r.quota else None
+            p = r.prezzo if isinstance(r.prezzo, (int, float)) and r.prezzo == r.prezzo else None
+            if r.tipo in ("apertura", "aumento"):
+                tot = q if q else (1.0 if size == 0 else size)
+                inc = tot - size
+                if inc <= 1e-9:
+                    e.at[i, "quota"] = np.nan
+                    e.at[i, "tipo"] = "stop_spostato" if r.tipo == "aumento" else r.tipo   # nessun incremento: evento neutro
+                    continue
+                if r.tipo == "aumento" and p and avg:
+                    e.at[i, "prezzo"] = (p * tot - avg * size) / inc            # prezzo della tranche dal medio dopo l'aumento
+                    avg = p
+                elif r.tipo == "aumento" and p and senza_prezzo:
+                    for j in senza_prezzo:                                      # tranche precedenti senza prezzo: il medio vale per tutte
+                        e.at[j, "prezzo"] = p
+                    senza_prezzo, avg = [], p
+                else:
+                    avg = p if p else avg
+                    if not p:
+                        senza_prezzo.append(i)
+                e.at[i, "quota"] = inc
+                size = tot
+                mx = max(mx, size)
+            elif r.tipo in ("chiusura_parziale", "stop_preso", "target_preso") and q:
+                e.at[i, "quota"] = q * (mx or 1.0)
+                size = max(0.0, size - q * (mx or 1.0))
+            elif r.tipo == "chiusura_totale":
+                size = 0.0
+    return e
+
+
+SPOT = {"C00a", "C00b", "C00c", "C00d", "C04", "C09"}   # accumuli spot, tenuti separati dal trader come gli H*
+NON_CALCOLABILI = {"A22", "A26"}                        # revisione: chiusura mai dichiarata e prezzo ignoto
 
 
 def ex_post(g: pd.DataFrame) -> bool:
@@ -68,6 +112,12 @@ def ex_post(g: pd.DataFrame) -> bool:
     if a.empty:
         return True
     n = str(a["note"].iloc[0]).lower()
+    if REV:
+        if "utc_msg" in a and isinstance(a["utc_msg"].iloc[0], str) and pd.notna(a["utc"].iloc[0]):
+            if pd.Timestamp(a["utc_msg"].iloc[0]) - a["utc"].iloc[0] > pd.Timedelta(hours=3):
+                return True                                        # eseguita molto prima del messaggio che la comunica
+        return any(k in n for k in ("non annunciata", "mai annunciata", "comunicata il giorno dopo", "comunicata in ritardo",
+                                    "prima entrata non annunciata", "data d'ingresso ignota"))
     return any(k in n for k in ("non annunciata", "dedotta", "dedotto", "non annunciato", "data d'ingresso ignota"))
 
 
@@ -140,8 +190,11 @@ def rebuild(e: pd.DataFrame, mode: str = "trader") -> pd.DataFrame:
                 if isinstance(r.target, list) and r.target:
                     tgts = r.target
             elif tipo in ("chiusura_parziale", "chiusura_totale", "stop_preso", "target_preso") and size > 0:
+                if REV and tipo == "chiusura_parziale" and not q:
+                    notes.append(f"#{r.msg_id}: parziale senza quota, ignorata")
+                    continue
                 if REV and tipo in ("chiusura_parziale", "stop_preso", "target_preso", "chiusura_totale") and q and tipo != "chiusura_totale":
-                    out = q                                                 # revisione: quota = frazione della posizione piena
+                    out = q * maxsize if str(tid).startswith("C") else q     # revisione: frazione della posizione piena (C: della massima)
                 elif tipo == "chiusura_parziale" and q:
                     total = maxsize
                     if q > closed_cum / total + 1e-9 and q < 1:
