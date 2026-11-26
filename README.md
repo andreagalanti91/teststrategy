@@ -4,6 +4,7 @@ Confronto di strategie di trading con backtest dal 01/01/2021, a partire dall'an
 [`andreagalanti91/radar`](https://github.com/andreagalanti91/radar).
 
 - **[`STRATEGIE.md`](STRATEGIE.md)** — confronto di 16 strategie e 4 portafogli dal 2021, robustezza, proposta e domande aperte.
+- **[`TELEGRAM_ALDO.md`](TELEGRAM_ALDO.md)** — canale Telegram di un trader: strategia ricostruita messaggio per messaggio, risultati con i suoi prezzi e per chi lo copiava, versione meccanica dal 2018.
 - **[`ELIZ_24NOV.md`](ELIZ_24NOV.md)** — il piano a tre scenari di Eliz del 24/11/2026: cosa è successo e le stesse regole verificate dal 2018.
 - **[`OPZIONI_W32.md`](OPZIONI_W32.md)** — le opzioni da zero, la strategia "una call o una put a ogni segnale di W3.2", backtest, confronto con i prezzi veri di OKX, da dove operare.
 - **[`RICERCA_NUOVA.md`](RICERCA_NUOVA.md)** — cosa manca: affidabilità statistica dei risultati (Sharpe deflazionato), leva (Kelly), premio di volatilità, opzioni vendute e comprate.

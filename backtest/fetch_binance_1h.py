@@ -8,7 +8,7 @@ from pathlib import Path
 
 import pandas as pd
 
-OUT = Path(__file__).resolve().parent.parent / "data" / "telegram_prezzi"
+OUT = Path(__file__).resolve().parent.parent / "data" / ("telegram_prezzi" if len(sys.argv) < 2 or sys.argv[1] >= "2023" else "alts_1h")
 OUT.mkdir(parents=True, exist_ok=True)
 
 
