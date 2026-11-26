@@ -187,10 +187,10 @@ class BotTelegram:
 
 def pulsanti(id_avviso: str, esegui_bitget: bool = False) -> list:
     """Tastiera dell'avviso. "Esegui su Bitget" e' solo un punto d'aggancio: spento (aldo_bitget.esegui_su_bitget non e' implementato)."""
-    riga = [{"text": "Fatto", "callback_data": f"aldo:f:{id_avviso}"}, {"text": "Salto", "callback_data": f"aldo:s:{id_avviso}"}]
+    riga = [{"text": "✅ Fatto", "callback_data": f"aldo:f:{id_avviso}"}, {"text": "⏭️ Salto", "callback_data": f"aldo:s:{id_avviso}"}]
     out = [riga]
     if esegui_bitget:
-        out.append([{"text": "Esegui su Bitget", "callback_data": f"aldo:b:{id_avviso}"}])
+        out.append([{"text": "⚙️ Esegui su Bitget", "callback_data": f"aldo:b:{id_avviso}"}])
     return out
 
 
@@ -220,15 +220,13 @@ def righe_ordine(o: dict, spec: dict | None, cfg: Config) -> list[str]:
     """Le righe di dimensione comuni a ordine limite e ingresso a mercato."""
     r = []
     if o.get("modalita") == "importo" and o.get("margine_usdt") is not None:
-        r.append(f"Margine {_fmt(o['importo_eur'], 0)} € (≈ {_fmt(o['margine_usdt'], 0)} USDT, cambio {_fmt(o['cambio_eur_usdt'], 2)} approssimato)"
-                 f" · leva {_fmt(o['leva'], 1)}x · controvalore {_fmt(o['controvalore_usdt'], 0)} USDT")
-        r.append(f"Allo stop perdi ≈ {_fmt(o['perdita_stop_eur'], 0)} € ({_fmt(o['perdita_stop_pct_importo'], 1)}% dell'importo)")
+        r.append(f"💶 Margine <b>{_fmt(o['importo_eur'], 0)} €</b> (≈ {_fmt(o['margine_usdt'], 0)} USDT) · leva <b>{_fmt(o['leva'], 1)}x</b> · controvalore {_fmt(o['controvalore_usdt'], 0)} USDT")
+        r.append(f"📉 Allo stop perdi ≈ <b>{_fmt(o['perdita_stop_eur'], 0)} €</b> ({_fmt(o['perdita_stop_pct_importo'], 1)}% del margine)")
     else:
-        r.append(f"Rischio {_fmt(o.get('rischio_pct', cfg.rischio_pct), 1)}% di {_fmt(o.get('capitale_usdt', cfg.capitale_usdt), 0)} USDT"
-                 f" = perdita allo stop {_fmt(o.get('perdita_stop_usdt'), 0)} USDT · controvalore {_fmt(o.get('controvalore_usdt'), 0)} USDT"
-                 f" · leva {_fmt(o.get('leva'), 1)}x (tetto {_fmt(cfg.leva_max, 0)}x)")
+        r.append(f"💶 Controvalore {_fmt(o.get('controvalore_usdt'), 0)} USDT · leva <b>{_fmt(o.get('leva'), 1)}x</b> (tetto {_fmt(cfg.leva_max, 0)}x)")
+        r.append(f"📉 Allo stop perdi ≈ <b>{_fmt(o.get('perdita_stop_usdt'), 0)} USDT</b> ({_fmt(o.get('rischio_pct', cfg.rischio_pct), 1)}% di {_fmt(o.get('capitale_usdt', cfg.capitale_usdt), 0)} USDT)")
     for n in o.get("note") or []:
-        r.append(f"<b>Attenzione</b>: {_esc(n)}")
+        r.append(f"⚠️ <b>Attenzione</b>: {_esc(n)}")
     return r
 
 
@@ -239,17 +237,18 @@ def _riga_quantita(o: dict, spec: dict | None) -> str:
 
 
 def _riga_stop_obiettivi(o: dict, spec, obiettivi: list) -> list[str]:
-    stop = f"Stop {_px(o['stop'], spec)}" + (" (non indicato da Aldo: 2% oltre il prezzo d'ingresso)" if o.get("stop_stimato") else " (dichiarato)")
-    r = [stop + f" · distanza {_fmt(o.get('distanza_stop_pct'), 2)}%"]
+    stop = f"🛑 Stop <b>{_px(o['stop'], spec)}</b>" + (" ⚠️ non indicato da Aldo: 2% oltre l'ingresso" if o.get("stop_stimato") else " (dichiarato)")
+    r = [stop + f" · {_fmt(o.get('distanza_stop_pct'), 2)}% dall'ingresso"]
     if obiettivi:
-        r.append(f"Obiettivo 1: {_px(obiettivi[0], spec)} → chiudi metà, poi stop a pareggio"
-                 + (f" · poi {' / '.join(_px(t, spec) for t in obiettivi[1:])}" if len(obiettivi) > 1 else ""))
+        r.append(f"🎯 Obiettivo 1 <b>{_px(obiettivi[0], spec)}</b> → chiudi metà e sposta lo stop a pareggio")
+        if len(obiettivi) > 1:
+            r.append(f"🎯 Poi {' / '.join(_px(t, spec) for t in obiettivi[1:])}")
     else:
-        r.append("Obiettivi non indicati: segui i suoi messaggi di chiusura")
+        r.append("🎯 Obiettivi non indicati: segui i suoi messaggi di chiusura")
     return r
 
 
-PIEDE = "Lo metti tu a mano su Bitget. «Fatto» / «Salto» registrano cosa hai fatto."
+PIEDE = "👉 Lo fai tu su Bitget, poi premi ✅ Fatto o ⏭️ Salto."
 
 
 # ------------------------------------------------------------------------------------------------------------------------------
@@ -369,8 +368,8 @@ class Servizio:
             p = prodotti[0]
             cosa = f"{A.NOMI_TIPO.get(p.get('tipo'), 'piano')} {p['asset']} {p.get('verso') or ''}".strip()
             av = self._nuovo_avviso({"tipo": "modifica", "asset": p["asset"], "verso": p.get("verso"), "msg_id": msg["id"], "utc": p["utc"], "trade": p.get("trade")},
-                                    msg, adesso, f"<b>Aldo ha modificato un messaggio già letto</b> ({_esc(cosa)}).\n"
-                                                 "Il registro non cambia da solo: controlla nel canale se livelli o stop sono diversi.", azionabile=False)
+                                    msg, adesso, f"✏️ <b>Aldo ha modificato un messaggio già letto</b> ({_esc(cosa)})\n\n"
+                                                 "👉 Controlla nel canale se livelli o stop sono cambiati: il registro non si aggiorna da solo.", azionabile=False)
             self._invia(av)
             self._salva()
             return [av]
@@ -400,46 +399,53 @@ class Servizio:
         V = (verso or "").upper()
         spec = self._spec(asset)
         px = self._ora(asset)
-        testa = lambda titolo: f"<b>Aldo · {asset} {V} · {titolo}</b>".replace("  ", " ")
+        dot = "🟢" if verso == "long" else "🔴" if verso == "short" else "⚪"
+        EMO = {"nuovo livello": "🎯", "entrato sul livello annunciato": "✅", "stop a pareggio": "🛡️", "stop spostato": "🔧", "chiuso tutto": "🏁",
+               "operazione chiusa (dedotto)": "🏁", "stop preso": "⛔", "livello annullato": "❌", "aumenta la posizione": "➕", "ordine per aumentare": "➕",
+               "aperta senza livello annunciato": "🚫", "ingresso a mercato": "⚡", "aperta": "ℹ️"}
+
+        def testa(titolo):
+            e = "💰" if titolo.startswith("chiuso il") else EMO.get(titolo, "📣")
+            return f"{e} <b>{titolo[:1].upper() + titolo[1:]}</b>\n{dot} <b>{asset} {V}</b> · Aldo"
 
         if tipo == "piano":
             if not a.get("livello_innesco") or verso not in ("long", "short"):
                 return None
             obiettivi = a.get("target") or []
             if not spec:
-                return self._nuovo_avviso(a, msg, adesso, testa("nuovo livello") + f"\nLivello {_px(a['livello_innesco'])}, stop {_px(a.get('stop'))}.\n"
-                                          f"<b>Attenzione</b>: {asset}USDT non trovato fra i futures USDT-M di Bitget: quantità non calcolata.", False)
+                return self._nuovo_avviso(a, msg, adesso, testa("nuovo livello") + f"\n\n📌 Livello {_px(a['livello_innesco'])} · 🛑 stop {_px(a.get('stop'))}\n"
+                                          f"⚠️ <b>Attenzione</b>: {asset}USDT non trovato fra i futures USDT-M di Bitget: quantità non calcolata.", False)
             o = B.ordine(spec, verso, a["livello_innesco"], a.get("stop"), **self._kw())
             if o.get("errore"):
-                return self._nuovo_avviso(a, msg, adesso, testa("nuovo livello") + f"\nLivello {_px(a['livello_innesco'], spec)}: {_esc(o['errore'])}.", False)
+                return self._nuovo_avviso(a, msg, adesso, testa("nuovo livello") + f"\n\n📌 Livello {_px(a['livello_innesco'], spec)}\n⚠️ {_esc(o['errore'])}.", False)
             scade = A._dt(msg["data"]) + timedelta(hours=cfg.ordine_ore)
-            r = [testa("nuovo livello"),
-                 f"<b>ORDINE LIMITE</b>: {o['lato']} {_riga_quantita(o, spec)} a <b>{_px(o['livello'], spec)}</b> · Bitget {o['simbolo']} (USDT-M)"]
+            r = [testa("nuovo livello"), "",
+                 f"📌 <b>ORDINE LIMITE: {o['lato'].upper()} a {_px(o['livello'], spec)}</b>",
+                 f"📦 {_riga_quantita(o, spec)} · Bitget {o['simbolo']}"]
             r += _riga_stop_obiettivi(o, spec, obiettivi)
             r += righe_ordine(o, spec, cfg)
             if px:
-                r.append(f"Prezzo ora {_px(px, spec)} (livello a {A._p(round((o['livello'] / px - 1) * 100, 2))}) · ordine valido {_fmt(cfg.ordine_ore, 0)} ore, fino al {_ora(scade)}")
+                r.append(f"📍 Prezzo ora {_px(px, spec)} · livello a {A._p(round((o['livello'] / px - 1) * 100, 2))}")
                 if (verso == "short" and px >= o["livello"]) or (verso == "long" and px <= o["livello"]):
-                    r.append("<b>Attenzione</b>: il prezzo è già oltre il livello: l'ordine limite verrebbe eseguito subito")
-            else:
-                r.append(f"Ordine valido {_fmt(cfg.ordine_ore, 0)} ore, fino al {_ora(scade)}")
-            r.append(PIEDE)
+                    r.append("⚠️ <b>Attenzione</b>: il prezzo è già oltre il livello: l'ordine limite verrebbe eseguito subito")
+            r.append(f"⏳ Ordine valido {_fmt(cfg.ordine_ore, 0)} ore, fino al {_ora(scade)}")
+            r += ["", PIEDE]
             return self._nuovo_avviso(a, msg, adesso, "\n".join(r), True, o)
 
         if tipo == "apertura":
             piano = next((p for p in self.registro["piani"] if a.get("trade") and p.get("trade_collegato") == a["trade"]), None)
             if piano:
-                txt = (testa("entrato sul livello annunciato") + f"\nAldo è entrato vicino a {_px(piano['livello_innesco'], spec)}, il livello annunciato"
-                       f" il {_ora(A._dt(piano['utc']))}.\nSe hai messo l'ordine limite, controlla che sia eseguito e che ci sia lo stop.")
+                txt = (testa("entrato sul livello annunciato") + f"\n\n📌 Aldo è entrato vicino a <b>{_px(piano['livello_innesco'], spec)}</b>, il livello annunciato"
+                       f" il {_ora(A._dt(piano['utc']))}.\n👉 Se hai messo l'ordine limite, controlla che sia eseguito e che ci sia lo stop.")
                 return self._nuovo_avviso(a, msg, adesso, txt, False)
             return self._ingresso_a_mercato(a, msg, adesso, spec, px, eta_min, testa)
 
         if not a.get("trade") and tipo != "ordine_non_eseguito":
             return None
         scelta = self._scelta_ingresso(a.get("trade"))
-        copiata = ("Risulta copiata da te (Fatto il " + _ora(A._dt(scelta["scelta_alle"])) + ")") if scelta and scelta["scelta"] == "fatto" else \
-            ("Non risulta copiata da te" if scelta else "Copia non registrata")
-        ora = f"Prezzo ora {_px(px, spec)}." if px else ""
+        copiata = ("📒 Copiata da te (Fatto il " + _ora(A._dt(scelta["scelta_alle"])) + ")") if scelta and scelta["scelta"] == "fatto" else \
+            ("📒 Non risulta copiata da te" if scelta else "📒 Copia non registrata")
+        ora = f"📍 Prezzo ora {_px(px, spec)}" if px else ""
         tua = (scelta or {}).get("ordine") if scelta and scelta["scelta"] == "fatto" else None
         if tipo == "chiusura_parziale":
             q = a.get("quota") or 0.5
@@ -447,31 +453,31 @@ class Servizio:
             if tua and spec:
                 qt = B.arrotonda_quantita(spec, tua["quantita"] * q)
                 dett = f" = {_q(qt, spec)} {tua['unita']} della tua posizione" if qt else ""
-            txt = testa(f"chiuso il {q * 100:.0f}%") + f"\n<b>Chiudi il {q * 100:.0f}% a mercato</b>{dett}. {ora}\n{copiata}."
+            txt = testa(f"chiuso il {q * 100:.0f}%") + f"\n\n👉 <b>CHIUDI IL {q * 100:.0f}% A MERCATO</b>{dett}\n{ora}\n{copiata}"
         elif tipo == "stop_pareggio":
             tuo = f" (il tuo: {_px(tua['livello'], spec)})" if tua else ""
-            txt = testa("stop a pareggio") + f"\n<b>Sposta lo stop a prezzo d'ingresso</b>{tuo}. {ora}\n{copiata}."
+            txt = testa("stop a pareggio") + f"\n\n👉 <b>SPOSTA LO STOP AL PREZZO D'INGRESSO</b>{tuo}\n{ora}\n{copiata}"
         elif tipo == "stop_spostato":
             if not a.get("stop"):
                 return None
-            txt = testa("stop spostato") + f"\n<b>Sposta lo stop a {_px(a['stop'], spec)}</b>. {ora}\n{copiata}."
+            txt = testa("stop spostato") + f"\n\n👉 <b>SPOSTA LO STOP A {_px(a['stop'], spec)}</b>\n{ora}\n{copiata}"
         elif tipo in ("chiusura_totale", "target_preso"):
             dedotta = "dedotta" in str(a.get("note"))
             txt = testa("chiuso tutto" if not dedotta else "operazione chiusa (dedotto)") + \
-                (f"\n<b>Chiudi il resto a mercato</b>. {ora}" if not dedotta else
-                 f"\nAldo ha aperto una nuova operazione sullo stesso asset: la precedente risulta chiusa. Se l'avevi copiata, <b>chiudila a mercato</b>. {ora}") + \
-                f"\n{copiata}."
+                (f"\n\n👉 <b>CHIUDI IL RESTO A MERCATO</b>\n{ora}" if not dedotta else
+                 f"\n\nℹ️ Aldo ha aperto una nuova operazione sullo stesso asset: la precedente risulta chiusa.\n👉 Se l'avevi copiata, <b>CHIUDILA A MERCATO</b>\n{ora}") + \
+                f"\n{copiata}"
         elif tipo == "stop_preso":
-            txt = testa("stop preso") + f"\nAldo è uscito allo stop. <b>Se il tuo stop non è scattato, chiudi a mercato</b>. {ora}\n{copiata}."
+            txt = testa("stop preso") + f"\n\nℹ️ Aldo è uscito allo stop.\n👉 <b>Se il tuo stop non è scattato, CHIUDI A MERCATO</b>\n{ora}\n{copiata}"
         elif tipo == "ordine_non_eseguito":
-            txt = testa("livello annullato") + f"\n<b>Cancella l'ordine limite</b> su {asset}USDT, se l'avevi messo."
+            txt = testa("livello annullato") + f"\n\n👉 <b>CANCELLA L'ORDINE LIMITE</b> su {asset}USDT, se l'avevi messo"
         elif tipo in ("aumento", "ordine_limite"):
             txt = testa("aumenta la posizione" if tipo == "aumento" else "ordine per aumentare") + \
-                f"\nLa copia non aumenta: nessuna azione. {ora}"
+                f"\n\nℹ️ La copia non aumenta: nessuna azione.\n{ora}"
             return self._nuovo_avviso(a, msg, adesso, txt, False)
         else:
             return None
-        return self._nuovo_avviso(a, msg, adesso, txt + "\n" + PIEDE, True)
+        return self._nuovo_avviso(a, msg, adesso, txt + "\n\n" + PIEDE, True)
 
     def _kw(self) -> dict:
         c = self.cfg.copia()
@@ -511,19 +517,20 @@ class Servizio:
                 motivi.append(f"{a['asset']}USDT non trovato fra i futures di Bitget")
             if scost is None and minuti is not None:
                 motivi.append("prezzo di Bitget non disponibile")
-            txt = (testa("aperta senza livello annunciato") + "\n<b>NON COPIARE</b>: " + "; ".join(motivi) + "."
-                   + (f"\nPrezzo suo {_px(prezzo_suo, spec)}" if prezzo_suo else "") + (f" · prezzo ora {_px(px, spec)}" if px else ""))
+            txt = (testa("aperta senza livello annunciato") + "\n\n🚫 <b>NON COPIARE</b>: " + "; ".join(motivi) + "."
+                   + (f"\n💲 Prezzo suo {_px(prezzo_suo, spec)}" if prezzo_suo else "") + (f" · 📍 prezzo ora {_px(px, spec)}" if px else ""))
             return self._nuovo_avviso(a, msg, adesso, txt, False)
         o = B.ordine(spec, verso, px, a.get("stop"), **self._kw())
         if o.get("errore"):
             return self._nuovo_avviso(a, msg, adesso, testa("aperta") + f"\n{_esc(o['errore'])}.", False)
-        r = [testa("ingresso a mercato"),
-             f"<b>A MERCATO</b>: Aldo è già dentro da {'meno di un minuto' if minuti < 1 else _fmt(minuti, 0) + ' minuti'}"
-             + (f", prezzo suo {_px(prezzo_suo, spec)}" if prezzo_suo else "") + f", prezzo ora {_px(px, spec)}, scostamento {A._p(round(scost, 2))}",
-             f"Ordine a mercato: {o['lato']} {_riga_quantita(o, spec)} · Bitget {o['simbolo']} (USDT-M)"]
+        r = [testa("ingresso a mercato"), "",
+             f"⚡ <b>A MERCATO: {o['lato'].upper()} SUBITO</b>",
+             f"⏱️ Aldo è dentro da {'meno di un minuto' if minuti < 1 else _fmt(minuti, 0) + ' minuti'}"
+             + (f" a {_px(prezzo_suo, spec)}" if prezzo_suo else "") + f" · ora {_px(px, spec)} ({A._p(round(scost, 2))})",
+             f"📦 {_riga_quantita(o, spec)} · Bitget {o['simbolo']}"]
         r += _riga_stop_obiettivi(o, spec, a.get("target") or [])
         r += righe_ordine(o, spec, cfg)
-        r.append(PIEDE)
+        r += ["", PIEDE]
         return self._nuovo_avviso(a, msg, adesso, "\n".join(r), True, o)
 
     def _invia(self, av: dict):

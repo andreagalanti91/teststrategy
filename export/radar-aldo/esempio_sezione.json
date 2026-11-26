@@ -203,35 +203,35 @@
     "creato": "2026-11-21T07:10:20Z",
     "stato": "inviato",
     "scelta": null,
-    "testo": "<b>Aldo · SOL LONG · entrato sul livello annunciato</b>\nAldo è entrato vicino a 68,500, il livello annunciato il 20/11 13:00 UTC.\nSe hai messo l'ordine limite, controlla che sia eseguito e che ci sia lo stop."
+    "testo": "✅ <b>Entrato sul livello annunciato</b>\n🟢 <b>SOL LONG</b> · Aldo\n\n📌 Aldo è entrato vicino a <b>68,500</b>, il livello annunciato il 20/11 13:00 UTC.\n👉 Se hai messo l'ordine limite, controlla che sia eseguito e che ci sia lo stop."
    },
    {
     "tipo": "chiusura_parziale",
     "creato": "2026-11-23T15:00:20Z",
     "stato": "inviato",
     "scelta": null,
-    "testo": "<b>Aldo · SOL LONG · chiuso il 33%</b>\n<b>Chiudi il 33% a mercato</b>. Prezzo ora 72,300.\nCopia non registrata.\nLo metti tu a mano su Bitget. «Fatto» / «Salto» registrano cosa hai fatto."
+    "testo": "💰 <b>Chiuso il 33%</b>\n🟢 <b>SOL LONG</b> · Aldo\n\n👉 <b>CHIUDI IL 33% A MERCATO</b>\n📍 Prezzo ora 72,300\n📒 Copia non registrata\n\n👉 Lo fai tu su Bitget, poi premi ✅ Fatto o ⏭️ Salto."
    },
    {
     "tipo": "stop_pareggio",
     "creato": "2026-11-23T15:00:20Z",
     "stato": "inviato",
     "scelta": null,
-    "testo": "<b>Aldo · SOL LONG · stop a pareggio</b>\n<b>Sposta lo stop a prezzo d'ingresso</b>. Prezzo ora 72,300.\nCopia non registrata.\nLo metti tu a mano su Bitget. «Fatto» / «Salto» registrano cosa hai fatto."
+    "testo": "🛡️ <b>Stop a pareggio</b>\n🟢 <b>SOL LONG</b> · Aldo\n\n👉 <b>SPOSTA LO STOP AL PREZZO D'INGRESSO</b>\n📍 Prezzo ora 72,300\n📒 Copia non registrata\n\n👉 Lo fai tu su Bitget, poi premi ✅ Fatto o ⏭️ Salto."
    },
    {
     "tipo": "piano",
     "creato": "2026-11-25T18:30:20Z",
     "stato": "inviato",
     "scelta": null,
-    "testo": "<b>Aldo · BTC SHORT · nuovo livello</b>\n<b>ORDINE LIMITE</b>: vendi 0,0851 BTC = 851 contratti da 0,0001 a <b>63.400,0</b> · Bitget BTCUSDT (USDT-M)\nStop 64.200,0 (dichiarato) · distanza 1,26%\nObiettivo 1: 61.000,0 → chiudi metà, poi stop a pareggio · poi 59.500,0\nMargine 1.000 € (≈ 1.080 USDT, cambio 1,08 approssimato) · leva 5,0x · controvalore 5.395 USDT\nAllo stop perdi ≈ 63 € (6,3% dell'importo)\nPrezzo ora 62.587,4 (livello a +1,30%) · ordine valido 24 ore, fino al 26/11 18:30 UTC\nLo metti tu a mano su Bitget. «Fatto» / «Salto» registrano cosa hai fatto."
+    "testo": "🎯 <b>Nuovo livello</b>\n🔴 <b>BTC SHORT</b> · Aldo\n\n📌 <b>ORDINE LIMITE: VENDI a 63.400,0</b>\n📦 0,0851 BTC = 851 contratti da 0,0001 · Bitget BTCUSDT\n🛑 Stop <b>64.200,0</b> (dichiarato) · 1,26% dall'ingresso\n🎯 Obiettivo 1 <b>61.000,0</b> → chiudi metà e sposta lo stop a pareggio\n🎯 Poi 59.500,0\n💶 Margine <b>1.000 €</b> (≈ 1.080 USDT) · leva <b>5,0x</b> · controvalore 5.395 USDT\n📉 Allo stop perdi ≈ <b>63 €</b> (6,3% del margine)\n📍 Prezzo ora 62.587,4 · livello a +1,30%\n⏳ Ordine valido 24 ore, fino al 26/11 18:30 UTC\n\n👉 Lo fai tu su Bitget, poi premi ✅ Fatto o ⏭️ Salto."
    },
    {
     "tipo": "piano",
     "creato": "2026-11-26T08:00:20Z",
     "stato": "inviato",
     "scelta": null,
-    "testo": "<b>Aldo · ETH LONG · nuovo livello</b>\n<b>ORDINE LIMITE</b>: compra 3,31 ETH = 331 contratti da 0,01 a <b>1.630,00</b> · Bitget ETHUSDT (USDT-M)\nStop 1.600,00 (dichiarato) · distanza 1,84%\nObiettivi non indicati: segui i suoi messaggi di chiusura\nMargine 1.000 € (≈ 1.080 USDT, cambio 1,08 approssimato) · leva 5,0x · controvalore 5.395 USDT\nAllo stop perdi ≈ 92 € (9,2% dell'importo)\nPrezzo ora 1.651,99 (livello a −1,33%) · ordine valido 24 ore, fino al 27/11 08:00 UTC\nLo metti tu a mano su Bitget. «Fatto» / «Salto» registrano cosa hai fatto."
+    "testo": "🎯 <b>Nuovo livello</b>\n🟢 <b>ETH LONG</b> · Aldo\n\n📌 <b>ORDINE LIMITE: COMPRA a 1.630,00</b>\n📦 3,31 ETH = 331 contratti da 0,01 · Bitget ETHUSDT\n🛑 Stop <b>1.600,00</b> (dichiarato) · 1,84% dall'ingresso\n🎯 Obiettivi non indicati: segui i suoi messaggi di chiusura\n💶 Margine <b>1.000 €</b> (≈ 1.080 USDT) · leva <b>5,0x</b> · controvalore 5.395 USDT\n📉 Allo stop perdi ≈ <b>92 €</b> (9,2% del margine)\n📍 Prezzo ora 1.651,99 · livello a −1,33%\n⏳ Ordine valido 24 ore, fino al 27/11 08:00 UTC\n\n👉 Lo fai tu su Bitget, poi premi ✅ Fatto o ⏭️ Salto."
    }
   ]
  },

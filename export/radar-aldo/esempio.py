@@ -163,15 +163,15 @@ def scrivi_esempio_avvisi(s: S.Servizio, file: Path):
     scelti = ("piano", "apertura", "chiusura_parziale", "stop_pareggio", "chiusura_totale", "stop_preso", "ordine_non_eseguito")
     visti = set()
     for av in s.avvisi:
-        chiave = av["testo"].splitlines()[0].split("·")[-1]
+        chiave = re.sub(r"<[^>]+>", "", av["testo"].splitlines()[0]).strip()
         if av["tipo"] not in scelti or chiave in visti:
             continue
         visti.add(chiave)
-        L += [f"## {chiave.replace('</b>', '').strip().capitalize()}{'' if av['azionabile'] else ' (informativo)'}", "",
+        L += [f"## {chiave}{'' if av['azionabile'] else ' (informativo)'}", "",
               f"Messaggio di Aldo alle {A._dt(av['data_msg']):%d/%m %H:%M} UTC · avviso dopo {A._fmt(av['latenza_s'], 0)} s", "", "```"]
         L += _md(av["testo"]).splitlines()
         if av["azionabile"]:
-            L += ["", "[ Fatto ]  [ Salto ]"]
+            L += ["", "[ ✅ Fatto ]  [ ⏭️ Salto ]"]
         L += ["```", ""]
     L += ["Dopo «Fatto» o «Salto» il messaggio perde i pulsanti e riceve la riga \"Registrato: fatto, 10/11 09:12 UTC\".", "",
           "Un futuro pulsante «Esegui su Bitget» è previsto solo come punto d'aggancio (spento, non implementato)."]

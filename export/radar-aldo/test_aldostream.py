@@ -123,12 +123,12 @@ def test_avvisi_in_tempo_reale(tmp_path):
     assert len(bot.inviati) == len(s.avvisi) == 14 and len({a["id"] for a in s.avvisi}) == 14
     primo = bot.inviati[0]
     assert "ORDINE LIMITE" in primo["testo"] and "0,0882 BTC" in primo["testo"] and "Allo stop perdi" in primo["testo"]
-    assert primo["pulsanti"][0][0] == {"text": "Fatto", "callback_data": "aldo:f:101.1"} and not primo["silenzioso"]
+    assert primo["pulsanti"][0][0] == {"text": "✅ Fatto", "callback_data": "aldo:f:101.1"} and not primo["silenzioso"]
     assert any("A MERCATO" in t and "ETH" in t for t in testi)                                     # ingresso rapido: si copia
     assert any("NON COPIARE" in t for t in testi)                                                   # entrato da molto: no
-    parz = next(t for t in testi if "Chiudi il 50%" in t)
-    assert "0,0441 BTC della tua posizione" in parz and "Risulta copiata da te" in parz
-    assert any("Sposta lo stop a prezzo d'ingresso" in t for t in testi) and any("Chiudi il resto a mercato" in t for t in testi)
+    parz = next(t for t in testi if "CHIUDI IL 50%" in t)
+    assert "0,0441 BTC della tua posizione" in parz and "Copiata da te" in parz
+    assert any("SPOSTA LO STOP AL PREZZO D'INGRESSO" in t for t in testi) and any("CHIUDI IL RESTO A MERCATO" in t for t in testi)
     assert all(a["latenza_s"] == 20 for a in s.avvisi)
     lat = s.latenze()
     assert len(lat) == 13 and S.latenza(lat)["mediana_s"] == 20                                      # 13 messaggi, uno senza eventi
