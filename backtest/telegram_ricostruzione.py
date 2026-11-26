@@ -51,6 +51,10 @@ def load_events() -> pd.DataFrame:
     for f in sorted(EST.glob("eventi_*.json")):
         ev += json.load(open(f, encoding="utf-8"))
     e = pd.DataFrame(ev)
+    if REV and "utc_effettivo" in e:                                # ora reale stimata dell'esecuzione, se la revisione la indica
+        eff = pd.to_datetime(e["utc_effettivo"], errors="coerce")
+        e["utc_msg"] = e["utc"]
+        e["utc"] = eff.dt.strftime("%Y-%m-%d %H:%M").where(eff.notna(), e["utc"])
     e["utc"] = pd.to_datetime(e["utc"])
     return e.sort_values(["utc", "msg_id"]).reset_index(drop=True)
 
@@ -112,7 +116,8 @@ def rebuild(e: pd.DataFrame, mode: str = "trader") -> pd.DataFrame:
             if tipo in ("stop_preso",) and p is None and avg:
                 p, src = avg, "pareggio"
             if p is None:
-                p = px_at(asset, r.utc)
+                t_px = pd.Timestamp(r.utc_msg) if (mode == "follower" and hasattr(r, "utc_msg") and isinstance(r.utc_msg, str)) else r.utc
+                p = px_at(asset, t_px)
             if p is None:
                 notes.append(f"#{r.msg_id}: prezzo di {asset} non disponibile")
                 continue
@@ -135,7 +140,9 @@ def rebuild(e: pd.DataFrame, mode: str = "trader") -> pd.DataFrame:
                 if isinstance(r.target, list) and r.target:
                     tgts = r.target
             elif tipo in ("chiusura_parziale", "chiusura_totale", "stop_preso", "target_preso") and size > 0:
-                if tipo == "chiusura_parziale" and q:
+                if REV and tipo in ("chiusura_parziale", "stop_preso", "target_preso", "chiusura_totale") and q and tipo != "chiusura_totale":
+                    out = q                                                 # revisione: quota = frazione della posizione piena
+                elif tipo == "chiusura_parziale" and q:
                     total = maxsize
                     if q > closed_cum / total + 1e-9 and q < 1:
                         out = max(0.0, q * total - closed_cum)              # quota cumulativa
