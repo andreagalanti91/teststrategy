@@ -1424,7 +1424,7 @@ def ricostruisci(registro: dict, prezzi, adesso=None, capitale: float | None = N
         liv, ora = x["livello_innesco"], prezzi.ora(x["asset"])
         tocco = m.touched(x["asset"], liv, _ts(x["utc"]) + pd.Timedelta(hours=1), _ts(adesso)) if prezzi(x["asset"]) is not None else (None, None)
         piani.append({"asset": x["asset"], "verso": x["verso"], "livello": liv, "stop": x.get("stop"), "obiettivi": x.get("target") or [],
-                      "annunciato": x["utc"], "scade": (_dt(x["utc"]) + timedelta(days=GIORNI_PIANO)).strftime("%Y-%m-%d %H:%M"),
+                      "annunciato": x["utc"], "scade": (_dt(x["utc"]) + timedelta(hours=float(os.environ.get("ORDINE_ORE", ORE_ORDINE)))).strftime("%Y-%m-%d %H:%M"),
                       "prezzo_ora": ora, "distanza_pct": _r((liv / ora - 1) * 100) if ora else None,
                       "stato": "raggiunto" if tocco[0] else "in attesa", "raggiunto_il": tocco[1].strftime("%Y-%m-%d %H:%M") if tocco[0] else None,
                       "affidabilita": x.get("affidabilita"), "ordine": _ordine_piano(x, contratti, copia, capitale)})

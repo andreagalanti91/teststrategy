@@ -76,7 +76,7 @@ Messaggio di Aldo alle 14/11 10:05 UTC · avviso dopo 20 s
 
 ```
 **Aldo · ETH LONG · ingresso a mercato**
-**A MERCATO**: Aldo è già dentro da 0 minuti, prezzo suo 1.701,00, prezzo ora 1.700,36, scostamento -0,04%
+**A MERCATO**: Aldo è già dentro da meno di un minuto, prezzo suo 1.701,00, prezzo ora 1.700,36, scostamento −0,04%
 Ordine a mercato: compra 3,17 ETH = 317 contratti da 0,01 · Bitget ETHUSDT (USDT-M)
 Stop 1.670,00 (dichiarato) · distanza 1,79%
 Obiettivo 1: 1.780,00 → chiudi metà, poi stop a pareggio

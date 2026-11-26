@@ -35,7 +35,7 @@
    "stop": 1600.0,
    "obiettivi": [],
    "annunciato": "2026-11-26 08:00",
-   "scade": "2026-12-03 08:00",
+   "scade": "2026-11-27 08:00",
    "prezzo_ora": 1648.0,
    "distanza_pct": -1.09,
    "stato": "in attesa",
@@ -75,7 +75,7 @@
     59500.0
    ],
    "annunciato": "2026-11-25 18:30",
-   "scade": "2026-12-02 18:30",
+   "scade": "2026-11-26 18:30",
    "prezzo_ora": 62150.0,
    "distanza_pct": 2.01,
    "stato": "in attesa",
