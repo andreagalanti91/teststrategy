@@ -17,9 +17,11 @@ import numpy as np
 import pandas as pd
 
 ROOT = Path(__file__).resolve().parent.parent
-EST = ROOT / "telegram" / "estrazione"
+import os
+REV = os.environ.get("TELEGRAM_REVISIONE") == "1"          # 1 = usa gli eventi rivisti (telegram/revisione/eventi_*_rev.json)
+EST = ROOT / "telegram" / ("revisione" if REV else "estrazione")
 PRZ = ROOT / "data" / "telegram_prezzi"
-OUT = ROOT / "results" / "telegram"
+OUT = ROOT / "results" / ("telegram_rev" if REV else "telegram")
 OUT.mkdir(parents=True, exist_ok=True)
 COST = 0.0008
 FINE = pd.Timestamp("2024-03-18 11:00")

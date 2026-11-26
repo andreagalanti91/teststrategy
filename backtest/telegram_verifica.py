@@ -45,7 +45,7 @@ def touched(asset, price, t0, t1):
 def main():
     e = TR.load_events()
     pl = []
-    for f in sorted((ROOT / "telegram" / "estrazione").glob("piani_*.json")):
+    for f in sorted((ROOT / "telegram" / "estrazione").glob("piani_*.json")):          # i piani restano quelli della prima estrazione
         pl += json.load(open(f, encoding="utf-8"))
     p = pd.DataFrame(pl)
     p["utc"] = pd.to_datetime(p["utc"])
