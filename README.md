@@ -4,6 +4,7 @@ Confronto di strategie di trading con backtest dal 01/01/2021, a partire dall'an
 [`andreagalanti91/radar`](https://github.com/andreagalanti91/radar).
 
 - **[`STRATEGIE.md`](STRATEGIE.md)** — confronto di 16 strategie e 4 portafogli dal 2021, robustezza, proposta e domande aperte.
+- **[`STRATEGIE_ESTESE.md`](STRATEGIE_ESTESE.md)** — W3.2 estesa a ETH, SOL, TAO, INJ, DOGE; strategia AE (Aldo + Eliz, swing); come seguire Aldo e strumento per radar.
 - **[`ALDO_ELIZ_INTRADAY.md`](ALDO_ELIZ_INTRADAY.md)** — seconda analisi del canale (schermate autentiche, copia con ordini limite), strategia di Aldo come regole, strategia intraday Aldo + Eliz su BTC, ETH, SOL, TAO.
 - **[`TELEGRAM_ALDO.md`](TELEGRAM_ALDO.md)** — canale Telegram di un trader: strategia ricostruita messaggio per messaggio, risultati con i suoi prezzi e per chi lo copiava, versione meccanica dal 2018.
 - **[`ELIZ_24NOV.md`](ELIZ_24NOV.md)** — il piano a tre scenari di Eliz del 24/11/2026: cosa è successo e le stesse regole verificate dal 2018.
@@ -38,6 +39,6 @@ python backtest/build_report.py
 Ricerca su dati storici, non una raccomandazione d'investimento.
 
 
-Esportazioni per il repo radar: `export/radar-v1/` (switch W3.2 · v1 · Confronto), `export/radar-opzioni/` (sezione "Opzioni": prompt, modulo, test, dati) e `export/radar-livelli/` (sezione "Livelli").
+Esportazioni per il repo radar: `export/radar-aldo/` (tracciamento di Aldo), `export/radar-v1/` (switch W3.2 · v1 · Confronto), `export/radar-opzioni/` (sezione "Opzioni": prompt, modulo, test, dati) e `export/radar-livelli/` (sezione "Livelli").
 
 Strumento di confronto: `tool/index.html` con `tool/data.json` (rigenerabile con `python backtest/build_tool.py`).

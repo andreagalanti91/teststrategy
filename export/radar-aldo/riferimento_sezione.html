@@ -1,0 +1,99 @@
+<!doctype html>
+<html lang="it">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Riferimento sezione Aldo</title>
+<style>
+/* Riferimento per la sezione "Aldo" di Radar, nei due stati (attiva, vuota). Dati inventati. In Radar va rifatta con i componenti e i colori della dashboard. */
+:root { --bg: #f7f8fa; --surface: #ffffff; --fg: #14181f; --muted: #5b6472; --line: #dde1e7; --accent: #2a78d6; --chip: #eef1f5; --good: #0a7d33; --bad: #c0392b; --warn: #9a6400;
+  --font: system-ui, -apple-system, "Segoe UI", sans-serif; color-scheme: light; }
+@media (prefers-color-scheme: dark) { :root { --bg: #10141a; --surface: #181d25; --fg: #e8ebf0; --muted: #9aa3b0; --line: #2b323d; --accent: #5b9bea; --chip: #222934;
+  --good: #4cc27a; --bad: #f0786a; --warn: #e0b050; color-scheme: dark; } }
+* { box-sizing: border-box; }
+body { margin: 0; background: var(--bg); color: var(--fg); font-family: var(--font); font-size: 14px; line-height: 1.45; }
+.wrap { max-width: 1080px; margin: 0 auto; padding: 20px 16px 40px; display: flex; flex-direction: column; gap: 18px; }
+h1 { font-size: 20px; margin: 0; } h2 { font-size: 16px; margin: 0; } h3 { font-size: 13px; margin: 20px 0 8px; color: var(--muted); font-weight: 600; text-transform: uppercase; letter-spacing: .04em; }
+.sub { color: var(--muted); margin: 4px 0 0; }
+.card { background: var(--surface); border: 1px solid var(--line); border-radius: 8px; padding: 16px; min-width: 0; }
+.head { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; margin-bottom: 12px; }
+.chip { font-size: 12px; padding: 2px 8px; border-radius: 999px; background: var(--chip); color: var(--muted); }
+.banner { display: flex; gap: 12px; align-items: flex-start; padding: 12px; border-radius: 8px; background: var(--chip); }
+.tag { font-weight: 700; font-size: 12px; letter-spacing: .06em; padding: 4px 10px; border-radius: 999px; color: #fff; flex: none; background: var(--muted); }
+.tag.piani { background: var(--accent); } .tag.posizioni { background: var(--good); }
+.banner b { display: block; } .banner div span { color: var(--muted); }
+#out { display: flex; flex-direction: column; gap: 18px; }
+.scroll { overflow-x: auto; }
+table { border-collapse: collapse; width: 100%; font-variant-numeric: tabular-nums; }
+th, td { padding: 7px 10px; text-align: right; border-bottom: 1px solid var(--line); white-space: nowrap; }
+th:first-child, td:first-child, .l { text-align: left; }
+th { color: var(--muted); font-weight: 500; font-size: 12px; }
+.pos { color: var(--good); } .neg { color: var(--bad); } .m { color: var(--muted); }
+.note { color: var(--muted); font-size: 12px; margin: 10px 0 0; }
+.niente { color: var(--muted); margin: 4px 0; }
+pre { white-space: pre-wrap; font-family: inherit; background: var(--chip); border-radius: 8px; padding: 10px 12px; margin: 8px 0 0; }
+ol { margin: 8px 0 0; padding-left: 20px; } details summary { cursor: pointer; color: var(--accent); margin-top: 14px; }
+.avv { border-top: 1px solid var(--line); margin-top: 16px; padding-top: 10px; color: var(--muted); font-size: 12px; }
+</style>
+<div class="wrap">
+  <header><h1>Riferimento per la sezione «Aldo» di Radar</h1>
+    <p class="sub">Due stati della stessa sezione, generati da <code>build()</code> con dati inventati: messaggi scritti apposta e prezzi sintetici. Capitale d'esempio 10.000 $.</p></header>
+  <div id="out"></div>
+</div>
+<script>
+const STATI = {"attiva": {"aggiornato": "2026-11-26T12:00:00Z", "capitale": 10000.0, "capitale_esempio": true, "fonte": {"messaggi": 12, "ultimo_messaggio": "2026-11-26T08:00:00Z", "per_origine": {"export": 6, "bot": 6}, "estrattore": {"regole": 12}, "da_rivedere": 0, "prezzi_mancanti": []}, "piani": [{"asset": "ETH", "verso": "long", "livello": 2010.0, "stop": 1960.0, "obiettivi": [], "annunciato": "2026-11-26 08:00", "scade": "2026-12-03 08:00", "prezzo_ora": 2041.0, "distanza_pct": -1.52, "stato": "in attesa", "raggiunto_il": null, "affidabilita": 0.9, "rischio_1": {"rischio_pct": 1.0, "quantita": 2.0, "controvalore": 4020.0, "leva": 0.4, "perdita_allo_stop": 100.0, "stop": 1960.0, "stop_stimato": false, "distanza_stop_pct": 2.49}}, {"asset": "BTC", "verso": "short", "livello": 63400.0, "stop": 64200.0, "obiettivi": [61000.0, 59500.0], "annunciato": "2026-11-25 18:30", "scade": "2026-12-02 18:30", "prezzo_ora": 62150.0, "distanza_pct": 2.01, "stato": "in attesa", "raggiunto_il": null, "affidabilita": 0.9, "rischio_1": {"rischio_pct": 1.0, "quantita": 0.125, "controvalore": 7925.0, "leva": 0.8, "perdita_allo_stop": 100.0, "stop": 64200.0, "stop_stimato": false, "distanza_stop_pct": 1.26}}], "posizioni": [{"trade": "L-261121-SOL-L", "asset": "SOL", "verso": "long", "aperta": "2026-11-21 07:10", "quota_aperta": 0.67, "prezzo_medio": 128.5, "prezzo_ora": 133.1, "stop": 124.0, "stop_a_pareggio": true, "obiettivi": [136.0, 142.0], "trader_pct": 3.65, "mercato_pct": 2.82, "limite_pct": 3.69, "comunicata_dopo": false}], "chiuse": [{"trade": "L-261114-ETH-L", "asset": "ETH", "verso": "long", "apertura": "2026-11-14 10:05", "chiusura": "2026-11-15 08:30", "giorni": 0.9, "trader_pct": -2.3, "mercato_pct": -2.31, "limite_pct": -2.31, "ingresso_limite": false, "comunicata_dopo": false}, {"trade": "L-261110-BTC-S", "asset": "BTC", "verso": "short", "apertura": "2026-11-10 16:20", "chiusura": "2026-11-12 12:30", "giorni": 1.8, "trader_pct": 3.07, "mercato_pct": 2.95, "limite_pct": 3.14, "ingresso_limite": true, "comunicata_dopo": false}], "statistiche": {"trader": {"operazioni": 2, "in_guadagno_pct": 50.0, "medio_pct": 0.38, "mediana_pct": 0.38, "capitale_1x": 10070.0, "capitale_rischio_1": 10111.0, "capitale_rischio_2": 10217.0, "peggiore_rischio_2_pct": -2.15}, "mercato": {"operazioni": 2, "in_guadagno_pct": 50.0, "medio_pct": 0.32, "mediana_pct": 0.32, "capitale_1x": 10057.0, "capitale_rischio_1": 10088.0, "capitale_rischio_2": 10172.0, "peggiore_rischio_2_pct": -2.15}, "limite": {"operazioni": 2, "in_guadagno_pct": 50.0, "medio_pct": 0.42, "mediana_pct": 0.42, "capitale_1x": 10076.0, "capitale_rischio_1": 10131.0, "capitale_rischio_2": 10256.0, "peggiore_rischio_2_pct": -2.15}, "limite_entrate_con_ordine": 2}, "ritardo": {"prezzi_dichiarati": 3, "toccati_pct": 100.0, "mediana_ore": 0.3, "quartile_ore": 3.8}, "avvisi": {"attivi": false, "proposti": [{"tipo": "piano", "creato": "2026-11-26 08:00", "testo": "Aldo · ordine limite suggerito\nETH long a 2.010 · stop 1.960 · obiettivi non indicati\nRischio 1% di 10.000 $ = 2,00 ETH (controvalore 4.020 $, leva 0,4x)\nValido 7 giorni. Su carta: Radar non invia ordini."}]}, "regole": ["Si copiano solo i livelli annunciati prima: ordine limite al livello, non a mercato dopo il messaggio", "Stop: quello dichiarato; se manca, 2% oltre il livello", "Rischio fisso: 1% del capitale per operazione, al massimo leva 10x", "Metà al primo obiettivo, poi stop a pareggio, come fa lui", "Operazioni comunicate solo dopo l'ingresso: non si inseguono", "Un piano non eseguito vale 7 giorni, poi l'ordine si cancella"], "avvertenza": "Registro ricostruito dai messaggi del canale privato di Aldo, solo per uso personale: non ridistribuire. Su carta: Radar non invia ordini. Nel periodo studiato (05/2023–03/2024) il trader, con i suoi prezzi, aveva il 73% di operazioni in guadagno; chi lo copiava a mercato dopo il messaggio il 44%, chi metteva ordini limite sui livelli annunciati il 58%. Risultati passati, non una raccomandazione.", "stato": "piani", "titolo": "2 livelli da mettere a ordine limite", "testo": "Ultimo: ETH long a 2.010. Ordine limite al livello, stop e rischio 1% indicati sotto."}, "vuota": {"aggiornato": "2026-11-26T12:00:00Z", "capitale": 10000.0, "capitale_esempio": true, "fonte": {"messaggi": 0, "ultimo_messaggio": null, "per_origine": {}, "estrattore": {}, "da_rivedere": 0, "prezzi_mancanti": []}, "piani": [], "posizioni": [], "chiuse": [], "statistiche": {}, "ritardo": {}, "avvisi": {"attivi": false, "proposti": []}, "regole": ["Si copiano solo i livelli annunciati prima: ordine limite al livello, non a mercato dopo il messaggio", "Stop: quello dichiarato; se manca, 2% oltre il livello", "Rischio fisso: 1% del capitale per operazione, al massimo leva 10x", "Metà al primo obiettivo, poi stop a pareggio, come fa lui", "Operazioni comunicate solo dopo l'ingresso: non si inseguono", "Un piano non eseguito vale 7 giorni, poi l'ordine si cancella"], "avvertenza": "Registro ricostruito dai messaggi del canale privato di Aldo, solo per uso personale: non ridistribuire. Su carta: Radar non invia ordini. Nel periodo studiato (05/2023–03/2024) il trader, con i suoi prezzi, aveva il 73% di operazioni in guadagno; chi lo copiava a mercato dopo il messaggio il 44%, chi metteva ordini limite sui livelli annunciati il 58%. Risultati passati, non una raccomandazione.", "stato": "vuoto", "titolo": "Nessun messaggio di Aldo registrato", "testo": "Inoltra i post del canale al bot di Radar, oppure importa un export di Telegram Desktop."}};
+const mig = (v, d = 0) => { const s = Math.abs(v).toFixed(d).split("."); return s[0].replace(/\B(?=(\d{3})+(?!\d))/g, ".") + (s[1] ? "," + s[1] : ""); };
+const px = v => v == null ? "–" : mig(v, Math.abs(v) >= 1000 ? 0 : Math.abs(v) >= 100 ? 1 : Math.abs(v) >= 1 ? 2 : 4);
+const usd = v => v == null ? "–" : mig(v) + " $";
+const pct = (v, d = 1) => v == null ? "–" : (v > 0 ? "+" : v < 0 ? "−" : "") + mig(v, d) + "%";
+const cls = v => v > 0 ? "pos" : v < 0 ? "neg" : "";
+const dt = s => s ? s.slice(8, 10) + "/" + s.slice(5, 7) + " " + s.slice(11, 16) : "–";
+const NOMI = { piani: "PIANI", posizioni: "POSIZIONI", attesa: "ATTESA", vuoto: "VUOTO" };
+
+function tabella(intest, righe, vuoto) {
+  if (!righe.length) return `<p class="niente">${vuoto}</p>`;
+  return `<div class="scroll"><table><thead><tr>${intest.map(h => `<th class="${["Verso", "Note"].includes(h) ? "l" : ""}">${h}</th>`).join("")}</tr></thead><tbody>${righe.map(r => `<tr>${r.join("")}</tr>`).join("")}</tbody></table></div>`;
+}
+const td = (v, c = "") => `<td class="${c}">${v}</td>`;
+
+function sezione(s) {
+  const piani = tabella(["Asset", "Verso", "Livello", "Distanza", "Stop", "Obiettivi", "Rischio 1%", "Annunciato", "Scade", "Stato"],
+    s.piani.map(p => [td(p.asset), td(p.verso, "l"), td(px(p.livello)), td(pct(p.distanza_pct)), td(px(p.rischio_1.stop) + (p.rischio_1.stop_stimato ? " *" : "")),
+      td(p.obiettivi.map(px).join(" / ") || "–"), td(`${mig(p.rischio_1.quantita, p.rischio_1.quantita < 10 ? 3 : 0)} ${p.asset} · ${usd(p.rischio_1.controvalore)} · ${mig(p.rischio_1.leva, 1)}x`),
+      td(dt(p.annunciato)), td(dt(p.scade)), td(p.stato === "raggiunto" ? "livello toccato " + dt(p.raggiunto_il) : "in attesa", p.stato === "raggiunto" ? "" : "m")]),
+    "Nessun livello annunciato negli ultimi 7 giorni.");
+  const pos = tabella(["Asset", "Verso", "Dal", "Prezzo medio", "Adesso", "Quota aperta", "Stop", "Trader", "A mercato", "Con ordini limite"],
+    s.posizioni.map(p => [td(p.asset), td(p.verso, "l"), td(dt(p.aperta)), td(px(p.prezzo_medio)), td(px(p.prezzo_ora)), td(mig(p.quota_aperta * 100) + "%"),
+      td(p.stop_a_pareggio ? "a pareggio" : px(p.stop)), td(pct(p.trader_pct), cls(p.trader_pct)), td(pct(p.mercato_pct), cls(p.mercato_pct)), td(pct(p.limite_pct), cls(p.limite_pct))]),
+    "Nessuna posizione aperta.");
+  const chiuse = tabella(["Asset", "Verso", "Apertura", "Chiusura", "Giorni", "Trader", "A mercato", "Con ordini limite", "Note"],
+    s.chiuse.map(o => [td(o.asset), td(o.verso, "l"), td(dt(o.apertura)), td(dt(o.chiusura)), td(o.giorni == null ? "–" : mig(o.giorni, 1)),
+      td(pct(o.trader_pct), cls(o.trader_pct)), td(pct(o.mercato_pct), cls(o.mercato_pct)), td(pct(o.limite_pct), cls(o.limite_pct)),
+      td([o.ingresso_limite ? "entrata con ordine limite" : "", o.comunicata_dopo ? "comunicata dopo" : ""].filter(Boolean).join(", ") || "–", "l m")]),
+    "Nessuna operazione chiusa.");
+  const st = s.statistiche || {}, W = [["trader", "Trader, prezzi suoi"], ["mercato", "Chi copiava a mercato"], ["limite", "Chi copiava con ordini limite"]];
+  const righe = [["Operazioni chiuse", x => x.operazioni ?? 0], ["In guadagno", x => x.in_guadagno_pct == null ? "–" : mig(x.in_guadagno_pct) + "%"],
+    ["Medio per operazione", x => `<span class="${cls(x.medio_pct)}">${pct(x.medio_pct, 2)}</span>`],
+    ["Capitale, rischio 1%", x => usd(x.capitale_rischio_1)], ["Capitale, rischio 2%", x => usd(x.capitale_rischio_2)]];
+  const stat = st.trader ? tabella(["", ...W.map(w => w[1])], righe.map(([k, f]) => [td(k, "l"), ...W.map(w => td(f(st[w[0]] || {})))]), "") : `<p class="niente">Nessuna operazione registrata.</p>`;
+  const r = s.ritardo || {}, f = s.fonte;
+  const origini = Object.entries(f.per_origine).map(([k, v]) => `${{ export: "export", bot: "inoltrati al bot", telethon: "Telethon" }[k] || k} ${v}`).join(", ");
+  const estr = Object.entries(f.estrattore).map(([k, v]) => `${k} ${v}`).join(", ");
+  return `<section class="card">
+    <div class="head"><h2>Aldo</h2><span class="chip">su carta</span><span class="chip">canale privato · uso personale</span></div>
+    <div class="banner"><span class="tag ${s.stato}">${NOMI[s.stato]}</span><div><b>${s.titolo}</b><span>${s.testo}</span></div></div>
+    <h3>Livelli da mettere a ordine limite</h3>${piani}
+    ${s.piani.some(p => p.rischio_1.stop_stimato) ? `<p class="note">* stop non indicato da Aldo: 2% oltre il livello.</p>` : ""}
+    <h3>Posizioni aperte di Aldo</h3>${pos}
+    <h3>Ultime operazioni chiuse</h3>${chiuse}
+    <h3>Statistiche dall'inizio del registro</h3>${stat}
+    <p class="note">Rendimenti sul controvalore di ogni operazione, dopo i costi. Capitale da ${usd(s.capitale)}${s.capitale_esempio ? " (d'esempio)" : ""}, con lo stop dichiarato (2% se manca), leva massima 10x.
+      ${r.prezzi_dichiarati ? `Ritardo fra il prezzo d'ingresso dichiarato e il messaggio: mediana ${mig(r.mediana_ore, 1)} ore, un quarto oltre ${mig(r.quartile_ore, 1)} ore.` : ""}</p>
+    <details><summary>Avvisi proposti${s.avvisi.attivi ? "" : " (disattivati: aspettano la tua approvazione)"}</summary>
+      ${s.avvisi.proposti.length ? s.avvisi.proposti.map(a => `<pre>${a.testo}</pre>`).join("") : `<p class="niente">Nessun avviso proposto.</p>`}</details>
+    <details><summary>Come si copia</summary><ol>${s.regole.map(x => `<li>${x}</li>`).join("")}</ol></details>
+    <p class="note">Messaggi registrati: ${f.messaggi}${origini ? " (" + origini + ")" : ""}${estr ? " · estrattore: " + estr : ""} · da rivedere: ${f.da_rivedere}${f.ultimo_messaggio ? " · ultimo " + dt(f.ultimo_messaggio.replace("T", " ")) : ""}.</p>
+    <p class="avv">${s.avvertenza}</p>
+  </section>`;
+}
+document.getElementById("out").innerHTML = Object.values(STATI).map(sezione).join("");
+</script>

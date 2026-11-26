@@ -1,0 +1,181 @@
+{
+ "aggiornato": "2026-11-26T12:00:00Z",
+ "capitale": 10000.0,
+ "capitale_esempio": true,
+ "fonte": {
+  "messaggi": 12,
+  "ultimo_messaggio": "2026-11-26T08:00:00Z",
+  "per_origine": {
+   "export": 6,
+   "bot": 6
+  },
+  "estrattore": {
+   "regole": 12
+  },
+  "da_rivedere": 0,
+  "prezzi_mancanti": []
+ },
+ "piani": [
+  {
+   "asset": "ETH",
+   "verso": "long",
+   "livello": 2010.0,
+   "stop": 1960.0,
+   "obiettivi": [],
+   "annunciato": "2026-11-26 08:00",
+   "scade": "2026-12-03 08:00",
+   "prezzo_ora": 2041.0,
+   "distanza_pct": -1.52,
+   "stato": "in attesa",
+   "raggiunto_il": null,
+   "affidabilita": 0.9,
+   "rischio_1": {
+    "rischio_pct": 1.0,
+    "quantita": 2.0,
+    "controvalore": 4020.0,
+    "leva": 0.4,
+    "perdita_allo_stop": 100.0,
+    "stop": 1960.0,
+    "stop_stimato": false,
+    "distanza_stop_pct": 2.49
+   }
+  },
+  {
+   "asset": "BTC",
+   "verso": "short",
+   "livello": 63400.0,
+   "stop": 64200.0,
+   "obiettivi": [
+    61000.0,
+    59500.0
+   ],
+   "annunciato": "2026-11-25 18:30",
+   "scade": "2026-12-02 18:30",
+   "prezzo_ora": 62150.0,
+   "distanza_pct": 2.01,
+   "stato": "in attesa",
+   "raggiunto_il": null,
+   "affidabilita": 0.9,
+   "rischio_1": {
+    "rischio_pct": 1.0,
+    "quantita": 0.125,
+    "controvalore": 7925.0,
+    "leva": 0.8,
+    "perdita_allo_stop": 100.0,
+    "stop": 64200.0,
+    "stop_stimato": false,
+    "distanza_stop_pct": 1.26
+   }
+  }
+ ],
+ "posizioni": [
+  {
+   "trade": "L-261121-SOL-L",
+   "asset": "SOL",
+   "verso": "long",
+   "aperta": "2026-11-21 07:10",
+   "quota_aperta": 0.67,
+   "prezzo_medio": 128.5,
+   "prezzo_ora": 133.1,
+   "stop": 124.0,
+   "stop_a_pareggio": true,
+   "obiettivi": [
+    136.0,
+    142.0
+   ],
+   "trader_pct": 3.65,
+   "mercato_pct": 2.82,
+   "limite_pct": 3.69,
+   "comunicata_dopo": false
+  }
+ ],
+ "chiuse": [
+  {
+   "trade": "L-261114-ETH-L",
+   "asset": "ETH",
+   "verso": "long",
+   "apertura": "2026-11-14 10:05",
+   "chiusura": "2026-11-15 08:30",
+   "giorni": 0.9,
+   "trader_pct": -2.3,
+   "mercato_pct": -2.31,
+   "limite_pct": -2.31,
+   "ingresso_limite": false,
+   "comunicata_dopo": false
+  },
+  {
+   "trade": "L-261110-BTC-S",
+   "asset": "BTC",
+   "verso": "short",
+   "apertura": "2026-11-10 16:20",
+   "chiusura": "2026-11-12 12:30",
+   "giorni": 1.8,
+   "trader_pct": 3.07,
+   "mercato_pct": 2.95,
+   "limite_pct": 3.14,
+   "ingresso_limite": true,
+   "comunicata_dopo": false
+  }
+ ],
+ "statistiche": {
+  "trader": {
+   "operazioni": 2,
+   "in_guadagno_pct": 50.0,
+   "medio_pct": 0.38,
+   "mediana_pct": 0.38,
+   "capitale_1x": 10070.0,
+   "capitale_rischio_1": 10111.0,
+   "capitale_rischio_2": 10217.0,
+   "peggiore_rischio_2_pct": -2.15
+  },
+  "mercato": {
+   "operazioni": 2,
+   "in_guadagno_pct": 50.0,
+   "medio_pct": 0.32,
+   "mediana_pct": 0.32,
+   "capitale_1x": 10057.0,
+   "capitale_rischio_1": 10088.0,
+   "capitale_rischio_2": 10172.0,
+   "peggiore_rischio_2_pct": -2.15
+  },
+  "limite": {
+   "operazioni": 2,
+   "in_guadagno_pct": 50.0,
+   "medio_pct": 0.42,
+   "mediana_pct": 0.42,
+   "capitale_1x": 10076.0,
+   "capitale_rischio_1": 10131.0,
+   "capitale_rischio_2": 10256.0,
+   "peggiore_rischio_2_pct": -2.15
+  },
+  "limite_entrate_con_ordine": 2
+ },
+ "ritardo": {
+  "prezzi_dichiarati": 3,
+  "toccati_pct": 100.0,
+  "mediana_ore": 0.3,
+  "quartile_ore": 3.8
+ },
+ "avvisi": {
+  "attivi": false,
+  "proposti": [
+   {
+    "tipo": "piano",
+    "creato": "2026-11-26 08:00",
+    "testo": "Aldo · ordine limite suggerito\nETH long a 2.010 · stop 1.960 · obiettivi non indicati\nRischio 1% di 10.000 $ = 2,00 ETH (controvalore 4.020 $, leva 0,4x)\nValido 7 giorni. Su carta: Radar non invia ordini."
+   }
+  ]
+ },
+ "regole": [
+  "Si copiano solo i livelli annunciati prima: ordine limite al livello, non a mercato dopo il messaggio",
+  "Stop: quello dichiarato; se manca, 2% oltre il livello",
+  "Rischio fisso: 1% del capitale per operazione, al massimo leva 10x",
+  "Metà al primo obiettivo, poi stop a pareggio, come fa lui",
+  "Operazioni comunicate solo dopo l'ingresso: non si inseguono",
+  "Un piano non eseguito vale 7 giorni, poi l'ordine si cancella"
+ ],
+ "avvertenza": "Registro ricostruito dai messaggi del canale privato di Aldo, solo per uso personale: non ridistribuire. Su carta: Radar non invia ordini. Nel periodo studiato (05/2023–03/2024) il trader, con i suoi prezzi, aveva il 73% di operazioni in guadagno; chi lo copiava a mercato dopo il messaggio il 44%, chi metteva ordini limite sui livelli annunciati il 58%. Risultati passati, non una raccomandazione.",
+ "stato": "piani",
+ "titolo": "2 livelli da mettere a ordine limite",
+ "testo": "Ultimo: ETH long a 2.010. Ordine limite al livello, stop e rischio 1% indicati sotto."
+}

@@ -158,7 +158,19 @@ Un bot normale non può leggere il canale: Telegram lo permette solo agli ammini
 
 ### Lo strumento ad hoc
 
-In preparazione.
+Pacchetto pronto per radar in `export/radar-aldo/` (prompt da incollare, modulo `aldo.py`, 44 test che passano, anteprime).
+
+| Pezzo | Cosa fa |
+|---|---|
+| Ingresso | Tre modi nello stesso formato: export di Telegram Desktop; post inoltrati al bot di radar (consigliato, nessuna credenziale in più); client automatico Telethon, spento di default |
+| Estrazione | Regole in italiano sempre attive ("short", "chiuso metà", "stop a pareggio", livelli come 27,6k); in più, se c'è la chiave dell'API, un modello (Claude Haiku) che legge anche le schermate. Le sole regole ritrovano circa un terzo degli eventi: molti prezzi sono solo nelle immagini |
+| Ricostruzione | Stesso motore di questo studio, sui prezzi reali di OKX: trader, chi copia a mercato, chi copia con ordini limite. Sullo storico riproduce i numeri dello studio (55 operazioni e 73% per il trader; 43 e 58% con ordini limite) |
+| Dashboard | Sezione "Aldo": livelli da mettere a ordine limite (con quantità a rischio 1%), posizioni aperte, operazioni chiuse, statistiche, nessun testo del canale |
+| Avvisi | Proposti ma spenti finché non approvi il testo: nuovo livello da mettere a limite, metà chiusa, stop a pareggio |
+| Riepilogo | Un file settimanale in markdown, da passare a una sessione di analisi |
+
+Due cautele scritte nel prompt: il canale è privato e a pagamento, quindi i livelli non vanno pubblicati se il sito di radar è
+pubblico; i messaggi e la sessione di Telethon restano fuori dal repository.
 
 ## 5. Cosa farei
 
