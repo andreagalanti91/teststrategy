@@ -743,6 +743,15 @@ async def _ascolta(cfg: Config, servizio: Servizio):
         await client.disconnect()
 
 
+def attesa_dopo_errore(e: Exception, attesa: int) -> tuple[int, int]:
+    """Quanto aspettare dopo un errore e l'attesa successiva: FloodWait = secondi chiesti da Telegram + 5 (l'attesa crescente non
+    cambia); altri errori = attesa crescente 5 s -> 5 min."""
+    secondi = getattr(e, "seconds", None)
+    if type(e).__name__ == "FloodWaitError" and secondi:
+        return int(secondi) + 5, attesa
+    return attesa, min(attesa * 2, 300)
+
+
 def avvia(cfg: Config | None = None):
     """Servizio: riconnessione con attese crescenti (5 s -> 5 min), FloodWait rispettato (attesa indicata da Telegram + 5 s)."""
     import asyncio
@@ -768,14 +777,10 @@ def avvia(cfg: Config | None = None):
             log(str(e))
             time.sleep(600)
         except Exception as e:
-            secondi = getattr(e, "seconds", None)
-            if type(e).__name__ == "FloodWaitError" and secondi:
-                log(f"Telegram chiede di aspettare {secondi} s (FloodWait)")
-                time.sleep(int(secondi) + 5)
-            else:
-                log(f"connessione persa: {type(e).__name__}, riprovo fra {attesa} s")
-                time.sleep(attesa)
-                attesa = min(attesa * 2, 300)
+            secondi, attesa = attesa_dopo_errore(e, attesa)
+            log(f"Telegram chiede di aspettare {secondi} s (FloodWait)" if type(e).__name__ == "FloodWaitError"
+                else f"connessione persa: {type(e).__name__}, riprovo fra {secondi} s")
+            time.sleep(secondi)
 
 
 def accedi(cfg: Config | None = None):

@@ -275,3 +275,16 @@ def test_file_di_deploy():
     guida = (QUI / "deploy" / "ALDOSTREAM.md").read_text(encoding="utf-8")
     for k in ("my.telegram.org", "TELEGRAM_API_ID", "TELEGRAM_API_HASH", "ALDO_CANALE_ID", "ANTHROPIC_API_KEY", "chmod 600", "accedi"):
         assert k in guida
+
+
+def test_attese_dopo_errori():
+    class FloodWaitError(Exception):
+        seconds = 42
+    assert S.attesa_dopo_errore(FloodWaitError(), 5) == (47, 5)
+    assert S.attesa_dopo_errore(ConnectionError(), 5) == (5, 10) and S.attesa_dopo_errore(OSError(), 200) == (200, 300)
+
+
+def test_giro_orario_non_importa_telethon_ne_anthropic():
+    import subprocess
+    codice = "import sys, aldo, aldo_bitget; assert 'telethon' not in sys.modules and 'anthropic' not in sys.modules"
+    assert subprocess.run([sys.executable, "-c", codice], cwd=QUI).returncode == 0

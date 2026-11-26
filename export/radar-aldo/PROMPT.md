@@ -1,122 +1,97 @@
 # Prompt per la sessione Claude Code del repo `radar`
 
-Incolla tutto il testo qui sotto nella sessione di radar e allega i file di questa cartella.
+Incolla tutto il testo qui sotto nella sessione di radar e allega i file di questa cartella (compresa la cartella `deploy/`).
 
 ---
 
-Voglio in Radar uno strumento per seguire **Aldo**, il trader del canale Telegram privato "Aldo Qefalia - Trading" (supergruppo
-privato a pagamento: io sono membro, non amministratore). Deve registrare i suoi messaggi, ricavarne le operazioni, ricostruirle
-sui prezzi veri e mostrarmi nella dashboard **i livelli che annuncia prima, da mettere a ordine limite**, le sue posizioni aperte e
-come sarebbe andato chi lo copiava. Tutto **sulla carta**: Radar non invia ordini.
+Voglio in Radar uno strumento per **copiare Aldo**, il trader del canale Telegram privato "Aldo Qefalia - Trading" (supergruppo
+privato, non a pagamento: io sono membro, non amministratore). Aldo non ha un profilo di copy trading sugli exchange: si copia
+dal canale. Lo strumento legge il canale in tempo reale, capisce cosa fa Aldo e mi manda su Telegram **l'ordine pronto per
+Bitget** (futures USDT-M), che io metto a mano; due pulsanti, «Fatto» e «Salto», registrano cosa ho fatto, così posso confrontare
+la mia copia reale con la copia sulla carta. **Radar non invia ordini.**
 
 ## Da dove viene
 
-L'ho studiato in un altro repo (`teststrategy`, file `TELEGRAM_ALDO.md` e `ALDO_ELIZ_INTRADAY.md`). In breve, sui messaggi dal
-05/2023 al 03/2024:
+L'ho studiato in un altro repo (`teststrategy`, file `TELEGRAM_ALDO.md` e `ALDO_ELIZ_INTRADAY.md`). Sui messaggi dal 05/2023 al
+03/2024: Aldo, con i prezzi delle sue schermate, 55 operazioni, 73% in guadagno, +3,35% medio; chi lo copiava **a mercato dopo il
+messaggio** 44% in guadagno, +1,4%; chi metteva **ordini limite sui livelli annunciati prima** 58%, +2,1%. Il suo stile: livelli
+decisi prima, ordine limite, metà al primo obiettivo, stop a pareggio, BTC e altcoin, leva circa 10x.
 
-- con i prezzi delle sue schermate (autentiche) Aldo ha 55 operazioni, 73% in guadagno, +3,35% medio sul controvalore;
-- chi lo copiava **a mercato dopo il messaggio**: 39 operazioni copiabili, 44% in guadagno, +1,4% medio;
-- chi metteva **ordini limite sui livelli annunciati prima**: 43 operazioni, 58% in guadagno, +2,1% medio. È l'unico modo di
-  copiarlo che conserva una parte del suo vantaggio;
-- il suo stile: livelli decisi prima, ingresso con ordine limite, metà al primo obiettivo, stop a pareggio, BTC e altcoin, leva
-  circa 10x su Bybit.
+Da qui le regole di copia (già decise, non vanno ottimizzate):
+1. **Livello annunciato** → ordine limite al livello, valido 24 ore.
+2. **Ingresso senza livello** → a mercato solo se l'avviso arriva entro 10 minuti dal suo ingresso stimato e con scostamento sotto
+   lo 0,5%; altrimenti avviso informativo "non copiare".
+3. Stop dichiarato o, se manca, 2% oltre il livello (segnalato). Metà al primo obiettivo, poi stop a pareggio.
+4. Dimensione: modalità **"importo"** (predefinita): margine fisso per operazione 500–2.000 € (predefinito 1.000) con leva 5x
+   (tetto 10x), e l'avviso dice quanto si perde allo stop in € e in % dell'importo; oppure modalità **"rischio"**: perdita allo stop
+   pari a RISCHIO_PCT (2%) del capitale. Cambio EUR/USDT configurabile (1,08), indicato come approssimato.
 
 ## Cosa ti allego
 
 | File | A cosa serve |
 |---|---|
-| `aldo.py` | Modulo autonomo (libreria standard + pandas/numpy): ingresso dei messaggi (export, inoltri al bot, Telethon), estrattore a regole e con modello, registro, motore di ricostruzione dello studio, statistiche, avvisi proposti, `build()` per la dashboard, riepilogo settimanale, `giro()` |
-| `prompt_estrattore.md` | Le istruzioni dell'estrattore con modello |
-| `test_aldo.py`, `esempio.py` | 44 test offline; `esempio.py` contiene 12 messaggi inventati e prezzi sintetici |
-| `esempio_sezione.json` | Uscita di `build()`: è lo schema della sezione |
-| `esempio_riepilogo.md` | Il riepilogo settimanale con gli stessi dati |
-| `riferimento_sezione.html`, `anteprima_*.png` | Come immagino la sezione (stato attivo e vuoto, chiaro e scuro). In Radar va rifatta con i componenti e i colori della dashboard |
-| `LEGGIMI.md` | Dettagli: modi d'ingresso, scelta del modello, verifica sullo storico, rischi di Telethon, limiti |
-
-## Cosa deve mostrare la sezione
-
-Una nuova scheda (o card) **"Aldo"**, con l'etichetta "su carta" ben visibile:
-
-1. **Stato** in una riga con etichetta (`PIANI`, `POSIZIONI`, `ATTESA`, `VUOTO`): campi `stato`, `titolo`, `testo`.
-2. **Livelli da mettere a ordine limite** (`piani`): asset, verso, livello, distanza dal prezzo, stop (se manca: 2% oltre il livello,
-   segnalato), obiettivi, quantità con rischio 1% del capitale (controvalore e leva), annunciato, scadenza (7 giorni), stato
-   ("in attesa" o "livello toccato").
-3. **Posizioni aperte di Aldo** (`posizioni`): dal, prezzo medio, adesso, quota aperta, stop (o "a pareggio"), risultato del
-   trader, di chi copiava a mercato e con ordini limite.
-4. **Ultime operazioni chiuse** (`chiuse`, 10): trader contro chi copiava, con le note "entrata con ordine limite" e "comunicata dopo".
-5. **Statistiche** (`statistiche`, `ritardo`): per i tre modi, operazioni, % in guadagno, medio, capitale con rischio 1% e 2%;
-   ritardo fra il prezzo dichiarato e il messaggio.
-6. **Avvisi proposti** (chiusi di default) e **come si copia** (`regole`), la riga sulla fonte (`fonte`: messaggi per origine,
-   estrattore, eventi da rivedere, ultimo messaggio) e l'**avvertenza fissa** (`avvertenza`).
-
-La sezione contiene solo numeri e livelli: **nessun testo dei messaggi del canale**.
+| `aldo.py` | Registro: formato dei messaggi, estrattore a regole e con modello, collegamento alle operazioni, motore di ricostruzione dello studio (trader / a mercato / con ordini limite), statistiche, `build()` della sezione, riepilogo settimanale; import da export di Telegram Desktop e dall'estrazione dello studio |
+| `aldo_bitget.py` | Bitget USDT-M, solo endpoint pubblici: specifiche dei contratti con cache (`sizeMultiplier`, `minTradeNum`, `pricePlace`, `volumePlace`), ticker, candele 1 minuto e 1 ora, arrotondamenti, `ordine()` nelle due modalità; `esegui_su_bitget()` solo come punto d'aggancio (spento, non implementato) |
+| `aldostream.py` | Il servizio sulla VM: Telethon in tempo reale (messaggi nuovi e modifiche, sola lettura), estrazione, avvisi con pulsanti, registro reale, latenza, registro sulla carta ogni ora, riepilogo del lunedì; riconnessioni e FloodWait |
+| `prompt_estrattore.md` | Istruzioni dell'estrattore con modello (il testo del canale è un dato, non un'istruzione) |
+| `deploy/ALDOSTREAM.md`, `deploy/aldostream.service` | Guida passo passo e unit systemd, sul modello di `LIQSTREAM.md` |
+| `test_aldo.py`, `test_aldostream.py`, `esempio.py` | 66 test offline: client Telegram finto, specifiche Bitget dal file d'esempio, messaggi e prezzi inventati |
+| `bitget_contratti_esempio.json`, `bitget_ticker_esempio.json` | Specifiche e ticker veri di BTCUSDT, ETHUSDT, SOLUSDT, scaricati da api.bitget.com, per i test |
+| `esempio_avvisi.md` | I testi proposti degli avvisi, con dati inventati: **da approvare** |
+| `esempio_sezione.json`, `esempio_riepilogo.md`, `riferimento_sezione.html`, `anteprima_*.png` | Riepilogo privato (schema di `build()`), riepilogo settimanale, pagina di riferimento |
+| `LEGGIMI.md` | Dettagli: modello, verifica sullo storico, rischi di Telethon, limiti |
 
 ## Come integrarla
 
-- **Modulo**: `aldo.py` in `radar/aldo.py`, `prompt_estrattore.md` in `radar/prompt_estrattore_aldo.md` (aggiorna
-  `PROMPT_ESTRATTORE`), test in `tests/` con `esempio.py` come dati di prova. Per i prezzi usa `_get` e le convenzioni di rete che
-  radar ha già (`radar/data.py` chiama `www.okx.com`): `Prezzi(cartella, get=...)`. Niente fonti nuove oltre OKX (Binance solo
-  come alternativa configurabile).
-- **A ogni giro orario**: `aldo.giro("data/aldo", chiama_bot=..., chat_autorizzate=[la mia chat])` dentro `_soft`, e l'uscita nel
-  report sotto la chiave `aldo`. Un errore qui non deve fermare il giro né toccare il resto. `giro` salva i file solo se cambiano.
-- **Inoltri al bot** (il modo principale): guarda come radar usa oggi il bot Telegram.
-  - Se il bot solo invia messaggi, scrivi `chiama_bot(metodo, parametri)` con lo stesso token per `getUpdates`; l'offset sta in
-    `data/aldo/eventi.json`.
-  - Se radar legge già gli update (getUpdates o webhook), passa gli update a `da_aggiornamento_bot` dal lettore esistente: mai due
-    lettori sulla stessa coda (con un webhook attivo getUpdates non funziona).
-  - Chat autorizzata: la chat a cui radar manda già gli avvisi. Filtro sull'origine: `RADAR_ALDO_ORIGINI` (predefinito
-    "aldo,qefalia").
-  - Le foto degli inoltri si scaricano (getFile) solo se c'è l'estrattore con modello.
-  - Il bot **non risponde** agli inoltri: una conferma ("salvato") sarebbe un messaggio nuovo. Se pensi serva, proponimi il testo.
-  - Il token non deve comparire in log o messaggi d'errore (attenzione alle URL con il token dentro).
-- **Estrattore con modello**: attivo solo se nell'ambiente di radar c'è `ANTHROPIC_API_KEY` (segreto della macchina o del
-  servizio, mai nel repo). Modello `claude-haiku-5-5`, modificabile con `RADAR_ALDO_MODELLO`; al massimo 50 messaggi per giro.
-  `anthropic` è una dipendenza opzionale: importata solo se serve.
-- **Telethon**: opzionale, spento (`RADAR_ALDO_TELETHON=1` per accenderlo, con `RADAR_ALDO_TG_API_ID`, `RADAR_ALDO_TG_API_HASH`,
-  `RADAR_ALDO_TG_SESSIONE`, `RADAR_ALDO_TG_CANALE`). La sessione si crea una volta a mano con `python -m radar.aldo accedi` e resta
-  fuori dal repo. `telethon` non va nei requisiti obbligatori. Non accenderlo tu: leggi i rischi in `LEGGIMI.md`.
-- **Storico**: due strade, da propormi.
-  - `importa_studio(...)` con i file `telegram/estrazione/eventi_*.json` e `piani_*.json` di teststrategy più l'export
-    `result.json`: li copio io sulla macchina di radar (contengono testi del canale: **non nel repo**). Con questi il modulo
-    riproduce i numeri dello studio (vedi `LEGGIMI.md`).
-  - `python -m radar.aldo importa result.json`: con le sole regole lo storico viene ricostruito male (61 eventi su 174), serve il modello.
-- **File di stato**: in `data/aldo/` vanno `messaggi.json`, `eventi.json`, `operazioni.json`, `foto/`, `prezzi/`, `riepilogo_*.md`.
-  `messaggi.json`, `eventi.json` (contiene estratti di 120 caratteri), `foto/` e i riepiloghi sono **contenuti privati**: fuori dal
-  repo (`.gitignore`) e fuori da quello che si pubblica. Se radar salva lo stato facendo commit di `data/`, fermati e chiedimi come
-  tenerli fuori.
-- **Pubblicazione**: se il sito di radar è pubblico, la sezione mostrerebbe a chiunque i livelli di un canale a pagamento. Prima del
-  deploy verifica se il sito è pubblico: in quel caso non pubblicare la sezione (pagina protetta, oppure visibile solo in locale) e
-  chiedimi come procedere.
-- **Capitale**: `RADAR_ALDO_CAPITALE` (se manca, 10.000 $ indicati come "d'esempio").
-- **Riepilogo settimanale**: al primo giro del lunedì, `riepilogo_settimanale` della settimana appena finita in
-  `data/aldo/riepilogo_AAAA-MM-GG.md`. Nessun invio: lo passo io a una sessione di analisi.
-- **Avvisi Telegram**: il modulo prepara i testi (ordine limite suggerito con quantità al rischio 1%, chiusura parziale, stop a
-  pareggio) ma `avvisi_da_inviare` resta vuoto finché `RADAR_ALDO_AVVISI` non vale 1. **Fammi vedere i testi prima di attivarli.**
-  Messaggi più vecchi di 6 ore non generano avvisi.
+- **Moduli**: `radar/aldo.py`, `radar/aldo_bitget.py`, `radar/aldostream.py`, `radar/prompt_estrattore_aldo.md` (aggiorna
+  `PROMPT_ESTRATTORE`). Gli import diretti (`import aldo as A`, `from aldo_bitget import …`) diventano relativi: sono segnati con
+  un commento `# in radar: …`. Test in `tests/` con `esempio.py` e i due file JSON di Bitget come dati di prova.
+- **Deploy**: `deploy/ALDOSTREAM.md` e `deploy/aldostream.service` nel repo. Il servizio gira sulla stessa VM di `liqstream`,
+  con `/etc/aldostream.env` (permessi 600). Dipendenze del solo servizio (`telethon`, e `anthropic` se si usa il modello) in un file
+  a parte (es. `requirements-aldostream.txt`): il giro orario su GitHub non deve installarle.
+- **Dati**: testi, foto, registro, avvisi, latenze stanno solo sulla VM in `ALDO_DATI` (`~/aldo-dati`), fuori dal repo; la sessione
+  Telethon in `~/.aldostream/` con permessi 600. Il servizio **non fa commit né push**. Aggiungi comunque a `.gitignore`
+  `*.session`, `aldo-dati/` e `data/aldo/` come protezione.
+- **Bot**: `radar/journal.py` legge già il bot di radar con getUpdates ogni ora. I pulsanti richiedono che il servizio legga gli
+  aggiornamenti del bot: due lettori sulla stessa coda si rubano i messaggi. Quindi **bot dedicato** (`ALDO_BOT_TOKEN`, creato con
+  BotFather, stessa chat `TELEGRAM_CHAT_ID`); senza bot dedicato gli avvisi partono dal bot di radar ma senza pulsanti. Non
+  modificare `journal.py` senza chiedermelo.
+- **Dashboard**: la sezione "Aldo" è **spenta di default** (`ALDO_SEZIONE_PUBBLICA=0`): restano gli avvisi privati su Telegram e il
+  riepilogo privato sulla VM (`sezione.json`, `riepilogo_*.md`, sintesi del lunedì nella chat del bot). Se in futuro la accendo,
+  la sezione non contiene testi dei messaggi, e i suoi dati (solo `sezione.json`) dovrebbero arrivare dalla VM come fa liqstream:
+  non implementarlo ora, proponimelo se serve. Se il sito di radar è pubblico, la sezione resta spenta in ogni caso.
+- **Estrattore con modello**: solo se c'è `ANTHROPIC_API_KEY` in `/etc/aldostream.env`. Modello `claude-haiku-5-5`
+  (`RADAR_ALDO_MODELLO` per cambiarlo). Se il modello non risponde o sbaglia formato, restano le regole.
+- **Storico**: per partire con il registro già pieno, `importa_studio(...)` con i file `telegram/estrazione/eventi_*.json` e
+  `piani_*.json` di teststrategy più l'export `result.json`: li copio io sulla VM in `ALDO_DATI` (contengono testi del canale:
+  **mai nel repo**). Con questi il motore riproduce i numeri dello studio (vedi `LEGGIMI.md`).
+- **Avvisi**: `ALDO_AVVISI=0` all'inizio: gli avvisi vengono composti, misurati e salvati in `avvisi.json` ma non inviati. **Fammi
+  vedere i testi** (`esempio_avvisi.md` e quelli veri dei primi giorni) prima di passare a `ALDO_AVVISI=1`. Nessuna ora silenziosa
+  di default (avvisi anche di notte).
 
 ## Vincoli
 
-- Segui le regole del progetto: skill gengar, file `stato/STATO-aldo.md`, test, suite verde, render a 400 e 1280 px, deploy e
-  verifica (con il limite sulla pubblicazione scritto sopra).
+- Segui le regole del progetto: skill gengar, file `stato/STATO-aldo.md`, test, suite verde, render a 400 e 1280 px della pagina di
+  riferimento se tocchi la dashboard, deploy (qui: la VM, seguendo `deploy/ALDOSTREAM.md`) e verifica.
 - **W3.2 non si tocca**: nessuna modifica a `radar/weekly.py`, ai segnali, agli stop o al capitale.
 - **Nessun avviso Telegram nuovo senza la mia approvazione** dei testi.
-- **Nessuna credenziale nel repo**: né chiavi Anthropic, né `api_id`/`api_hash`, né file di sessione Telethon, né token del bot.
-- **Nessun ordine, nessuna chiave di borsa**: solo prezzi pubblici.
-- Le regole di copia (solo livelli annunciati prima, stop dichiarato o 2%, rischio 1%, piano valido 7 giorni) non si ottimizzano:
-  se trovi un motivo per cambiarle, dimmelo prima.
-- Testi sobri: deve essere chiaro che è un registro su carta, ricostruito, per uso personale, e che chi copiava a mercato faceva
-  molto peggio del trader.
-- Tema chiaro e scuro; dal telefono nessuno scorrimento orizzontale della pagina (le tabelle scorrono nel loro riquadro).
+- **Nessuna credenziale nel repo**: né `TELEGRAM_API_ID`/`TELEGRAM_API_HASH`, né file di sessione, né token dei bot, né chiave
+  Anthropic. Niente nei log: il servizio scrive solo id dei messaggi, tipi di evento e latenze.
+- **Sola lettura del canale**: nessun messaggio nel canale, nessuna reazione, nessuna azione dell'account oltre alla lettura.
+- **Nessun ordine automatico**: `esegui_su_bitget` resta uno stub; il pulsante «Esegui su Bitget» resta spento.
+- Le regole di copia e i limiti (importo 500–2.000 €, leva massima 10x, 10 minuti, 0,5%, 24 ore) non si ottimizzano: se trovi un
+  motivo per cambiarli, dimmelo prima.
+- Testi sobri: canale privato, uso personale; chi copiava a mercato faceva molto peggio del trader.
 
 ## Come capisco che è fatto
 
-1. `python -m pytest` verde, con i 44 test di `test_aldo.py` adattati al modulo in `radar/` (estrattore a regole, ingresso dal bot
-   e dall'export, ricostruzione nei tre modi, dimensione al rischio 1%, `build()` in tutti gli stati, avvisi spenti, estrattore con
-   modello finto, giro offline).
-2. Un test che dimostra che un errore di rete (bot, OKX, modello) non ferma il giro di radar.
-3. Screenshot della sezione a 400 e 1280 px, tema chiaro e scuro, nello stato "vuoto" e con i miei primi messaggi inoltrati.
-4. La prova dell'inoltro: inoltro due o tre post di Aldo al bot e al giro dopo li vedo in `data/aldo/messaggi.json` con la data
-   originale, e nella sezione.
-5. `.gitignore` aggiornato e conferma che nessun file privato di `data/aldo/` è nel repo o nel sito pubblicato.
-6. I testi proposti per gli avvisi, in attesa del mio via libera.
-7. Un riepilogo finale: cosa hai cambiato rispetto ad `aldo.py`, come legge gli update del bot, dove sta la sezione, cosa resta spento.
+1. `python -m pytest` verde, con i 66 test del pacchetto adattati (estrattore, Bitget con il file d'esempio, ordine nelle due
+   modalità, avvisi in tempo reale con client finto, pulsanti, regola a mercato, modifiche, ore silenziose, FloodWait/rete che non
+   fermano il servizio, riepilogo del lunedì).
+2. Un test che dimostra che il giro orario di radar non importa né `telethon` né `anthropic`.
+3. Sulla VM: `python -m radar.aldostream prova` mostra canale, specifiche Bitget e bot; il servizio è attivo con systemd e al primo
+   messaggio di Aldo il log riporta eventi, avvisi e latenza in secondi.
+4. I testi degli avvisi dei primi giorni (da `avvisi.json`), in attesa del mio via libera.
+5. Conferma che nel repo e nel sito non c'è nessun file di `ALDO_DATI` né la sessione.
+6. Un riepilogo finale: cosa hai cambiato rispetto al pacchetto, dove stanno i file, cosa resta spento (sezione pubblica, invio
+   avvisi fino all'approvazione, esecuzione su Bitget).
