@@ -4,6 +4,7 @@ Confronto di strategie di trading con backtest dal 01/01/2021, a partire dall'an
 [`andreagalanti91/radar`](https://github.com/andreagalanti91/radar).
 
 - **[`STRATEGIE.md`](STRATEGIE.md)** — confronto di 16 strategie e 4 portafogli dal 2021, robustezza, proposta e domande aperte.
+- **[`ALDO_OPERAZIONI.md`](ALDO_OPERAZIONI.md)** — le 55 operazioni di Aldo una per una (sue, copia con limite, copia a mercato) ed esempio con 10.000 € e 500–1.000 € a operazione.
 - **[`CONFRONTO_FINALE.md`](CONFRONTO_FINALE.md)** — W3.2, strategia AE e copytrading di Aldo nel periodo del canale: percentuali mese per mese e se è perseguibile.
 - **[`STRATEGIE_ESTESE.md`](STRATEGIE_ESTESE.md)** — W3.2 estesa a ETH, SOL, TAO, INJ, DOGE; strategia AE (Aldo + Eliz, swing); come seguire Aldo e strumento per radar.
 - **[`ALDO_ELIZ_INTRADAY.md`](ALDO_ELIZ_INTRADAY.md)** — seconda analisi del canale (schermate autentiche, copia con ordini limite), strategia di Aldo come regole, strategia intraday Aldo + Eliz su BTC, ETH, SOL, TAO.
