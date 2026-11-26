@@ -63,8 +63,8 @@ def rebuild(e: pd.DataFrame) -> pd.DataFrame:
         avg, stop0, notes, t_open, t_close, fonte = None, None, [], None, None, set()
         for r in g.itertuples():
             tipo = r.tipo
-            if tipo in ("ordine_non_eseguito",):
-                continue
+            if tipo in ("ordine_non_eseguito", "ordine_limite", "stop_pareggio", "stop_spostato"):
+                continue                                                    # ordini e spostamenti di stop non muovono la posizione
             p = r.prezzo if isinstance(r.prezzo, (int, float)) and r.prezzo and np.isfinite(r.prezzo) else None
             src = "trader" if p else "mercato"
             if tipo in ("stop_preso",) and p is None and avg:
@@ -76,7 +76,7 @@ def rebuild(e: pd.DataFrame) -> pd.DataFrame:
                 continue
             fonte.add(src)
             q = r.quota if isinstance(r.quota, (int, float)) and r.quota == r.quota else None
-            if tipo in ("apertura", "aumento", "ordine_limite"):
+            if tipo in ("apertura", "aumento"):
                 add = q if q else (1.0 - size if tipo == "aumento" and size < 1 else (1.0 if size == 0 else 0.0))
                 if tipo == "aumento" and q and size + q > 1.0001 and q <= 1:
                     add = max(0.0, q - size) if q > size else q            # "full position" = porta a 1
@@ -106,7 +106,7 @@ def rebuild(e: pd.DataFrame) -> pd.DataFrame:
                 size -= out
                 cost_basis = avg * size
                 t_close = r.utc
-            if size <= 1e-9 and t_open is not None and tipo not in ("apertura", "aumento", "ordine_limite"):
+            if size <= 1e-9 and t_open is not None and tipo not in ("apertura", "aumento"):
                 size = 0.0
         aperta = size > 1e-9
         if aperta:
