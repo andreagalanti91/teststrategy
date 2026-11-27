@@ -1,2 +1,3 @@
 data_post_utc,visto_alle,asset,verso,tipo,livello,stop,obiettivi,copiabile,azione_consigliata,margine_eur,leva,fatto,prezzo_tuo,esito_pct,note
 2026-11-26,2026-11-26,BTC,long,piano (video),59000-58000 DCA,57300 (sotto),64000;68000,sì,limite 50% a 59000 e 50% a 58000; stop 57100; metà a 64000 e stop a pareggio; resto a 68000,1000,5,,,,BTC 60490 al momento; minimo recente 57300 (24/11); da confermare: stop a tocco o in chiusura
+2026-11-27 14:54,2026-11-27 14:57,BTC,long,aggiornamento (non entrato),VAL ~59000,57300,62270;68215,sì (piano),mantenere limiti 59000/58000 e stop 57100; cancellare se annulla il piano,1000,5,,,,rifiuto a 62k; candela 1h -3.9% alle 14 UTC; minimo 59024 (ordine a 59000 non ancora eseguito); Aldo non esposto; realized price 53833
